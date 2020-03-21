@@ -1,0 +1,21 @@
+name: BookShelf
+author: loohp
+version: 2.1.1b
+main: com.loohp.bookshelf.Bookshelf
+api-version: 1.13
+description: Actual BookShelf in Minecraft
+softdepend: [LWC, WorldGuard, GriefPrevention]
+prefix: BookShelf
+
+commands:
+  bookshelf:
+    usage: /<command>
+    description: Allows you to reload the plugin
+
+permissions:
+  bookshelf.use:
+    description: Allow players to use a bookshelf
+    default: true
+  bookshelf.reload:
+    description: Allows you to reload the plugin
+    default: op
