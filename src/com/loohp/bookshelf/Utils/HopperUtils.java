@@ -90,7 +90,7 @@ public class HopperUtils {
 				}
 				long end = System.currentTimeMillis();
 				if ((end - start) > 500) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Hopper Minecart Item Move Function took more than 500ms! (" + (System.currentTimeMillis() - start) + "ms)");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Hopper Minecart Item Move Function took more than 500ms! (" + (end - start) + "ms)");
 				}
 			}
 		}.runTaskTimer(Bookshelf.plugin, 0, 1).getTaskId();
@@ -227,8 +227,9 @@ public class HopperUtils {
 					}
 				}
 				long end = System.currentTimeMillis();
+				//Bukkit.getConsoleSender().sendMessage("(" + (end - start) + "ms)");
 				if ((end - start) > 500) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Hopper Item Move Function took more than 500ms! (" + (System.currentTimeMillis() - start) + "ms)");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Hopper Item Move Function took more than 500ms! (" + (end - start) + "ms)");
 				}
 			}
 		}.runTaskTimer(Bookshelf.plugin, 0, Bookshelf.HopperTicksPerTransfer).getTaskId();
