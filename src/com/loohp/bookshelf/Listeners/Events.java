@@ -94,7 +94,7 @@ public class Events implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onDropper(BlockDispenseEvent event) {
-		if (Bookshelf.EnableHopperDropperSupport == false) {
+		if (Bookshelf.EnableDropperSupport == false) {
 			return;
 		}
 		if (event.isCancelled() == true) {
