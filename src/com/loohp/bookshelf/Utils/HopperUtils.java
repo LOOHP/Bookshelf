@@ -1,7 +1,6 @@
 package com.loohp.bookshelf.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -25,25 +24,10 @@ import com.loohp.bookshelf.Bookshelf;
 
 public class HopperUtils {
 	
-	private static HashMap<World, Long> PerWorldHopperTransferCurrentTick = new HashMap<World, Long>();
-	private static HashMap<World, Long> PerWorldHopperTransferSpeed = new HashMap<World, Long>();
-	private static HashMap<World, Long> PerWorldHopperTransferAmount = new HashMap<World, Long>();
-	
 	public static void hopperMinecartCheck() {
-		for (World world : Bukkit.getWorlds()) {
-			if (Bukkit.spigot().getConfig().contains("world-settings." + world.getName() + ".ticks-per.hopper-transfer")) {
-				long rate = Bukkit.spigot().getConfig().getLong("world-settings." + world.getName() + ".ticks-per.hopper-transfer");
-				PerWorldHopperTransferSpeed.put(world, rate);
-			}
-			if (Bukkit.spigot().getConfig().contains("world-settings." + world.getName() + ".hopper-amount")) {
-				long amount = Bukkit.spigot().getConfig().getLong("world-settings." + world.getName() + ".hopper-amount");
-				PerWorldHopperTransferAmount.put(world, amount);
-			}
-		}
 		Bookshelf.HopperMinecartTaskID = new BukkitRunnable() {
 			public void run() {
 				long start = System.currentTimeMillis();
-				long startNano = System.nanoTime();
 				for (World world : Bukkit.getWorlds()) {
 					for (Entity entity : world.getEntities()) {
 						if (entity.getType().equals(EntityType.MINECART_HOPPER)) {
@@ -54,38 +38,36 @@ public class HopperUtils {
 							if (hoppercart.getLocation().getBlock().getRelative(BlockFace.UP) == null) {
 								continue;
 							}
-							Block bookshelfBlock = hoppercart.getLocation().getBlock().getRelative(BlockFace.UP);
-							if (!bookshelfBlock.getType().equals(Material.BOOKSHELF)) {
+							if (!hoppercart.getLocation().getBlock().getRelative(BlockFace.UP).getType().equals(Material.BOOKSHELF)) {
 								continue;
-							}							
-							String key = BookshelfUtils.locKey(bookshelfBlock.getLocation());
+							}
+							if (Bookshelf.BlockLockerHook == true) {
+								if (BlockLockerUtils.isLocked(hoppercart.getLocation().getBlock().getRelative(BlockFace.UP)) == true) {
+									continue;
+								}
+							}
+							String key = BookshelfUtils.locKey(hoppercart.getLocation().getBlock().getRelative(BlockFace.UP).getLocation());
 							if (!Bookshelf.bookshelfContent.containsKey(key)) {
 								continue;
-							}			
-							
+							}							
+							if (Bookshelf.LWCHook == true) {
+								if (LWCUtils.checkHopperFlagOut(hoppercart.getLocation().getBlock().getRelative(BlockFace.UP)) == false) {
+									continue;
+								}
+							}
+							if (Bookshelf.LWCHook == true) {
+								if (LWCUtils.checkHopperFlagIn(hoppercart) == false) {
+									continue;
+								}
+							}
 							Inventory inventory = hoppercart.getInventory();
 							Inventory bookshelfInv = Bookshelf.bookshelfContent.get(key);			           
-				            for (int i = 0; i < bookshelfInv.getSize(); i++) {
+				            for (int i = 0; i < bookshelfInv.getSize(); i = i + 1) {
 				            	ItemStack item = bookshelfInv.getItem(i);
 				            	if (item == null) {
 				            		continue;
 				            	}
 				            	if (InventoryUtils.hasAvaliableSlot(inventory, item.getType())) {
-				            		
-				            		if (Bookshelf.BlockLockerHook == true) {
-										if (BlockLockerUtils.isLocked(bookshelfBlock) == true) {
-											break;
-										}
-									}
-									if (Bookshelf.LWCHook == true) {
-										if (LWCUtils.checkHopperFlagOut(bookshelfBlock) == false) {
-											break;
-										}
-										if (LWCUtils.checkHopperFlagIn(hoppercart) == false) {
-											break;
-										}
-									}
-									
 					            	ItemStack additem = item.clone();
 					            	additem.setAmount(1);
 					            	ItemStack beforeEvent = additem.clone();
@@ -107,8 +89,6 @@ public class HopperUtils {
 					}
 				}
 				long end = System.currentTimeMillis();
-				long endNano = System.nanoTime();
-				Bookshelf.lastHoppercartTime = endNano - startNano;
 				if ((end - start) > 500) {
 					Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Hopper Minecart Item Move Function took more than 500ms! (" + (end - start) + "ms)");
 				}
@@ -120,91 +100,86 @@ public class HopperUtils {
 		Bookshelf.HopperTaskID = new BukkitRunnable() {
 			public void run() {	
 				long start = System.currentTimeMillis();
-				long startNano = System.nanoTime();
-				HashMap<World, Long> perform = new HashMap<World, Long>();
-				for (World world : Bukkit.getWorlds()) {
-					long currentTick = 0;
-					if (PerWorldHopperTransferCurrentTick.containsKey(world)) {
-						currentTick = PerWorldHopperTransferCurrentTick.get(world);
-					}
-					long rate = Bookshelf.HopperTicksPerTransfer;
-					if (PerWorldHopperTransferSpeed.containsKey(world)) {
-						rate = PerWorldHopperTransferSpeed.get(world);
-					}
-					currentTick++;
-					if (currentTick > rate) {
-						currentTick = 1;
-					}
-					PerWorldHopperTransferCurrentTick.put(world, currentTick);
-					if (currentTick == 1) {
-						long amount = Bookshelf.HopperAmount;
-						if (PerWorldHopperTransferAmount.containsKey(world)) {
-							amount = PerWorldHopperTransferAmount.get(world);
-						}
-						perform.put(world, amount);
-					}
-				}
 				for (Entry<String, Inventory> entry : Bookshelf.bookshelfContent.entrySet()) {
 					Location loc = BookshelfUtils.keyLoc(entry.getKey());	
-					if (!perform.containsKey(loc.getWorld())) {
-						continue;
-					}
-					long amount = perform.get(loc.getWorld());
-					Block blockBelow = loc.getBlock().getRelative(BlockFace.DOWN);
 					if (!loc.getBlock().getType().equals(Material.BOOKSHELF)) {
 						continue;
 					}
-					if (blockBelow != null) {
-						if (blockBelow.getType().equals(Material.HOPPER)) {
-							if (!blockBelow.isBlockPowered() && !blockBelow.isBlockIndirectlyPowered()) {
-								org.bukkit.block.Hopper h = (org.bukkit.block.Hopper) blockBelow.getState();
-								Inventory inventory = h.getInventory();
-								Inventory bookshelfInv = entry.getValue();			           
-					            for (int i = 0; i < bookshelfInv.getSize(); i++) {
-					            	ItemStack item = bookshelfInv.getItem(i);
-					            	if (item == null) {
-					            		continue;
-					            	}
-					            	if (InventoryUtils.hasAvaliableSlot(inventory, item.getType())) {
-					            		if (isAllow(loc.getBlock())) {
-						            		ItemStack additem = item.clone();
-						            		int num = item.getAmount();
-						            		if (num > amount) {
-						            			num = (int) amount;
-						            		}
-							            	additem.setAmount(num);
-							            	ItemStack beforeEvent = additem.clone();
-							            	InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
-						            		if (event.isCancelled()) {
-						            			break;
-						            		}
-						            		additem = event.getItem();
-						            		if (beforeEvent.equals(additem)) {
-								            	item.setAmount(item.getAmount() - num);
-								            	bookshelfInv.setItem(i, item);		
-						            		}         		
-							            	inventory.addItem(additem);
-							            	Bookshelf.bookshelfSavePending.add(entry.getKey());
-							            	break;
-					            		} else {
-					            			break;
-					            		}
-					            	}
-					            }
-							}
+					if (Bookshelf.BlockLockerHook == true) {
+						if (BlockLockerUtils.canRedstone(loc.getBlock()) == false) {
+							continue;
 						}
 					}
-					
-					Block bookshelfBlock = loc.getBlock();
-					List<Block> hoppers = getHoppersIn(bookshelfBlock, BlockFace.UP, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);					
+					if (loc.getBlock().getRelative(BlockFace.DOWN) == null) {
+						continue;
+					}
+					if (Bookshelf.LWCHook == true) {
+						if (LWCUtils.checkHopperFlagOut(loc.getBlock()) == false) {
+							continue;
+						}
+					}
+					if (Bookshelf.LWCHook == true) {
+						if (LWCUtils.checkHopperFlagIn(loc.getBlock().getRelative(BlockFace.DOWN)) == false) {
+							continue;
+						}
+					}
+					if (loc.getBlock().getRelative(BlockFace.DOWN).isBlockPowered() || loc.getBlock().getRelative(BlockFace.DOWN).isBlockIndirectlyPowered()) {
+						continue;
+					}
+					if (loc.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.HOPPER)) {
+						org.bukkit.block.Hopper h = (org.bukkit.block.Hopper) loc.getBlock().getRelative(BlockFace.DOWN).getState();
+						Inventory inventory = h.getInventory();
+						Inventory bookshelfInv = entry.getValue();			           
+			            for (int i = 0; i < bookshelfInv.getSize(); i = i + 1) {
+			            	ItemStack item = bookshelfInv.getItem(i);
+			            	if (item == null) {
+			            		continue;
+			            	}
+			            	if (InventoryUtils.hasAvaliableSlot(inventory, item.getType())) {
+			            		ItemStack additem = item.clone();
+				            	additem.setAmount(1);
+				            	ItemStack beforeEvent = additem.clone();
+				            	InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
+			            		if (event.isCancelled()) {
+			            			break;
+			            		}
+			            		additem = event.getItem();
+			            		if (beforeEvent.equals(additem)) {
+					            	item.setAmount(item.getAmount() - 1);
+					            	bookshelfInv.setItem(i, item);		
+			            		}         		
+				            	inventory.addItem(additem);
+				            	Bookshelf.bookshelfSavePending.add(entry.getKey());
+				            	break;
+			            	}
+			            }
+					}
+				}
+				
+				for (Entry<String, Inventory> entry : Bookshelf.bookshelfContent.entrySet()) {
+					Location loc = BookshelfUtils.keyLoc(entry.getKey());		
+					if (Bookshelf.BlockLockerHook == true) {
+						if (BlockLockerUtils.canRedstone(loc.getBlock()) == false) {
+							continue;
+						}
+					}
+					List<Block> hoppers = getHoppersIn(loc.getBlock(), BlockFace.UP, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);					
 					for (Block hopper : hoppers) {				
 						if (hopper.isBlockPowered() || hopper.isBlockIndirectlyPowered()) {
 							continue;
 						}
+						if (Bookshelf.LWCHook == true) {
+							if (LWCUtils.checkHopperFlagOut(hopper) == false) {
+								continue;
+							}
+							if (LWCUtils.checkHopperFlagIn(loc.getBlock()) == false) {
+								continue;
+							}
+						}
 						org.bukkit.block.Hopper h = (org.bukkit.block.Hopper) hopper.getState();
 			            Inventory inventory = h.getInventory();
 			            Inventory bookshelfInv = entry.getValue();
-			            for (int i = 0; i < inventory.getSize(); i++) {
+			            for (int i = 0; i < inventory.getSize(); i = i + 1) {
 			            	ItemStack item = inventory.getItem(i);
 			            	if (item == null) {
 			            		continue;
@@ -212,33 +187,16 @@ public class HopperUtils {
 			            	if (Bookshelf.UseWhitelist == true) {
 				            	if (Bookshelf.Whitelist.contains(item.getType().toString().toUpperCase())) {
 				            		if (InventoryUtils.hasAvaliableSlot(bookshelfInv, item.getType())) {
-				            			if (Bookshelf.LWCHook == true) {
-											if (LWCUtils.checkHopperFlagOut(hopper) == false) {
-												break;
-											}
-											if (LWCUtils.checkHopperFlagIn(bookshelfBlock) == false) {
-												break;
-											}
-										}
-				            			if (Bookshelf.BlockLockerHook == true) {
-				    						if (BlockLockerUtils.canRedstone(bookshelfBlock) == false) {
-				    							break;
-				    						}
-				    					}
 				            			ItemStack additem = item.clone();
-				            			int num = item.getAmount();
-					            		if (num > amount) {
-					            			num = (int) amount;
-					            		}
-						            	additem.setAmount(num);
+						            	additem.setAmount(1);
 						            	ItemStack beforeEvent = additem.clone();
-						            	InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, inventory, false);
+						            	InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
 					            		if (event.isCancelled()) {
 					            			break;
 					            		}
 					            		additem = event.getItem();
 					            		if (beforeEvent.equals(additem)) {
-							            	item.setAmount(item.getAmount() - num);
+							            	item.setAmount(item.getAmount() - 1);
 							            	inventory.setItem(i, item);		
 					            		}           
 					            		bookshelfInv.addItem(additem);
@@ -248,33 +206,16 @@ public class HopperUtils {
 				            	}
 			            	} else {
 			            		if (InventoryUtils.hasAvaliableSlot(bookshelfInv, item.getType())) {
-			            			if (Bookshelf.LWCHook == true) {
-										if (LWCUtils.checkHopperFlagOut(hopper) == false) {
-											break;
-										}
-										if (LWCUtils.checkHopperFlagIn(bookshelfBlock) == false) {
-											break;
-										}
-									}
-			            			if (Bookshelf.BlockLockerHook == true) {
-			    						if (BlockLockerUtils.canRedstone(bookshelfBlock) == false) {
-			    							break;
-			    						}
-			    					}
 			            			ItemStack additem = item.clone();
-			            			int num = item.getAmount();
-				            		if (num > amount) {
-				            			num = (int) amount;
-				            		}
-					            	additem.setAmount(num);
+					            	additem.setAmount(1);
 					            	ItemStack beforeEvent = additem.clone();
-					            	InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, inventory, false);
+					            	InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
 				            		if (event.isCancelled()) {
 				            			break;
 				            		}
 				            		additem = event.getItem();
 				            		if (beforeEvent.equals(additem)) {
-						            	item.setAmount(item.getAmount() - num);
+						            	item.setAmount(item.getAmount() - 1);
 						            	inventory.setItem(i, item);		
 				            		}                    
 				            		bookshelfInv.addItem(additem);
@@ -286,14 +227,12 @@ public class HopperUtils {
 					}
 				}
 				long end = System.currentTimeMillis();
-				long endNano = System.nanoTime();
-				//Bukkit.getConsoleSender().sendMessage("(" + (endNano - startNano) + "ns) / (" + (end - start) + "ms)");
-				Bookshelf.lastHopperTime = endNano - startNano;
+				//Bukkit.getConsoleSender().sendMessage("(" + (end - start) + "ms)");
 				if ((end - start) > 500) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Hopper Block Item Move Function took more than 500ms! (" + (end - start) + "ms)");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Hopper Item Move Function took more than 500ms! (" + (end - start) + "ms)");
 				}
 			}
-		}.runTaskTimer(Bookshelf.plugin, 0, 1).getTaskId();
+		}.runTaskTimer(Bookshelf.plugin, 0, Bookshelf.HopperTicksPerTransfer).getTaskId();
 	}
 	
     @SuppressWarnings("deprecation")
@@ -308,7 +247,6 @@ public class HopperUtils {
 	                }
 	            }
 	        }
-	        return hoppers;
         } else {
         	for (BlockFace face : faces) {
         		if (!block.getRelative(face).getType().equals(Material.HOPPER)) {
@@ -357,23 +295,6 @@ public class HopperUtils {
 	        }
         }
         return hoppers;
-    }
-    
-    public static boolean isAllow(Block block) {
-    	if (Bookshelf.BlockLockerHook == true) {
-			if (BlockLockerUtils.canRedstone(block) == false) {
-				return false;
-			}
-		}
-		if (Bookshelf.LWCHook == true) {
-			if (LWCUtils.checkHopperFlagOut(block) == false) {
-				return false;
-			}
-			if (LWCUtils.checkHopperFlagIn(block.getRelative(BlockFace.DOWN)) == false) {
-				return false;
-			}
-		}
-		return true;
     }
     
 }
