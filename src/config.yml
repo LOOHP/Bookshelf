@@ -22,5 +22,11 @@ Options:
   #Play particles or not when open
   ParticlesWhenOpened: true
 
-  #Whether to allow bookshelves to work with droppers and hoppers
-  EnableHopperDropperSupport: false
+  #Whether to allow bookshelves to work with hoppers
+  EnableHopperSupport: false
+
+  #Whether to allow bookshelves to work with droppers
+  EnableDropperSupport: false
+
+  #Enable update notifications for admins
+  Updater: true

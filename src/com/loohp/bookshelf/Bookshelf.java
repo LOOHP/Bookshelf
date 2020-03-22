@@ -2,12 +2,11 @@ package com.loohp.bookshelf;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
@@ -36,6 +35,7 @@ import com.loohp.bookshelf.Utils.BookshelfUtils;
 import com.loohp.bookshelf.Utils.HopperUtils;
 import com.loohp.bookshelf.Utils.LegacyConfigConverter;
 import com.loohp.bookshelf.Utils.ParticlesUtils;
+import com.loohp.bookshelf.Utils.Updater;
 
 public class Bookshelf extends JavaPlugin {
 	
@@ -51,18 +51,19 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean GPHook = false;
 	public static boolean BlockLockerHook = false;
 	
-	public static boolean EnableHopperDropperSupport = true;
+	public static boolean EnableHopperSupport = true;
+	public static boolean EnableDropperSupport = true;
 	public static int HopperTaskID = -1;
 	public static int HopperMinecartTaskID = -1;
 	public static long HopperTicksPerTransfer = 8;
 	public static long HopperAmount = 1;
 	
-	public static Map<String, Inventory> bookshelfContent = new HashMap<String, Inventory>();
+	public static ConcurrentHashMap<String, Inventory> bookshelfContent = new ConcurrentHashMap<String, Inventory>();
 	public static List<String> bookshelfSavePending = new ArrayList<String>();
 	
-	public static Map<Player, BlockFace> lastBlockFace = new HashMap<Player, BlockFace>();
+	public static ConcurrentHashMap<Player, BlockFace> lastBlockFace = new ConcurrentHashMap<Player, BlockFace>();
 	
-	public static Map<Player, String> requestOpen = new HashMap<Player, String>();
+	public static ConcurrentHashMap<Player, String> requestOpen = new ConcurrentHashMap<Player, String>();
 	
 	public static long BookShelfRows = 2;
 	public static boolean UseWhitelist = true;
@@ -71,16 +72,24 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean particlesEnabled = true;
 	
 	public static String NoPermissionToReloadMessage = "&cYou do not have permission use this command!";
+	public static String NoPermissionToUpdateMessage = "&cYou do not have permission use this command!";
 	
 	public static List<Player> cancelOpen = new ArrayList<Player>();
 	public static List<Player> isDonationView = new ArrayList<Player>();
 	
 	public static List<String> isEmittingParticle = new ArrayList<String>();
 	
-	public static Map<Long, Location> tempRedstone = new HashMap<Long, Location>();
+	public static ConcurrentHashMap<Long, Location> tempRedstone = new ConcurrentHashMap<Long, Location>();
 
 	private static long spawnchunks = 0;
 	private static long done = 0;
+	private static String currentWorld = "world";
+	
+	public static long lastHopperTime = 0;
+	public static long lastHoppercartTime = 0;
+	
+	public static boolean UpdaterEnabled = true;
+	public static int UpdaterTaskID = -1;
 
 	@Override
 	public void onEnable() {	
@@ -156,6 +165,14 @@ public class Bookshelf extends JavaPlugin {
 	    	getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of minecraft is unsupported!");
 	    	plugin.getPluginLoader().disablePlugin(this);
 	    }
+		
+		if (Bookshelf.plugin.getConfig().contains("Options.EnableHopperDropperSupport")) {
+			boolean setting = Bookshelf.plugin.getConfig().getBoolean("Options.EnableHopperDropperSupport");
+			Bookshelf.plugin.getConfig().set("Options.EnableHopperSupport", setting);
+			Bookshelf.plugin.getConfig().set("Options.EnableDropperSupport", setting);
+			Bookshelf.plugin.getConfig().set("Options.EnableHopperDropperSupport", null);
+			Bookshelf.plugin.saveConfig();
+		}
 	    
 	    loadConfig();
 	    
@@ -169,6 +186,50 @@ public class Bookshelf extends JavaPlugin {
             @Override
             public Integer call() throws Exception {
                 return BookshelfManager.getJsonObject().size();
+            }
+        }));
+	    
+	    metrics.addCustomChart(new Metrics.SimplePie("hoppers_enabled", new Callable<String>() {
+	        @Override
+	        public String call() throws Exception {
+	        	String string = "Disabled";
+	        	if (EnableHopperSupport == true) {
+	        		string = "Enabled";
+	        	}
+	            return string;
+	        }
+	    }));
+	    
+	    metrics.addCustomChart(new Metrics.SimplePie("droppers_enabled", new Callable<String>() {
+	        @Override
+	        public String call() throws Exception {
+	        	String string = "Disabled";
+	        	if (EnableDropperSupport == true) {
+	        		string = "Enabled";
+	        	}
+	            return string;
+	        }
+	    }));
+	    
+	    metrics.addCustomChart(new Metrics.SingleLineChart("average_hopper_process_time", new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+            	int num = 2147483647;
+            	if (lastHopperTime < 2147483647) {
+            		num = (int) lastHopperTime;
+            	}
+                return num;
+            }
+        }));
+	    
+	    metrics.addCustomChart(new Metrics.SingleLineChart("average_hopper_minecart_process_time", new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+            	int num = 2147483647;
+            	if (lastHoppercartTime < 2147483647) {
+            		num = (int) lastHoppercartTime;
+            	}
+                return num;
             }
         }));
 		
@@ -195,33 +256,42 @@ public class Bookshelf extends JavaPlugin {
 		Bookshelf.Whitelist = Bookshelf.plugin.getConfig().getStringList("Options.Whitelist");
 		Bookshelf.Title = ChatColor.translateAlternateColorCodes('&', Bookshelf.plugin.getConfig().getString("Options.Title"));
 		Bookshelf.NoPermissionToReloadMessage = Bookshelf.plugin.getConfig().getString("Options.NoPermissionToReloadMessage");
+		Bookshelf.NoPermissionToUpdateMessage = Bookshelf.plugin.getConfig().getString("Options.NoPermissionToUpdateMessage");
 		Bookshelf.particlesEnabled = Bookshelf.plugin.getConfig().getBoolean("Options.ParticlesWhenOpened");
-		Bookshelf.EnableHopperDropperSupport = Bookshelf.plugin.getConfig().getBoolean("Options.EnableHopperDropperSupport");
+		Bookshelf.EnableHopperSupport = Bookshelf.plugin.getConfig().getBoolean("Options.EnableHopperSupport");
+		Bookshelf.EnableDropperSupport = Bookshelf.plugin.getConfig().getBoolean("Options.EnableDropperSupport");
+		Bookshelf.lastHopperTime = 0;
+		Bookshelf.lastHoppercartTime = 0;
 		if (Bookshelf.HopperTaskID >= 0) {
 			Bukkit.getScheduler().cancelTask(Bookshelf.HopperTaskID);
 		}
 		if (Bookshelf.HopperMinecartTaskID >= 0) {
 			Bukkit.getScheduler().cancelTask(Bookshelf.HopperMinecartTaskID);
 		}
-		if (Bookshelf.EnableHopperDropperSupport == true) {
+		if (Bookshelf.EnableHopperSupport == true) {
 			Bookshelf.HopperTicksPerTransfer = Bukkit.spigot().getConfig().getLong("world-settings.default.ticks-per.hopper-transfer");
 			Bookshelf.HopperAmount = Bukkit.spigot().getConfig().getLong("world-settings.default.hopper-amount");
 			HopperUtils.hopperCheck();
 			HopperUtils.hopperMinecartCheck();
 		}
+		
+		if (UpdaterTaskID >= 0) {
+			Bukkit.getScheduler().cancelTask(UpdaterTaskID);
+		}
+		Bookshelf.UpdaterEnabled = Bookshelf.plugin.getConfig().getBoolean("Options.Updater");
+		if (UpdaterEnabled == true) {
+			Updater.updaterInterval();
+		}
 	}
 	
 	public void loadBookshelf() {
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Counting spawn chunks");
-		spawnchunks = 0;
-		done = 0;
-		for (World world : Bukkit.getWorlds()) {
-			spawnchunks = spawnchunks + world.getLoadedChunks().length;
-		}
-		loadBookshelfProgress();
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Loading bookshelves in spawn chunks");
 		long start = System.currentTimeMillis();
 		for (World world : Bukkit.getWorlds()) {
+			spawnchunks = world.getLoadedChunks().length;
+			done = 0;
+			currentWorld = world.getName();
+			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Loading bookshelves in spawn chunks in " + world.getName());
+			loadBookshelfProgress();
 			for (Chunk chunk: world.getLoadedChunks()) {
 				for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 					String loc = BookshelfUtils.locKey(block.getLocation());
@@ -238,17 +308,17 @@ public class Bookshelf extends JavaPlugin {
 				}
 				done = done + 1;
 			}
+			Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks in " + currentWorld + ": 100%");
 		}
 		BookshelfManager.save();
 		BookshelfManager.intervalSaveToFile();
-		Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks: 100%");
 		Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Bookshelf] Bookshelves loaded! (" + (System.currentTimeMillis() - start) + "ms)");
 	}
 	
 	public void loadBookshelfProgress() {
 		CompletableFuture.runAsync(()->{
 			while (done < spawnchunks) {
-				Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks: " + Math.round((double) ((double) done / (double) spawnchunks) * 100) + "%");
+				Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks in " + currentWorld + ": " + Math.round((double) ((double) done / (double) spawnchunks) * 100) + "%");
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
