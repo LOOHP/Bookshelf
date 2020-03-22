@@ -109,7 +109,14 @@ public class Events implements Listener {
 		}
 		String key = BookshelfUtils.locKey(relative.getLocation());
 		if (!Bookshelf.bookshelfContent.containsKey(key)) {
-			return;
+			if (!BookshelfManager.contains(key)) {
+				String bsTitle = Bookshelf.Title;
+				Bookshelf.bookshelfContent.put(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+				BookshelfManager.setTitle(key, bsTitle);
+				BookshelfUtils.saveBookShelf(key);
+			} else {
+				BookshelfUtils.loadBookShelf(key);
+			}
 		}
 		if (Bookshelf.LWCHook == true) {
 			if (LWCUtils.checkHopperFlagIn(relative) == false) {
@@ -167,6 +174,9 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event) {
+		if (Bookshelf.EnableHopperSupport == false) {
+			return;
+		}
 		Chunk chunk = event.getChunk();
 		for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 			String loc = BookshelfUtils.locKey(block.getLocation());
@@ -185,6 +195,9 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onChunkLoad(ChunkUnloadEvent event) {
+		if (Bookshelf.EnableHopperSupport == false) {
+			return;
+		}
 		Chunk chunk = event.getChunk();
 		for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 			String loc = BookshelfUtils.locKey(block.getLocation());

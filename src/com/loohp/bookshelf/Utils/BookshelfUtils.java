@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -53,6 +54,22 @@ public class BookshelfUtils {
 							list.add(block);
 						}
 					}
+				}
+			}
+		}
+		return list;
+	}
+	
+	public static List<String> getAllBookshelvesInChunk(ChunkSnapshot chunk) {
+		List<String> list = new ArrayList<String>();
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				for (int y = 0; y < 256; y++) {
+					if (chunk.getBlockType(x, y, z).equals(Material.BOOKSHELF));
+					int xExact = x + (chunk.getX() * 16);
+					int zExact = z + (chunk.getZ() * 16);
+					String key = chunk.getWorldName() + "_" + xExact + "_" + y + "_" + zExact;
+					list.add(key);
 				}
 			}
 		}

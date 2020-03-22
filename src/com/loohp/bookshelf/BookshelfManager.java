@@ -74,7 +74,7 @@ public class BookshelfManager {
         	ex.printStackTrace();
         	return false;
         }
-   }
+    }
     
     public static JSONObject getJsonObject() {
     	return json;
