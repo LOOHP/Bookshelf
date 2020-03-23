@@ -1,5 +1,6 @@
 package com.loohp.bookshelf.Listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -11,6 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import com.loohp.bookshelf.Bookshelf;
+import com.wasteofplastic.askyblock.ASkyBlock;
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 
 public class ASEvents implements Listener {
@@ -60,6 +62,8 @@ public class ASEvents implements Listener {
 		
 		if (!ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()).getOwner().equals(player.getUniqueId())) {
 			if (!ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()).getMembers().contains(player.getUniqueId())) {
+				String message = ASkyBlock.getPlugin().myLocale(player.getUniqueId()).islandProtected;
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
 				event.setCancelled(true);
 				
 			}

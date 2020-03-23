@@ -12,6 +12,7 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import com.loohp.bookshelf.Bookshelf;
 
+import net.md_5.bungee.api.ChatColor;
 import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.api.user.User;
 import world.bentobox.bentobox.lists.Flags;
@@ -58,12 +59,14 @@ public class BBEvents implements Listener {
 		}
 		
 		User user = User.getInstance(player);
-		
+		  
 		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).isPresent()) {
 			return;
 		}
 			
 		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).get().isAllowed(user, Flags.CONTAINER)) {
+			String message = BentoBox.getInstance().getLocalesManager().get("protection.protected").replace("[description]", BentoBox.getInstance().getLocalesManager().get("protection.flags.CONTAINER.hint"));
+			player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
 			event.setCancelled(true);
 		}
 	}
