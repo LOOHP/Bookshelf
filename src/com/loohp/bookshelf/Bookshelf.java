@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
@@ -27,9 +29,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.bookshelf.Debug.Debug;
+import com.loohp.bookshelf.Listeners.ASEvents;
+import com.loohp.bookshelf.Listeners.BBEvents;
 import com.loohp.bookshelf.Listeners.Events;
 import com.loohp.bookshelf.Listeners.GPEvents;
 import com.loohp.bookshelf.Listeners.LWCEvents;
+import com.loohp.bookshelf.Listeners.RPEvents;
+import com.loohp.bookshelf.Listeners.RSEvents;
 import com.loohp.bookshelf.Metrics.Metrics;
 import com.loohp.bookshelf.Utils.BookshelfUtils;
 import com.loohp.bookshelf.Utils.HopperUtils;
@@ -50,6 +56,10 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean WGHook = false;
 	public static boolean GPHook = false;
 	public static boolean BlockLockerHook = false;
+	public static boolean RPHook = false;
+	public static boolean BBHook = false;
+	public static boolean ASHook = false;
+	public static boolean RSHook = false;
 	
 	public static boolean EnableHopperSupport = true;
 	public static boolean EnableDropperSupport = true;
@@ -59,7 +69,10 @@ public class Bookshelf extends JavaPlugin {
 	public static long HopperAmount = 1;
 	
 	public static ConcurrentHashMap<String, Inventory> bookshelfContent = new ConcurrentHashMap<String, Inventory>();
-	public static List<String> bookshelfSavePending = new ArrayList<String>();
+	
+	public static ConcurrentLinkedQueue<String> bookshelfSavePending = new ConcurrentLinkedQueue<String>();
+	public static ConcurrentLinkedQueue<Chunk> bookshelfLoadPending = new ConcurrentLinkedQueue<Chunk>();
+	public static ConcurrentLinkedQueue<Chunk> bookshelfRemovePending = new ConcurrentLinkedQueue<Chunk>();
 	
 	public static ConcurrentHashMap<Player, BlockFace> lastBlockFace = new ConcurrentHashMap<Player, BlockFace>();
 	
@@ -68,16 +81,16 @@ public class Bookshelf extends JavaPlugin {
 	public static long BookShelfRows = 2;
 	public static boolean UseWhitelist = true;
 	public static String Title = "Bookshelf";
-	public static List<String> Whitelist = new ArrayList<String>();
+	public static List<String> Whitelist = new CopyOnWriteArrayList<String>();
 	public static boolean particlesEnabled = true;
 	
 	public static String NoPermissionToReloadMessage = "&cYou do not have permission use this command!";
 	public static String NoPermissionToUpdateMessage = "&cYou do not have permission use this command!";
 	
-	public static List<Player> cancelOpen = new ArrayList<Player>();
-	public static List<Player> isDonationView = new ArrayList<Player>();
+	public static List<Player> cancelOpen = new CopyOnWriteArrayList<Player>();
+	public static ConcurrentLinkedQueue<Player> isDonationView = new ConcurrentLinkedQueue<Player>();
 	
-	public static List<String> isEmittingParticle = new ArrayList<String>();
+	public static ConcurrentLinkedQueue<String> isEmittingParticle = new ConcurrentLinkedQueue<String>();
 	
 	public static ConcurrentHashMap<Long, Location> tempRedstone = new ConcurrentHashMap<Long, Location>();
 
@@ -137,6 +150,30 @@ public class Bookshelf extends JavaPlugin {
 			WGHook = true;
 		}
 		
+		if (Bukkit.getServer().getPluginManager().getPlugin("RedProtect") != null) {
+			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into RedProtect!");
+			getServer().getPluginManager().registerEvents(new RPEvents(), this);
+			RPHook = true;
+		}
+		
+		if (Bukkit.getServer().getPluginManager().getPlugin("BentoBox") != null) {
+			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into BentoBox!");
+			getServer().getPluginManager().registerEvents(new BBEvents(), this);
+			BBHook = true;
+		}
+		
+		if (Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock") != null) {
+			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into ASkyBlock!");
+			getServer().getPluginManager().registerEvents(new ASEvents(), this);
+			ASHook = true;
+		}
+		
+		if (Bukkit.getServer().getPluginManager().getPlugin("Residence") != null) {
+			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into Residence!");
+			getServer().getPluginManager().registerEvents(new RSEvents(), this);
+			RSHook = true;
+		}
+		
 		if (getServer().getClass().getPackage().getName().contains("1_15_R1") == true) {
 	    	version = "1.15";
 	    } else if (getServer().getClass().getPackage().getName().contains("1_14_R1") == true) {
@@ -179,6 +216,8 @@ public class Bookshelf extends JavaPlugin {
 	    BookshelfManager.reload();
 	    
 	    intervalSave();
+	    intervalLoad();
+	    intervalRemove();
 	    particles();
 	    loadBookshelf();
 	    
@@ -317,10 +356,11 @@ public class Bookshelf extends JavaPlugin {
 	
 	public void loadBookshelfProgress() {
 		CompletableFuture.runAsync(()->{
-			while (done < spawnchunks) {
+			String thisWorld = currentWorld;
+			while (done < spawnchunks && thisWorld == currentWorld) {
 				Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks in " + currentWorld + ": " + Math.round((double) ((double) done / (double) spawnchunks) * 100) + "%");
 				try {
-					TimeUnit.SECONDS.sleep(1);
+					TimeUnit.MILLISECONDS.sleep(500);
 				} catch (InterruptedException e) {
 					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Error");
 				}
@@ -344,6 +384,63 @@ public class Bookshelf extends JavaPlugin {
 				removeList.clear();
 			}
 		}.runTaskTimer(this, 0, 40);
+	}
+	
+	public void intervalLoad() {
+		new BukkitRunnable() {
+			public void run() {
+				List<Chunk> remove = new ArrayList<Chunk>();
+				int i = 1;
+				for (Chunk chunk : Bookshelf.bookshelfLoadPending) {
+					for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
+						String loc = BookshelfUtils.locKey(block.getLocation());
+						if (!Bookshelf.bookshelfContent.containsKey(loc)) {
+							if (!BookshelfManager.contains(loc)) {
+								String bsTitle = Bookshelf.Title;
+								Bookshelf.bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+								BookshelfManager.setTitle(loc, bsTitle);
+								BookshelfUtils.saveBookShelf(loc);
+							} else {
+								BookshelfUtils.loadBookShelf(loc);
+							}
+						}
+					}
+					remove.add(chunk);
+					i++;
+					if (i > 2) {
+						break;
+					}
+				}
+				for (Chunk chunk : remove) {
+					Bookshelf.bookshelfLoadPending.remove(chunk);
+				}
+			}
+		}.runTaskTimer(this, 0, 1);
+	}
+	
+	public void intervalRemove() {
+		new BukkitRunnable() {
+			public void run() {
+				List<Chunk> remove = new ArrayList<Chunk>();
+				int i = 1;
+				for (Chunk chunk : Bookshelf.bookshelfRemovePending) {
+					for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
+						String loc = BookshelfUtils.locKey(block.getLocation());
+						if (Bookshelf.bookshelfContent.containsKey(loc)) {
+							BookshelfUtils.saveBookShelf(loc, true);
+						}
+					}
+					remove.add(chunk);
+					i++;
+					if (i > 2) {
+						break;
+					}
+				}
+				for (Chunk chunk : remove) {
+					Bookshelf.bookshelfRemovePending.remove(chunk);
+				}
+			}
+		}.runTaskTimer(this, 0, 1);
 	}
 	
 	public void particles() {

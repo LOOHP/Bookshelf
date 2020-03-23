@@ -1,10 +1,18 @@
 name: BookShelf
 author: loohp
-version: 2.2.2
+version: 2.2.3
 main: com.loohp.bookshelf.Bookshelf
 api-version: 1.13
 description: Actual BookShelf in Minecraft
-softdepend: [LWC, WorldGuard, GriefPrevention]
+softdepend: 
+  - LWC
+  - WorldGuard
+  - GriefPrevention
+  - BlockLocker
+  - RedProtect
+  - BentoBox
+  - ASkyBlock
+  - Residence
 prefix: BookShelf
 
 commands:

@@ -178,32 +178,21 @@ public class Events implements Listener {
 			return;
 		}
 		Chunk chunk = event.getChunk();
-		for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
-			String loc = BookshelfUtils.locKey(block.getLocation());
-			if (!Bookshelf.bookshelfContent.containsKey(loc)) {
-				if (!BookshelfManager.contains(loc)) {
-					String bsTitle = Bookshelf.Title;
-					Bookshelf.bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
-					BookshelfManager.setTitle(loc, bsTitle);
-					BookshelfUtils.saveBookShelf(loc);
-				} else {
-					BookshelfUtils.loadBookShelf(loc);
-				}
-			}
+		Bookshelf.bookshelfLoadPending.add(chunk);
+		while (Bookshelf.bookshelfRemovePending.contains(chunk)) {
+			Bookshelf.bookshelfRemovePending.remove(chunk);
 		}
 	}
 	
 	@EventHandler
-	public void onChunkLoad(ChunkUnloadEvent event) {
+	public void onChunkUnload(ChunkUnloadEvent event) {
 		if (Bookshelf.EnableHopperSupport == false) {
 			return;
 		}
 		Chunk chunk = event.getChunk();
-		for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
-			String loc = BookshelfUtils.locKey(block.getLocation());
-			if (Bookshelf.bookshelfContent.containsKey(loc)) {
-				BookshelfUtils.saveBookShelf(loc, true);
-			}
+		Bookshelf.bookshelfRemovePending.add(chunk);
+		while (Bookshelf.bookshelfLoadPending.contains(chunk)) {
+			Bookshelf.bookshelfLoadPending.remove(chunk);
 		}
 	}
 	
