@@ -18,9 +18,9 @@ import com.wasteofplastic.askyblock.ASkyBlockAPI;
 public class ASEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBBCheck(PlayerInteractEvent event) {
+	public void onASCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.RPHook == false) {
+		if (Bookshelf.ASHook == false) {
 			return;
 		}
 		

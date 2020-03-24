@@ -58,7 +58,7 @@ public class RPEvents implements Listener {
 		if (RedProtect.get().getAPI().getRegion(event.getClickedBlock().getLocation()) == null) {
 			return;
 		}
-		
+
 		if (!RedProtect.get().getAPI().getRegion(event.getClickedBlock().getLocation()).canChest(player)) {
 			player.sendMessage(RedProtect.get().lang.get("_redprotect.prefix") + " " + RedProtect.get().lang.get("playerlistener.region.cantdoor"));
 			event.setCancelled(true);

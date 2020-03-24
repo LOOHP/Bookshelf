@@ -22,7 +22,7 @@ public class BBEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBBCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.RPHook == false) {
+		if (Bookshelf.BBHook == false) {
 			return;
 		}
 		

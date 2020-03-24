@@ -18,9 +18,9 @@ import com.loohp.bookshelf.Bookshelf;
 public class RSEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBBCheck(PlayerInteractEvent event) {
+	public void onRSCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.RPHook == false) {
+		if (Bookshelf.RSHook == false) {
 			return;
 		}
 		
