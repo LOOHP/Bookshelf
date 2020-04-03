@@ -2,6 +2,7 @@ package com.loohp.bookshelf;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
@@ -22,8 +23,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,6 +42,7 @@ import com.loohp.bookshelf.Listeners.RPEvents;
 import com.loohp.bookshelf.Listeners.RSEvents;
 import com.loohp.bookshelf.Metrics.Metrics;
 import com.loohp.bookshelf.Utils.BookshelfUtils;
+import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.Utils.HopperUtils;
 import com.loohp.bookshelf.Utils.LegacyConfigConverter;
 import com.loohp.bookshelf.Utils.ParticlesUtils;
@@ -93,6 +98,9 @@ public class Bookshelf extends JavaPlugin {
 	public static ConcurrentLinkedQueue<String> isEmittingParticle = new ConcurrentLinkedQueue<String>();
 	
 	public static ConcurrentHashMap<Long, Location> tempRedstone = new ConcurrentHashMap<Long, Location>();
+	
+	public static ConcurrentHashMap<Player, Long> enchantSeed = new ConcurrentHashMap<Player, Long>();
+	public static ConcurrentHashMap<Player, HashMap<ItemStack, EnchantmentOffer[]>> enchantOffers = new ConcurrentHashMap<Player, HashMap<ItemStack, EnchantmentOffer[]>>();
 
 	private static long spawnchunks = 0;
 	private static long done = 0;
@@ -100,6 +108,8 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static long lastHopperTime = 0;
 	public static long lastHoppercartTime = 0;
+	
+	public static boolean enchantmentTable = true;
 	
 	public static boolean UpdaterEnabled = true;
 	public static int UpdaterTaskID = -1;
@@ -250,6 +260,17 @@ public class Bookshelf extends JavaPlugin {
 	        }
 	    }));
 	    
+	    metrics.addCustomChart(new Metrics.SimplePie("enchtable_enabled", new Callable<String>() {
+	        @Override
+	        public String call() throws Exception {
+	        	String string = "Disabled";
+	        	if (enchantmentTable == true) {
+	        		string = "Enabled";
+	        	}
+	            return string;
+	        }
+	    }));
+	    
 	    metrics.addCustomChart(new Metrics.SingleLineChart("average_hopper_process_time", new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
@@ -299,6 +320,7 @@ public class Bookshelf extends JavaPlugin {
 		Bookshelf.particlesEnabled = Bookshelf.plugin.getConfig().getBoolean("Options.ParticlesWhenOpened");
 		Bookshelf.EnableHopperSupport = Bookshelf.plugin.getConfig().getBoolean("Options.EnableHopperSupport");
 		Bookshelf.EnableDropperSupport = Bookshelf.plugin.getConfig().getBoolean("Options.EnableDropperSupport");
+		Bookshelf.enchantmentTable = Bookshelf.plugin.getConfig().getBoolean("Options.EnableEnchantmentTableBoosting");
 		Bookshelf.lastHopperTime = 0;
 		Bookshelf.lastHoppercartTime = 0;
 		if (Bookshelf.HopperTaskID >= 0) {
@@ -469,7 +491,37 @@ public class Bookshelf extends JavaPlugin {
 											}
 										}
 										Bookshelf.isEmittingParticle.add(entry.getKey());
-										break;
+									}
+								}
+							}
+							if (enchantmentTable == true) {
+								if (player.getOpenInventory().getTopInventory().getType().equals(InventoryType.ENCHANTING)) {
+									for (Block block : EnchantmentTableUtils.getBookshelves(player.getOpenInventory().getTopInventory().getLocation().getBlock())) {
+										String key = BookshelfUtils.locKey(block.getLocation());
+										if (!Bookshelf.isEmittingParticle.contains(key)) {
+											Location loc = block.getLocation().clone();
+											Location loc2 = loc.clone().add(1,1,1);
+											DustOptions purple = new DustOptions(Color.fromRGB(204, 0, 204), 1);
+											DustOptions blue = new DustOptions(Color.fromRGB(51, 51, 255), 1);
+											for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
+												double random = Math.random() * 100;
+												if (random > 95) {
+													double ranColor = Math.floor(Math.random() * 2) + 1;
+													if (ranColor == 1) {
+														loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, blue);
+													} else if (ranColor == 2) {
+														loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, purple);
+													}
+												}
+											}
+											Bookshelf.isEmittingParticle.add(key);
+										}
+									}
+									String key = BookshelfUtils.locKey(player.getOpenInventory().getTopInventory().getLocation());
+									if (!Bookshelf.isEmittingParticle.contains(key)) {
+										Location pos = player.getOpenInventory().getTopInventory().getLocation().clone().add(0.5, 0.5, 0.5);
+										pos.getWorld().spawnParticle(Particle.PORTAL, pos, 75);
+										Bookshelf.isEmittingParticle.add(key);
 									}
 								}
 							}

@@ -29,5 +29,8 @@ Options:
   #Whether to allow bookshelves to work with droppers
   EnableDropperSupport: false
 
+  #Whether to enable enchantment table boosting
+  EnableEnchantmentTableBoosting: true
+
   #Enable update notifications for admins
   Updater: true
