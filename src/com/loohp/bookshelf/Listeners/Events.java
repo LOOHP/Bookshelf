@@ -678,6 +678,9 @@ public class Events implements Listener {
         }
 		
 		if (event.getAction().equals(InventoryAction.HOTBAR_MOVE_AND_READD) || event.getAction().equals(InventoryAction.HOTBAR_SWAP)) {
+			if (!Bookshelf.bookshelfContent.containsValue(event.getView().getTopInventory())) {
+				return;
+			}
 			int slot = event.getRawSlot();
 			int inventorySize = event.getView().getTopInventory().getSize();
 			if (slot < inventorySize) {
@@ -732,6 +735,9 @@ public class Events implements Listener {
 			putting = true;
 		}
 		if (event.getAction().equals(InventoryAction.HOTBAR_MOVE_AND_READD) || event.getAction().equals(InventoryAction.HOTBAR_SWAP)) {
+			if (!Bookshelf.bookshelfContent.containsValue(event.getView().getTopInventory())) {
+				return;
+			}
 			int slot = event.getRawSlot();
 			int inventorySize = event.getView().getTopInventory().getSize();
 			if (slot < inventorySize) {
