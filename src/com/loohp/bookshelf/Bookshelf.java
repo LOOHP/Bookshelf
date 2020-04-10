@@ -2,7 +2,6 @@ package com.loohp.bookshelf;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
@@ -23,11 +22,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -100,7 +97,6 @@ public class Bookshelf extends JavaPlugin {
 	public static ConcurrentHashMap<Long, Location> tempRedstone = new ConcurrentHashMap<Long, Location>();
 	
 	public static ConcurrentHashMap<Player, Long> enchantSeed = new ConcurrentHashMap<Player, Long>();
-	public static ConcurrentHashMap<Player, HashMap<ItemStack, EnchantmentOffer[]>> enchantOffers = new ConcurrentHashMap<Player, HashMap<ItemStack, EnchantmentOffer[]>>();
 
 	private static long spawnchunks = 0;
 	private static long done = 0;

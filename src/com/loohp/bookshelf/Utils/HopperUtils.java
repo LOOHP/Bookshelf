@@ -70,7 +70,7 @@ public class HopperUtils {
 				            	if (item == null) {
 				            		continue;
 				            	}
-				            	if (InventoryUtils.hasAvaliableSlot(inventory, item.getType())) {
+				            	if (InventoryUtils.stillHaveSpace(inventory, item.getType())) {
 				            		
 				            		if (Bookshelf.BlockLockerHook == true) {
 										if (BlockLockerUtils.isLocked(bookshelfBlock) == true) {
@@ -165,7 +165,7 @@ public class HopperUtils {
 					            	if (item == null) {
 					            		continue;
 					            	}
-					            	if (InventoryUtils.hasAvaliableSlot(inventory, item.getType())) {
+					            	if (InventoryUtils.stillHaveSpace(inventory, item.getType())) {
 					            		if (isAllow(loc.getBlock())) {
 						            		ItemStack additem = item.clone();
 						            		int num = item.getAmount();
@@ -211,7 +211,7 @@ public class HopperUtils {
 			            	}
 			            	if (Bookshelf.UseWhitelist == true) {
 				            	if (Bookshelf.Whitelist.contains(item.getType().toString().toUpperCase())) {
-				            		if (InventoryUtils.hasAvaliableSlot(bookshelfInv, item.getType())) {
+				            		if (InventoryUtils.stillHaveSpace(bookshelfInv, item.getType())) {
 				            			if (Bookshelf.LWCHook == true) {
 											if (LWCUtils.checkHopperFlagOut(hopper) == false) {
 												break;
@@ -247,7 +247,7 @@ public class HopperUtils {
 				            		}
 				            	}
 			            	} else {
-			            		if (InventoryUtils.hasAvaliableSlot(bookshelfInv, item.getType())) {
+			            		if (InventoryUtils.stillHaveSpace(bookshelfInv, item.getType())) {
 			            			if (Bookshelf.LWCHook == true) {
 										if (LWCUtils.checkHopperFlagOut(hopper) == false) {
 											break;

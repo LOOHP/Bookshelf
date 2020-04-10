@@ -56,12 +56,14 @@ import com.griefcraft.lwc.LWC;
 import com.griefcraft.model.Protection;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.Special;
 import com.loohp.bookshelf.Utils.BlockLockerUtils;
 import com.loohp.bookshelf.Utils.BookshelfUtils;
 import com.loohp.bookshelf.Utils.DropperUtils;
 import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.Utils.InventoryUtils;
 import com.loohp.bookshelf.Utils.LWCUtils;
+import com.loohp.bookshelf.Utils.MaterialUtils;
 import com.loohp.bookshelf.Utils.NBTUtils;
 import com.loohp.bookshelf.Utils.ReverseList;
 
@@ -110,9 +112,12 @@ public class Events implements Listener {
 	}
 */	
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPreEnchantTable(PrepareItemEnchantEvent event) {
+		if (Bookshelf.version.contains("OLD") || Bookshelf.version.equals("legacy1.9") || Bookshelf.version.equals("legacy1.9.4") || Bookshelf.version.equals("legacy1.10")) {
+			return;
+		}
 		if (Bookshelf.enchantmentTable == false) {
 			return;
 		}
@@ -124,7 +129,7 @@ public class Events implements Listener {
 		Block eTable = event.getEnchantBlock();
 		List<Block> blocks = EnchantmentTableUtils.getBookshelves(eTable);
 		Map<Enchantment, HashMap<String, Object>> enchants = new HashMap<Enchantment, HashMap<String, Object>>();
-		int totalSlots = 0;
+		int totalSlots = (int) (Bookshelf.BookShelfRows * 9 * 15);
 		if (blocks.isEmpty()) {
 			return;
 		}
@@ -141,7 +146,6 @@ public class Events implements Listener {
 				}
 			}
 			Inventory inv = Bookshelf.bookshelfContent.get(key);
-			totalSlots = totalSlots + inv.getSize();
 			for (int i = 0; i < inv.getSize(); i++) {
 				ItemStack item = inv.getItem(i);
 				if (item == null) {
@@ -193,7 +197,7 @@ public class Events implements Listener {
 		if (list.isEmpty()) {
 			return;
 		}
-		List<NamespacedKey> pick = new ArrayList<NamespacedKey>();
+		List<Object> pick = new ArrayList<Object>();
 		for (Entry<Enchantment, HashMap<String, Integer>> entry : list.entrySet()) {
 			if (entry.getKey().equals(Enchantment.MENDING)) {
 				continue;
@@ -212,7 +216,11 @@ public class Events implements Listener {
 			}
 			int occurance = entry.getValue().get("Occurance");
 			for (int i = 0; i < occurance; i++) {
-				pick.add(entry.getKey().getKey());
+				if (!Bookshelf.version.contains("legacy")) {
+					pick.add(entry.getKey().getKey());
+				} else {
+					pick.add(entry.getKey().getName());
+				}
 			}
 		}
 		if (pick.isEmpty()) {
@@ -231,11 +239,16 @@ public class Events implements Listener {
 			seed = Bookshelf.enchantSeed.get(player);
 			Random random = new Random(seed);
 			double ran = random.nextDouble();
-			NamespacedKey key = pick.get((int) (ran * pick.size()));
+			Object key = pick.get((int) (ran * pick.size()));
 			if (key == null) {
 				continue;
 			}
-			Enchantment ench = Enchantment.getByKey(key);
+			Enchantment ench = null;
+			if (!Bookshelf.version.contains("legacy")) {
+				ench = Enchantment.getByKey((NamespacedKey) key);
+			} else {
+				ench = Enchantment.getByName((String) key);
+			}
 			offer.setEnchantment(ench);
 			int level = list.get(ench).get("Level");
 			if (offer.getEnchantmentLevel() > level) {
@@ -243,17 +256,20 @@ public class Events implements Listener {
 			}
 		}
 		HashMap<ItemStack, EnchantmentOffer[]> offermap = null;
-		if (Bookshelf.enchantOffers.containsKey(player)) {
-			offermap = Bookshelf.enchantOffers.get(player);
+		if (Special.enchantOffers.containsKey(player)) {
+			offermap = Special.enchantOffers.get(player);
 		} else {
 			offermap = new HashMap<ItemStack, EnchantmentOffer[]>();
-			Bookshelf.enchantOffers.put(player, offermap);
+			Special.enchantOffers.put(player, offermap);
 		}
 		offermap.put(event.getItem(), offers);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEnchant(EnchantItemEvent event) {
+		if (Bookshelf.version.contains("OLD") || Bookshelf.version.equals("legacy1.9") || Bookshelf.version.equals("legacy1.9.4") || Bookshelf.version.equals("legacy1.10")) {
+			return;
+		}
 		if (Bookshelf.enchantmentTable == false) {
 			return;
 		}
@@ -263,8 +279,8 @@ public class Events implements Listener {
 		}
 		
 		Player player = event.getEnchanter();
-		if (Bookshelf.enchantOffers.containsKey(player)) {
-			EnchantmentOffer offer = Bookshelf.enchantOffers.get(player).get(event.getItem())[event.whichButton()];
+		if (Special.enchantOffers.containsKey(player)) {
+			EnchantmentOffer offer = Special.enchantOffers.get(player).get(event.getItem())[event.whichButton()];
 			Map<Enchantment, Integer> orginal = event.getEnchantsToAdd();
 			List<Enchantment> removelist = new ArrayList<Enchantment>();
 			for (Entry<Enchantment, Integer> entry : orginal.entrySet()) {
@@ -276,7 +292,7 @@ public class Events implements Listener {
 				orginal.remove(ench);
 			}
 			orginal.put(offer.getEnchantment(), offer.getEnchantmentLevel());
-			Bookshelf.enchantOffers.get(player).remove(event.getItem());
+			Special.enchantOffers.get(player).remove(event.getItem());
 		}
 		Bookshelf.enchantSeed.remove(player);
 	}
@@ -290,7 +306,12 @@ public class Events implements Listener {
 			Player player = (Player) event.getWhoClicked();
 			ItemStack item = event.getCursor();
 			if (item.getType().equals(Material.BOOKSHELF) && player.getGameMode().equals(GameMode.CREATIVE) && player.isSneaking() && player.hasPermission("bookshelf.copynbt")) {
-				Block block = player.getTargetBlockExact(10, FluidCollisionMode.NEVER);
+				Block block = null;
+				if (!Bookshelf.version.contains("legacy") && !Bookshelf.version.equals("1.13") && !Bookshelf.version.equals("1.13.1")) {
+					block = player.getTargetBlockExact(10, FluidCollisionMode.NEVER);
+				} else {
+					block = player.getTargetBlock(MaterialUtils.getNonSolidSet(), 10);
+				}
 				if (block.getType().equals(Material.BOOKSHELF)) {
 					String key = BookshelfUtils.locKey(block.getLocation());
 					if (!Bookshelf.bookshelfContent.containsKey(key)) {
@@ -355,7 +376,9 @@ public class Events implements Listener {
 		Inventory bookshelf = Bookshelf.bookshelfContent.get(key);
 		org.bukkit.block.Dropper d = (org.bukkit.block.Dropper) event.getBlock().getState();
 		Inventory dropper = d.getInventory();
-		List<ItemStack> newList = Arrays.asList(dropper.getContents());
+		List<ItemStack> newList = new ArrayList<ItemStack>();
+		newList.addAll(Arrays.asList(dropper.getContents()));
+		newList.add(event.getItem());
 		Collections.shuffle(newList);
 		for (ItemStack each : newList) {
 			if (each == null) {
@@ -366,12 +389,13 @@ public class Events implements Listener {
 					continue;
 				}
 			}
-			if (InventoryUtils.hasAvaliableSlot(bookshelf, each.getType()) == false) {
+			if (InventoryUtils.stillHaveSpace(bookshelf, each.getType()) == false) {
 				continue;
 			}
 			ItemStack additem = each.clone();
 			additem.setAmount(1);
 			bookshelf.addItem(additem);
+			boolean removed = false;
 			for (int i = 0; i < dropper.getSize(); i = i + 1) {
 				ItemStack removeitem = dropper.getItem(i);
             	if (removeitem == null) {
@@ -380,7 +404,26 @@ public class Events implements Listener {
             	if (removeitem.equals(each)) {
             		removeitem.setAmount(removeitem.getAmount() - 1);
             		dropper.setItem(i, removeitem);
+            		removed = true;
+            		break;
             	}
+			}
+			if (removed == false) {
+				new BukkitRunnable() {
+					public void run() {
+						for (int i = 0; i < dropper.getSize(); i = i + 1) {
+							ItemStack removeitem = dropper.getItem(i);
+			            	if (removeitem == null) {
+			            		continue;
+			            	}
+			            	if (removeitem.equals(each)) {
+			            		removeitem.setAmount(removeitem.getAmount() - 1);
+			            		dropper.setItem(i, removeitem);
+			            		break;
+			            	}
+						}
+					}
+				}.runTaskLater(Bookshelf.plugin, 1);
 			}
 			Bookshelf.bookshelfSavePending.add(key);
 			if (!Bookshelf.version.contains("legacy")) {
