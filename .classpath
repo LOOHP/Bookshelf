@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/LWCX-2.2.5-dev.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/GriefPrevention.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/org.apache.commons.io.jar/org.apache.commons.io.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/BlockLocker.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/RedProtect-7.6.5-b289-Universal.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/worldguard-bukkit-7.0.3-SNAPSHOT-dist.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/BentoBox/bentobox-1.12.0.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/Residence4.9.0.4.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/askyblock.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/worldedit-bukkit-7.2.0-SNAPSHOT-dist.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Desktop 2/test/spigot/1.8/spigot-1.15.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
