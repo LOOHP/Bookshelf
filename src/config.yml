@@ -31,6 +31,9 @@ Options:
 
   #Whether to enable enchantment table boosting
   EnableEnchantmentTableBoosting: true
+  #Max percentage of the enchantment table boosting feature
+  #Accepts integer from 0 - 100
+  EnchantmentTableBoostingMaxPercentage: 80
 
   #Enable update notifications for admins
   Updater: true

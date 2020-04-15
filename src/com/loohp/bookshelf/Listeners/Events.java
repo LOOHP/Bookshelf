@@ -229,6 +229,10 @@ public class Events implements Listener {
 		for (int i = pick.size() - 1; i < totalSlots; i++) {
 			pick.add(null);
 		}
+		int additionneeded = (pick.size() * Bookshelf.eTableMulti) - pick.size();
+		for (int i = 0; i < additionneeded; i++) {
+			pick.add(null);
+		}
 		Player player = event.getEnchanter();
 		EnchantmentOffer[] offers = event.getOffers();
 		for (EnchantmentOffer offer : offers) {

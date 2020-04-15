@@ -37,13 +37,14 @@ import com.loohp.bookshelf.Listeners.GPEvents;
 import com.loohp.bookshelf.Listeners.LWCEvents;
 import com.loohp.bookshelf.Listeners.RPEvents;
 import com.loohp.bookshelf.Listeners.RSEvents;
+import com.loohp.bookshelf.Listeners.WGEvents;
 import com.loohp.bookshelf.Metrics.Metrics;
+import com.loohp.bookshelf.Updater.Updater;
 import com.loohp.bookshelf.Utils.BookshelfUtils;
 import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.Utils.HopperUtils;
 import com.loohp.bookshelf.Utils.LegacyConfigConverter;
 import com.loohp.bookshelf.Utils.ParticlesUtils;
-import com.loohp.bookshelf.Utils.Updater;
 
 public class Bookshelf extends JavaPlugin {
 	
@@ -107,6 +108,8 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static boolean enchantmentTable = true;
 	
+	public static int eTableMulti = 1;
+	
 	public static boolean UpdaterEnabled = true;
 	public static int UpdaterTaskID = -1;
 
@@ -152,7 +155,7 @@ public class Bookshelf extends JavaPlugin {
 		
 		if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null) {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into WorldGuard!");
-			getServer().getPluginManager().registerEvents(new com.loohp.bookshelf.Listeners.WGEvents(), this);
+			getServer().getPluginManager().registerEvents(new WGEvents(), this);
 			WGHook = true;
 		}
 		
@@ -180,41 +183,43 @@ public class Bookshelf extends JavaPlugin {
 			RSHook = true;
 		}
 		
-		if (getServer().getClass().getPackage().getName().contains("1_15_R1") == true) {
-	    	version = "1.15";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_14_R1") == true) {
-	    	version = "1.14";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_13_R2") == true) {
-	    	version = "1.13.1";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_13_R1") == true) {
-	    	version = "1.13";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_12_R1") == true) {
-	    	version = "legacy1.12";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_11_R1") == true) {
-	    	version = "legacy1.11";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_10_R1") == true) {
-	    	version = "legacy1.10";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_9_R2") == true) {
-	    	version = "legacy1.9.4";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_9_R1") == true) {
-	    	version = "legacy1.9";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_8_R3") == true) {
-	    	version = "OLDlegacy1.8.4";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_8_R2") == true) {
-	    	version = "OLDlegacy1.8.3";
-	    } else if (getServer().getClass().getPackage().getName().contains("1_8_R1") == true) {
-	    	version = "OLDlegacy1.8";
-	    } else {
+		String packageName = getServer().getClass().getPackage().getName();
+
+        if (packageName.contains("1_15_R1")) {
+            version = "1.15";
+        } else if (packageName.contains("1_14_R1")) {
+            version = "1.14";
+        } else if (packageName.contains("1_13_R2")) {
+            version = "1.13.1";
+        } else if (packageName.contains("1_13_R1")) {
+            version = "1.13";
+        } else if (packageName.contains("1_12_R1")) {
+            version = "legacy1.12";
+        } else if (packageName.contains("1_11_R1")) {
+            version = "legacy1.11";
+        } else if (packageName.contains("1_10_R1")) {
+            version = "legacy1.10";
+        } else if (packageName.contains("1_9_R2")) {
+            version = "legacy1.9.4";
+        } else if (packageName.contains("1_9_R1")) {
+            version = "legacy1.9";
+        } else if (packageName.contains("1_8_R3")) {
+            version = "OLDlegacy1.8.4";
+        } else if (packageName.contains("1_8_R2")) {
+            version = "OLDlegacy1.8.3";
+        } else if (packageName.contains("1_8_R1")) {
+            version = "OLDlegacy1.8";
+        } else {
 	    	getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of minecraft is unsupported!");
 	    	plugin.getPluginLoader().disablePlugin(this);
 	    }
 		
-		if (Bookshelf.plugin.getConfig().contains("Options.EnableHopperDropperSupport")) {
-			boolean setting = Bookshelf.plugin.getConfig().getBoolean("Options.EnableHopperDropperSupport");
-			Bookshelf.plugin.getConfig().set("Options.EnableHopperSupport", setting);
-			Bookshelf.plugin.getConfig().set("Options.EnableDropperSupport", setting);
-			Bookshelf.plugin.getConfig().set("Options.EnableHopperDropperSupport", null);
-			Bookshelf.plugin.saveConfig();
+		if (plugin.getConfig().contains("Options.EnableHopperDropperSupport")) {
+			boolean setting = plugin.getConfig().getBoolean("Options.EnableHopperDropperSupport");
+			plugin.getConfig().set("Options.EnableHopperSupport", setting);
+			plugin.getConfig().set("Options.EnableDropperSupport", setting);
+			plugin.getConfig().set("Options.EnableHopperDropperSupport", null);
+			plugin.saveConfig();
 		}
 	    
 	    loadConfig();
@@ -296,8 +301,8 @@ public class Bookshelf extends JavaPlugin {
 	public void onDisable() {
 		getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Saving all pending bookshelves..");
 		long start = System.currentTimeMillis();
-		for (String entry : Bookshelf.bookshelfSavePending) {
-			if (Bookshelf.bookshelfContent.containsKey(entry)) {
+		for (String entry : bookshelfSavePending) {
+			if (bookshelfContent.containsKey(entry)) {
 				BookshelfUtils.saveBookShelf(entry);
 			}
 		}
@@ -307,27 +312,35 @@ public class Bookshelf extends JavaPlugin {
 	}
 	
 	public static void loadConfig() {	
-		Bookshelf.BookShelfRows = Bookshelf.plugin.getConfig().getLong("Options.BookShelfRows");
-		Bookshelf.UseWhitelist = Bookshelf.plugin.getConfig().getBoolean("Options.UseWhitelist");
-		Bookshelf.Whitelist = Bookshelf.plugin.getConfig().getStringList("Options.Whitelist");
-		Bookshelf.Title = ChatColor.translateAlternateColorCodes('&', Bookshelf.plugin.getConfig().getString("Options.Title"));
-		Bookshelf.NoPermissionToReloadMessage = Bookshelf.plugin.getConfig().getString("Options.NoPermissionToReloadMessage");
-		Bookshelf.NoPermissionToUpdateMessage = Bookshelf.plugin.getConfig().getString("Options.NoPermissionToUpdateMessage");
-		Bookshelf.particlesEnabled = Bookshelf.plugin.getConfig().getBoolean("Options.ParticlesWhenOpened");
-		Bookshelf.EnableHopperSupport = Bookshelf.plugin.getConfig().getBoolean("Options.EnableHopperSupport");
-		Bookshelf.EnableDropperSupport = Bookshelf.plugin.getConfig().getBoolean("Options.EnableDropperSupport");
-		Bookshelf.enchantmentTable = Bookshelf.plugin.getConfig().getBoolean("Options.EnableEnchantmentTableBoosting");
-		Bookshelf.lastHopperTime = 0;
-		Bookshelf.lastHoppercartTime = 0;
-		if (Bookshelf.HopperTaskID >= 0) {
-			Bukkit.getScheduler().cancelTask(Bookshelf.HopperTaskID);
+		BookShelfRows = plugin.getConfig().getLong("Options.BookShelfRows");
+		UseWhitelist = plugin.getConfig().getBoolean("Options.UseWhitelist");
+		Whitelist = plugin.getConfig().getStringList("Options.Whitelist");
+		Title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Options.Title"));
+		NoPermissionToReloadMessage = plugin.getConfig().getString("Options.NoPermissionToReloadMessage");
+		NoPermissionToUpdateMessage = plugin.getConfig().getString("Options.NoPermissionToUpdateMessage");
+		particlesEnabled = plugin.getConfig().getBoolean("Options.ParticlesWhenOpened");
+		EnableHopperSupport = plugin.getConfig().getBoolean("Options.EnableHopperSupport");
+		EnableDropperSupport = plugin.getConfig().getBoolean("Options.EnableDropperSupport");
+		enchantmentTable = plugin.getConfig().getBoolean("Options.EnableEnchantmentTableBoosting");
+		int eTableChance = plugin.getConfig().getInt("Options.EnchantmentTableBoostingMaxPercentage");
+		if (eTableChance > 100) {
+			eTableChance = 100;
+		} else if (eTableChance < 0) {
+			eTableChance = 0;
 		}
-		if (Bookshelf.HopperMinecartTaskID >= 0) {
-			Bukkit.getScheduler().cancelTask(Bookshelf.HopperMinecartTaskID);
+		eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
+		
+		lastHopperTime = 0;
+		lastHoppercartTime = 0;
+		if (HopperTaskID >= 0) {
+			Bukkit.getScheduler().cancelTask(HopperTaskID);
 		}
-		if (Bookshelf.EnableHopperSupport == true) {
-			Bookshelf.HopperTicksPerTransfer = Bukkit.spigot().getConfig().getLong("world-settings.default.ticks-per.hopper-transfer");
-			Bookshelf.HopperAmount = Bukkit.spigot().getConfig().getLong("world-settings.default.hopper-amount");
+		if (HopperMinecartTaskID >= 0) {
+			Bukkit.getScheduler().cancelTask(HopperMinecartTaskID);
+		}
+		if (EnableHopperSupport == true) {
+			HopperTicksPerTransfer = Bukkit.spigot().getConfig().getLong("world-settings.default.ticks-per.hopper-transfer");
+			HopperAmount = Bukkit.spigot().getConfig().getLong("world-settings.default.hopper-amount");
 			HopperUtils.hopperCheck();
 			HopperUtils.hopperMinecartCheck();
 		}
@@ -335,7 +348,7 @@ public class Bookshelf extends JavaPlugin {
 		if (UpdaterTaskID >= 0) {
 			Bukkit.getScheduler().cancelTask(UpdaterTaskID);
 		}
-		Bookshelf.UpdaterEnabled = Bookshelf.plugin.getConfig().getBoolean("Options.Updater");
+		UpdaterEnabled = plugin.getConfig().getBoolean("Options.Updater");
 		if (UpdaterEnabled == true) {
 			Updater.updaterInterval();
 		}
@@ -352,10 +365,10 @@ public class Bookshelf extends JavaPlugin {
 			for (Chunk chunk: world.getLoadedChunks()) {
 				for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 					String loc = BookshelfUtils.locKey(block.getLocation());
-					if (!Bookshelf.bookshelfContent.containsKey(loc)) {
+					if (!bookshelfContent.containsKey(loc)) {
 						if (!BookshelfManager.contains(loc)) {
-							String bsTitle = Bookshelf.Title;
-							Bookshelf.bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+							String bsTitle = Title;
+							bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
 							BookshelfManager.setTitle(loc, bsTitle);
 							BookshelfUtils.saveBookShelf(loc);
 						} else {
@@ -390,15 +403,15 @@ public class Bookshelf extends JavaPlugin {
 		new BukkitRunnable() {
 			public void run() {
 				List<String> removeList = new ArrayList<String>();
-				for (String entry : Bookshelf.bookshelfSavePending) {
-					if (Bookshelf.bookshelfContent.containsKey(entry)) {
+				for (String entry : bookshelfSavePending) {
+					if (bookshelfContent.containsKey(entry)) {
 						if (!removeList.contains(entry)) {
 							BookshelfUtils.saveBookShelf(entry);
 						}
 					}
 					removeList.add(entry);
 				}
-				Bookshelf.bookshelfSavePending.clear();
+				bookshelfSavePending.clear();
 				removeList.clear();
 			}
 		}.runTaskTimer(this, 0, 40);
@@ -409,13 +422,13 @@ public class Bookshelf extends JavaPlugin {
 			public void run() {
 				List<Chunk> remove = new ArrayList<Chunk>();
 				int i = 1;
-				for (Chunk chunk : Bookshelf.bookshelfLoadPending) {
+				for (Chunk chunk : bookshelfLoadPending) {
 					for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 						String loc = BookshelfUtils.locKey(block.getLocation());
-						if (!Bookshelf.bookshelfContent.containsKey(loc)) {
+						if (!bookshelfContent.containsKey(loc)) {
 							if (!BookshelfManager.contains(loc)) {
-								String bsTitle = Bookshelf.Title;
-								Bookshelf.bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+								String bsTitle = Title;
+								bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
 								BookshelfManager.setTitle(loc, bsTitle);
 								BookshelfUtils.saveBookShelf(loc);
 							} else {
@@ -430,7 +443,7 @@ public class Bookshelf extends JavaPlugin {
 					}
 				}
 				for (Chunk chunk : remove) {
-					Bookshelf.bookshelfLoadPending.remove(chunk);
+					bookshelfLoadPending.remove(chunk);
 				}
 			}
 		}.runTaskTimer(this, 0, 1);
@@ -441,10 +454,10 @@ public class Bookshelf extends JavaPlugin {
 			public void run() {
 				List<Chunk> remove = new ArrayList<Chunk>();
 				int i = 1;
-				for (Chunk chunk : Bookshelf.bookshelfRemovePending) {
+				for (Chunk chunk : bookshelfRemovePending) {
 					for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 						String loc = BookshelfUtils.locKey(block.getLocation());
-						if (Bookshelf.bookshelfContent.containsKey(loc)) {
+						if (bookshelfContent.containsKey(loc)) {
 							BookshelfUtils.saveBookShelf(loc, true);
 						}
 					}
@@ -455,7 +468,7 @@ public class Bookshelf extends JavaPlugin {
 					}
 				}
 				for (Chunk chunk : remove) {
-					Bookshelf.bookshelfRemovePending.remove(chunk);
+					bookshelfRemovePending.remove(chunk);
 				}
 			}
 		}.runTaskTimer(this, 0, 1);
@@ -464,12 +477,12 @@ public class Bookshelf extends JavaPlugin {
 	public void particles() {
 		new BukkitRunnable() {
 			public void run() {
-				if (Bookshelf.particlesEnabled == true && !Bookshelf.version.contains("legacy")) {
-					Bookshelf.isEmittingParticle.clear();
+				if (particlesEnabled == true && !version.contains("legacy")) {
+					isEmittingParticle.clear();
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.getOpenInventory() != null) {
-							for (Entry<String, Inventory> entry : Bookshelf.bookshelfContent.entrySet()) {
-								if (!Bookshelf.isEmittingParticle.contains(entry.getKey())) {
+							for (Entry<String, Inventory> entry : bookshelfContent.entrySet()) {
+								if (!isEmittingParticle.contains(entry.getKey())) {
 									if (entry.getValue().equals(player.getOpenInventory().getTopInventory())) {
 										Location loc = BookshelfUtils.keyLoc(entry.getKey());
 										Location loc2 = loc.clone().add(1,1,1);
@@ -486,7 +499,7 @@ public class Bookshelf extends JavaPlugin {
 												}
 											}
 										}
-										Bookshelf.isEmittingParticle.add(entry.getKey());
+										isEmittingParticle.add(entry.getKey());
 									}
 								}
 							}
@@ -494,7 +507,7 @@ public class Bookshelf extends JavaPlugin {
 								if (player.getOpenInventory().getTopInventory().getType().equals(InventoryType.ENCHANTING)) {
 									for (Block block : EnchantmentTableUtils.getBookshelves(player.getOpenInventory().getTopInventory().getLocation().getBlock())) {
 										String key = BookshelfUtils.locKey(block.getLocation());
-										if (!Bookshelf.isEmittingParticle.contains(key)) {
+										if (!isEmittingParticle.contains(key)) {
 											Location loc = block.getLocation().clone();
 											Location loc2 = loc.clone().add(1,1,1);
 											DustOptions purple = new DustOptions(Color.fromRGB(204, 0, 204), 1);
@@ -510,14 +523,14 @@ public class Bookshelf extends JavaPlugin {
 													}
 												}
 											}
-											Bookshelf.isEmittingParticle.add(key);
+											isEmittingParticle.add(key);
 										}
 									}
 									String key = BookshelfUtils.locKey(player.getOpenInventory().getTopInventory().getLocation());
-									if (!Bookshelf.isEmittingParticle.contains(key)) {
+									if (!isEmittingParticle.contains(key)) {
 										Location pos = player.getOpenInventory().getTopInventory().getLocation().clone().add(0.5, 0.5, 0.5);
 										pos.getWorld().spawnParticle(Particle.PORTAL, pos, 75);
-										Bookshelf.isEmittingParticle.add(key);
+										isEmittingParticle.add(key);
 									}
 								}
 							}

@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.loohp.bookshelf.Utils.Updater;
+import com.loohp.bookshelf.Updater.Updater;
 
 import net.md_5.bungee.api.ChatColor;
 
