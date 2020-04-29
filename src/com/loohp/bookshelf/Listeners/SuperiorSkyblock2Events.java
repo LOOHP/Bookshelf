@@ -10,19 +10,17 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.loohp.bookshelf.Bookshelf;
 
-import net.md_5.bungee.api.ChatColor;
-import world.bentobox.bentobox.BentoBox;
-import world.bentobox.bentobox.api.user.User;
-import world.bentobox.bentobox.lists.Flags;
-
-public class BBEvents implements Listener {
+public class SuperiorSkyblock2Events implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBBCheck(PlayerInteractEvent event) {
+	public void onRSCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.BBHook == false) {
+		if (Bookshelf.TownyHook == false) {
 			return;
 		}
 		
@@ -58,17 +56,16 @@ public class BBEvents implements Listener {
 			return;
 		}
 		
-		User user = User.getInstance(player);
-		  
-		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).isPresent()) {
+		Island island = SuperiorSkyblockAPI.getIslandAt(event.getClickedBlock().getLocation());
+		
+		if (island == null) {
 			return;
 		}
-			
-		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).get().isAllowed(user, Flags.CONTAINER)) {
-			String message = BentoBox.getInstance().getLocalesManager().get("protection.protected").replace("[description]", BentoBox.getInstance().getLocalesManager().get("protection.flags.CONTAINER.hint"));
-			player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+		
+		if (!island.hasPermission(SuperiorSkyblockAPI.getPlayer(event.getPlayer().getUniqueId()), IslandPermission.CHEST_ACCESS)) {
 			event.setCancelled(true);
 		}
+
 	}
 	
 }

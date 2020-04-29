@@ -30,13 +30,13 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class WGEvents implements Listener {
+public class WorldGuardEvents implements Listener {
 
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onWGCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.WGHook == false) {
+		if (Bookshelf.WorldGuardHook == false) {
 			return;
 		}
 		

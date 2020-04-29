@@ -10,16 +10,17 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import com.bekvon.bukkit.residence.Residence;
+import com.bekvon.bukkit.residence.containers.Flags;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.loohp.bookshelf.Bookshelf;
 
-import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
-
-public class RPEvents implements Listener {
+public class ResidenceEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onRPCheck(PlayerInteractEvent event) {
+	public void onRSCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.RPHook == false) {
+		if (Bookshelf.ResidenceHook == false) {
 			return;
 		}
 		
@@ -55,13 +56,17 @@ public class RPEvents implements Listener {
 			return;
 		}
 		
-		if (RedProtect.get().getAPI().getRegion(event.getClickedBlock().getLocation()) == null) {
+		@SuppressWarnings("static-access")
+		ClaimedResidence area = Residence.getInstance().getAPI().getResidenceManager().getByLoc(event.getClickedBlock().getLocation());
+		
+		if (area == null) {
 			return;
 		}
-
-		if (!RedProtect.get().getAPI().getRegion(event.getClickedBlock().getLocation()).canChest(player)) {
-			player.sendMessage(RedProtect.get().lang.get("_redprotect.prefix") + " " + RedProtect.get().lang.get("playerlistener.region.cantdoor"));
+		
+		if (area.getPermissions().playerHas(player, Flags.container, true) == false) {
 			event.setCancelled(true);
+			String message = Residence.getInstance().getLM().getMessage("Language.Flag.Deny").replace("%1", Flags.container.name());
+			player.sendMessage(message);
 		}
 	}
 	

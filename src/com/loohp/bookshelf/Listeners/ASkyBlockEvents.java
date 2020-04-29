@@ -10,17 +10,18 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.containers.Flags;
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.loohp.bookshelf.Bookshelf;
+import com.wasteofplastic.askyblock.ASkyBlock;
+import com.wasteofplastic.askyblock.ASkyBlockAPI;
 
-public class RSEvents implements Listener {
+import net.md_5.bungee.api.ChatColor;
+
+public class ASkyBlockEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onRSCheck(PlayerInteractEvent event) {
+	public void onASCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.RSHook == false) {
+		if (Bookshelf.ASkyBlockHook == false) {
 			return;
 		}
 		
@@ -56,17 +57,17 @@ public class RSEvents implements Listener {
 			return;
 		}
 		
-		@SuppressWarnings("static-access")
-		ClaimedResidence area = Residence.getInstance().getAPI().getResidenceManager().getByLoc(event.getClickedBlock().getLocation());
-		
-		if (area == null) {
+		if (ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()) == null) {
 			return;
 		}
 		
-		if (area.getPermissions().playerHas(player, Flags.container, true) == false) {
-			event.setCancelled(true);
-			String message = Residence.getInstance().getLM().getMessage("Language.Flag.Deny").replace("%1", Flags.container.name());
-			player.sendMessage(message);
+		if (!ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()).getOwner().equals(player.getUniqueId())) {
+			if (!ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()).getMembers().contains(player.getUniqueId())) {
+				String message = ASkyBlock.getPlugin().myLocale(player.getUniqueId()).islandProtected;
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+				event.setCancelled(true);
+				
+			}
 		}
 	}
 	

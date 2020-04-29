@@ -16,7 +16,7 @@ import com.loohp.bookshelf.Bookshelf;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
-public class GPEvents implements Listener {
+public class GriefPreventionEvents implements Listener {
 
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.LOW)
@@ -25,7 +25,7 @@ public class GPEvents implements Listener {
 			return;
 		}
 		
-		if (Bookshelf.GPHook == false) {
+		if (Bookshelf.GriefPreventionHook == false) {
 			return;
 		}
 		

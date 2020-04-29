@@ -1,6 +1,5 @@
 package com.loohp.bookshelf.Listeners;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -12,15 +11,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import com.loohp.bookshelf.Bookshelf;
-import com.wasteofplastic.askyblock.ASkyBlock;
-import com.wasteofplastic.askyblock.ASkyBlockAPI;
 
-public class ASEvents implements Listener {
+import net.md_5.bungee.api.ChatColor;
+import world.bentobox.bentobox.BentoBox;
+import world.bentobox.bentobox.api.user.User;
+import world.bentobox.bentobox.lists.Flags;
+
+public class BentoBoxEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onASCheck(PlayerInteractEvent event) {
+	public void onBBCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.ASHook == false) {
+		if (Bookshelf.BentoBoxHook == false) {
 			return;
 		}
 		
@@ -56,17 +58,16 @@ public class ASEvents implements Listener {
 			return;
 		}
 		
-		if (ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()) == null) {
+		User user = User.getInstance(player);
+		  
+		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).isPresent()) {
 			return;
 		}
-		
-		if (!ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()).getOwner().equals(player.getUniqueId())) {
-			if (!ASkyBlockAPI.getInstance().getIslandAt(event.getClickedBlock().getLocation()).getMembers().contains(player.getUniqueId())) {
-				String message = ASkyBlock.getPlugin().myLocale(player.getUniqueId()).islandProtected;
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-				event.setCancelled(true);
-				
-			}
+			
+		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).get().isAllowed(user, Flags.CONTAINER)) {
+			String message = BentoBox.getInstance().getLocalesManager().get("protection.protected").replace("[description]", BentoBox.getInstance().getLocalesManager().get("protection.flags.CONTAINER.hint"));
+			player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+			event.setCancelled(true);
 		}
 	}
 	

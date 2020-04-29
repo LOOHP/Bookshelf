@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -30,14 +29,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.bookshelf.Debug.Debug;
-import com.loohp.bookshelf.Listeners.ASEvents;
-import com.loohp.bookshelf.Listeners.BBEvents;
+import com.loohp.bookshelf.Listeners.ASkyBlockEvents;
+import com.loohp.bookshelf.Listeners.BentoBoxEvents;
 import com.loohp.bookshelf.Listeners.Events;
-import com.loohp.bookshelf.Listeners.GPEvents;
+import com.loohp.bookshelf.Listeners.GriefPreventionEvents;
 import com.loohp.bookshelf.Listeners.LWCEvents;
-import com.loohp.bookshelf.Listeners.RPEvents;
-import com.loohp.bookshelf.Listeners.RSEvents;
-import com.loohp.bookshelf.Listeners.WGEvents;
+import com.loohp.bookshelf.Listeners.RedProtectEvents;
+import com.loohp.bookshelf.Listeners.ResidenceEvents;
+import com.loohp.bookshelf.Listeners.SuperiorSkyblock2Events;
+import com.loohp.bookshelf.Listeners.TownyEvents;
+import com.loohp.bookshelf.Listeners.WorldGuardEvents;
+import com.loohp.bookshelf.Metrics.Charts;
 import com.loohp.bookshelf.Metrics.Metrics;
 import com.loohp.bookshelf.Updater.Updater;
 import com.loohp.bookshelf.Utils.BookshelfUtils;
@@ -56,13 +58,15 @@ public class Bookshelf extends JavaPlugin {
 	public static File cfile;
 	
 	public static boolean LWCHook = false;
-	public static boolean WGHook = false;
-	public static boolean GPHook = false;
+	public static boolean WorldGuardHook = false;
+	public static boolean GriefPreventionHook = false;
 	public static boolean BlockLockerHook = false;
-	public static boolean RPHook = false;
-	public static boolean BBHook = false;
-	public static boolean ASHook = false;
-	public static boolean RSHook = false;
+	public static boolean RedProtectHook = false;
+	public static boolean BentoBoxHook = false;
+	public static boolean ASkyBlockHook = false;
+	public static boolean ResidenceHook = false;
+	public static boolean TownyHook = false;
+	public static boolean SuperiorSkyblock2Hook = false;
 	
 	public static boolean EnableHopperSupport = true;
 	public static boolean EnableDropperSupport = true;
@@ -136,51 +140,73 @@ public class Bookshelf extends JavaPlugin {
 	    }
 	    //------
 	    
+	    String GriefPrevention = "GriefPrevention";
 	    if (Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention") != null) {
-	    	Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into GriefPrevention!");
-	    	getServer().getPluginManager().registerEvents(new GPEvents(), this);
-			GPHook = true;
+	    	hookMessage(GriefPrevention);
+	    	getServer().getPluginManager().registerEvents(new GriefPreventionEvents(), this);
+			GriefPreventionHook = true;
 		}
 		
-		if (Bukkit.getServer().getPluginManager().getPlugin("LWC") != null) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into LWC!");
+	    String LWC = "LWC";
+		if (Bukkit.getServer().getPluginManager().getPlugin(LWC) != null) {
+			hookMessage(LWC);
 			LWCEvents.hookLWC();
 			LWCHook = true;
 		}
 		
-		if (Bukkit.getServer().getPluginManager().getPlugin("BlockLocker") != null) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into BlockLocker!");
+		String BlockLocker = "BlockLocker";
+		if (Bukkit.getServer().getPluginManager().getPlugin(BlockLocker) != null) {
+			hookMessage(BlockLocker);
 			BlockLockerHook = true;
 		}
 		
-		if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into WorldGuard!");
-			getServer().getPluginManager().registerEvents(new WGEvents(), this);
-			WGHook = true;
+		String WorldGuard = "WorldGuard";
+		if (Bukkit.getServer().getPluginManager().getPlugin(WorldGuard) != null) {
+			hookMessage(WorldGuard);
+			getServer().getPluginManager().registerEvents(new WorldGuardEvents(), this);
+			WorldGuardHook = true;
 		}
 		
-		if (Bukkit.getServer().getPluginManager().getPlugin("RedProtect") != null) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into RedProtect!");
-			getServer().getPluginManager().registerEvents(new RPEvents(), this);
-			RPHook = true;
+		String RedProtect = "RedProtect";
+		if (Bukkit.getServer().getPluginManager().getPlugin(RedProtect) != null) {
+			hookMessage(RedProtect);
+			getServer().getPluginManager().registerEvents(new RedProtectEvents(), this);
+			RedProtectHook = true;
 		}
 		
-		if (Bukkit.getServer().getPluginManager().getPlugin("BentoBox") != null) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into BentoBox!");
-			getServer().getPluginManager().registerEvents(new BBEvents(), this);
-			BBHook = true;
+		String BentoBox = "BentoBox";
+		if (Bukkit.getServer().getPluginManager().getPlugin(BentoBox) != null) {
+			hookMessage(BentoBox);
+			getServer().getPluginManager().registerEvents(new BentoBoxEvents(), this);
+			BentoBoxHook = true;
 		}
 		
-		if (Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock") != null) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into ASkyBlock!");
-			getServer().getPluginManager().registerEvents(new ASEvents(), this);
-			ASHook = true;
+		String ASkyBlock = "ASkyBlock";
+		if (Bukkit.getServer().getPluginManager().getPlugin(ASkyBlock) != null) {
+			hookMessage(ASkyBlock);
+			getServer().getPluginManager().registerEvents(new ASkyBlockEvents(), this);
+			ASkyBlockHook = true;
 		}
 		
-		if (Bukkit.getServer().getPluginManager().getPlugin("Residence") != null) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into Residence!");
-			getServer().getPluginManager().registerEvents(new RSEvents(), this);
-			RSHook = true;
+		String Residence = "Residence";	
+		if (Bukkit.getServer().getPluginManager().getPlugin(Residence) != null) {
+			hookMessage(Residence);
+			getServer().getPluginManager().registerEvents(new ResidenceEvents(), this);
+			ResidenceHook = true;
+		}
+		
+		String Towny = "Towny";
+		if (Bukkit.getServer().getPluginManager().getPlugin(Towny) != null) {
+			hookMessage(Towny);
+			getServer().getPluginManager().registerEvents(new TownyEvents(), this);
+			TownyHook = true;
+		}
+		
+		String SuperiorSkyblock2 = "SuperiorSkyblock2";
+		if (Bukkit.getServer().getPluginManager().getPlugin(SuperiorSkyblock2) != null) {
+			hookMessage(SuperiorSkyblock2);
+			getServer().getPluginManager().registerEvents(new SuperiorSkyblock2Events(), this);
+			SuperiorSkyblock2Hook = true;
 		}
 		
 		String packageName = getServer().getClass().getPackage().getName();
@@ -211,7 +237,6 @@ public class Bookshelf extends JavaPlugin {
             version = "OLDlegacy1.8";
         } else {
 	    	getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of minecraft is unsupported!");
-	    	plugin.getPluginLoader().disablePlugin(this);
 	    }
 		
 		if (plugin.getConfig().contains("Options.EnableHopperDropperSupport")) {
@@ -232,67 +257,7 @@ public class Bookshelf extends JavaPlugin {
 	    particles();
 	    loadBookshelf();
 	    
-	    metrics.addCustomChart(new Metrics.SingleLineChart("total_bookshelves", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return BookshelfManager.getJsonObject().size();
-            }
-        }));
-	    
-	    metrics.addCustomChart(new Metrics.SimplePie("hoppers_enabled", new Callable<String>() {
-	        @Override
-	        public String call() throws Exception {
-	        	String string = "Disabled";
-	        	if (EnableHopperSupport == true) {
-	        		string = "Enabled";
-	        	}
-	            return string;
-	        }
-	    }));
-	    
-	    metrics.addCustomChart(new Metrics.SimplePie("droppers_enabled", new Callable<String>() {
-	        @Override
-	        public String call() throws Exception {
-	        	String string = "Disabled";
-	        	if (EnableDropperSupport == true) {
-	        		string = "Enabled";
-	        	}
-	            return string;
-	        }
-	    }));
-	    
-	    metrics.addCustomChart(new Metrics.SimplePie("enchtable_enabled", new Callable<String>() {
-	        @Override
-	        public String call() throws Exception {
-	        	String string = "Disabled";
-	        	if (enchantmentTable == true) {
-	        		string = "Enabled";
-	        	}
-	            return string;
-	        }
-	    }));
-	    
-	    metrics.addCustomChart(new Metrics.SingleLineChart("average_hopper_process_time", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-            	int num = 2147483647;
-            	if (lastHopperTime < 2147483647) {
-            		num = (int) lastHopperTime;
-            	}
-                return num;
-            }
-        }));
-	    
-	    metrics.addCustomChart(new Metrics.SingleLineChart("average_hopper_minecart_process_time", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-            	int num = 2147483647;
-            	if (lastHoppercartTime < 2147483647) {
-            		num = (int) lastHoppercartTime;
-            	}
-                return num;
-            }
-        }));
+	    Charts.loadCharts(metrics);
 		
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[Bookshelf] BookShelf has been Enabled!");
 	}
@@ -309,6 +274,10 @@ public class Bookshelf extends JavaPlugin {
 		BookshelfManager.save();
 		getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Bookshelves saved! (" + (System.currentTimeMillis() - start) + "ms)");
 		getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] BookShelf has been Disabled!");
+	}
+	
+	private static void hookMessage(String name) {
+		Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
 	}
 	
 	public static void loadConfig() {	
