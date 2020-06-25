@@ -13,7 +13,7 @@ public class DropperUtils {
 			return null;
 		}
 		Block relativeBlock = null;
-		if (!Bookshelf.version.contains("legacy")) {
+		if (!Bookshelf.version.isLegacy()) {
 			BlockFace face = ((org.bukkit.block.data.type.Dispenser) block.getBlockData()).getFacing();
 	        Block relative = block.getRelative(face);
 	        relativeBlock = relative;

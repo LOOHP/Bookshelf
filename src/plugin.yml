@@ -1,6 +1,6 @@
 name: BookShelf
 author: loohp
-version: 2.4.0
+version: 2.5.0
 main: com.loohp.bookshelf.Bookshelf
 api-version: 1.13
 description: Actual BookShelf in Minecraft
@@ -15,6 +15,7 @@ softdepend:
   - Residence
   - Towny
   - SuperiorSkyblock2
+  - Lands
 prefix: BookShelf
 
 commands:

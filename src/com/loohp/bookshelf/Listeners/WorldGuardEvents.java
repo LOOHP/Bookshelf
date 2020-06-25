@@ -44,7 +44,7 @@ public class WorldGuardEvents implements Listener {
 			return;
 		}
 		
-		if (!Bookshelf.version.contains("OLD")) {
+		if (!Bookshelf.version.isOld()) {
 			if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
 				return;
 			}

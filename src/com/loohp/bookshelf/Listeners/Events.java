@@ -50,6 +50,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.griefcraft.lwc.LWC;
@@ -63,6 +66,7 @@ import com.loohp.bookshelf.Utils.DropperUtils;
 import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.Utils.InventoryUtils;
 import com.loohp.bookshelf.Utils.LWCUtils;
+import com.loohp.bookshelf.Utils.MCVersion;
 import com.loohp.bookshelf.Utils.MaterialUtils;
 import com.loohp.bookshelf.Utils.NBTUtils;
 import com.loohp.bookshelf.Utils.ReverseList;
@@ -115,7 +119,7 @@ public class Events implements Listener {
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPreEnchantTable(PrepareItemEnchantEvent event) {
-		if (Bookshelf.version.contains("OLD") || Bookshelf.version.equals("legacy1.9") || Bookshelf.version.equals("legacy1.9.4") || Bookshelf.version.equals("legacy1.10")) {
+		if (Bookshelf.version.isOld() || Bookshelf.version.equals(MCVersion.V1_9) || Bookshelf.version.equals(MCVersion.V1_9_4) || Bookshelf.version.equals(MCVersion.V1_10)) {
 			return;
 		}
 		if (Bookshelf.enchantmentTable == false) {
@@ -216,7 +220,7 @@ public class Events implements Listener {
 			}
 			int occurance = entry.getValue().get("Occurance");
 			for (int i = 0; i < occurance; i++) {
-				if (!Bookshelf.version.contains("legacy")) {
+				if (!Bookshelf.version.isLegacy()) {
 					pick.add(entry.getKey().getKey());
 				} else {
 					pick.add(entry.getKey().getName());
@@ -248,7 +252,7 @@ public class Events implements Listener {
 				continue;
 			}
 			Enchantment ench = null;
-			if (!Bookshelf.version.contains("legacy")) {
+			if (!Bookshelf.version.isLegacy()) {
 				ench = Enchantment.getByKey((NamespacedKey) key);
 			} else {
 				ench = Enchantment.getByName((String) key);
@@ -271,7 +275,7 @@ public class Events implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEnchant(EnchantItemEvent event) {
-		if (Bookshelf.version.contains("OLD") || Bookshelf.version.equals("legacy1.9") || Bookshelf.version.equals("legacy1.9.4") || Bookshelf.version.equals("legacy1.10")) {
+		if (Bookshelf.version.isOld() || Bookshelf.version.equals(MCVersion.V1_9) || Bookshelf.version.equals(MCVersion.V1_9_4) || Bookshelf.version.equals(MCVersion.V1_10)) {
 			return;
 		}
 		if (Bookshelf.enchantmentTable == false) {
@@ -311,7 +315,7 @@ public class Events implements Listener {
 			ItemStack item = event.getCursor();
 			if (item.getType().equals(Material.BOOKSHELF) && player.getGameMode().equals(GameMode.CREATIVE) && player.isSneaking() && player.hasPermission("bookshelf.copynbt")) {
 				Block block = null;
-				if (!Bookshelf.version.contains("legacy") && !Bookshelf.version.equals("1.13") && !Bookshelf.version.equals("1.13.1")) {
+				if (!Bookshelf.version.isLegacy() && !Bookshelf.version.equals(MCVersion.V1_13) && !Bookshelf.version.equals(MCVersion.V1_13_1)) {
 					block = player.getTargetBlockExact(10, FluidCollisionMode.NEVER);
 				} else {
 					block = player.getTargetBlock(MaterialUtils.getNonSolidSet(), 10);
@@ -330,8 +334,16 @@ public class Events implements Listener {
 					}
 					String hash = BookshelfUtils.toBase64(Bookshelf.bookshelfContent.get(key));
 					String title = BookshelfManager.getTitle(key);
-					item = NBTUtils.set(item, hash, "BookshelfContent");
-					item = NBTUtils.set(item, title, "BookshelfTitle");
+					if (Bookshelf.version.isLegacy() || Bookshelf.version.equals(MCVersion.V1_13) || Bookshelf.version.equals(MCVersion.V1_13_1)) {
+						item = NBTUtils.set(item, hash, "BookshelfContent");
+						item = NBTUtils.set(item, title, "BookshelfTitle");
+					} else {
+						ItemMeta meta = item.getItemMeta();
+						PersistentDataContainer pdc = meta.getPersistentDataContainer();
+						pdc.set(new NamespacedKey(Bookshelf.plugin, "BookshelfContent"), PersistentDataType.STRING, hash);
+						pdc.set(new NamespacedKey(Bookshelf.plugin, "BookshelfTitle"), PersistentDataType.STRING, title);
+						item.setItemMeta(meta);
+					}
 					event.setCursor(item);
 				}
 			}
@@ -430,12 +442,12 @@ public class Events implements Listener {
 				}.runTaskLater(Bookshelf.plugin, 1);
 			}
 			Bookshelf.bookshelfSavePending.add(key);
-			if (!Bookshelf.version.contains("legacy")) {
+			if (!Bookshelf.version.isLegacy()) {
 				event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
 			}
 			return;
 		}
-		if (!Bookshelf.version.contains("legacy")) {
+		if (!Bookshelf.version.isLegacy()) {
 			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1, 1);
 		}
 	}
@@ -576,20 +588,39 @@ public class Events implements Listener {
 		
 		String loc = BookshelfUtils.locKey(event.getBlockPlaced().getLocation());
 		ItemStack item = event.getItemInHand();
-		if (NBTUtils.contains(item, "BookshelfContent") && NBTUtils.contains(item, "BookshelfTitle")) {
-			String title = NBTUtils.getString(item, "BookshelfTitle");
-			if (!item.getItemMeta().getDisplayName().equals("")) {
-				title = item.getItemMeta().getDisplayName();
+		if (Bookshelf.version.isLegacy() || Bookshelf.version.equals(MCVersion.V1_13) || Bookshelf.version.equals(MCVersion.V1_13_1)) {
+			if (NBTUtils.contains(item, "BookshelfContent") && NBTUtils.contains(item, "BookshelfTitle")) {
+				String title = NBTUtils.getString(item, "BookshelfTitle");
+				if (!item.getItemMeta().getDisplayName().equals("")) {
+					title = item.getItemMeta().getDisplayName();
+				}
+				String hash = NBTUtils.getString(item, "BookshelfContent");
+				try {
+					Bookshelf.bookshelfContent.put(loc, BookshelfUtils.fromBase64(hash, title));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}		
+				BookshelfManager.setTitle(loc, title);
+				BookshelfUtils.saveBookShelf(loc);
+				return;
 			}
-			String hash = NBTUtils.getString(item, "BookshelfContent");
-			try {
-				Bookshelf.bookshelfContent.put(loc, BookshelfUtils.fromBase64(hash, title));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}		
-			BookshelfManager.setTitle(loc, title);
-			BookshelfUtils.saveBookShelf(loc);
-			return;
+		} else {
+			ItemMeta meta = item.getItemMeta();
+			PersistentDataContainer pdc = meta.getPersistentDataContainer();
+			NamespacedKey keyContent = new NamespacedKey(Bookshelf.plugin, "BookshelfContent");
+			NamespacedKey keyTitle = new NamespacedKey(Bookshelf.plugin, "BookshelfTitle");
+			if (pdc.has(keyContent, PersistentDataType.STRING) && pdc.has(keyTitle, PersistentDataType.STRING)) {
+				String hash = pdc.get(keyContent, PersistentDataType.STRING);
+				String title = pdc.get(keyTitle, PersistentDataType.STRING);
+				try {
+					Bookshelf.bookshelfContent.put(loc, BookshelfUtils.fromBase64(hash, title));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}		
+				BookshelfManager.setTitle(loc, title);
+				BookshelfUtils.saveBookShelf(loc);
+				return;
+			}
 		}
 		
 		if (Bookshelf.bookshelfContent.containsKey(loc)) {
@@ -799,11 +830,11 @@ public class Events implements Listener {
 			if (entry.getValue().equals(event.getView().getTopInventory())) {
 				Location loc = BookshelfUtils.keyLoc(entry.getKey());
 				double random = Math.floor(Math.random() * 3) + 1;
-				if (Bookshelf.version.contains("OLD")) {
+				if (Bookshelf.version.isOld()) {
 					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 10, 1);
-        		} else if (Bookshelf.version.contains("legacy") || Bookshelf.version.equals("1.13") || Bookshelf.version.equals("1.13.1")) {
+        		} else if (Bookshelf.version.isLegacy() || Bookshelf.version.equals(MCVersion.V1_13) || Bookshelf.version.equals(MCVersion.V1_13_1)) {
 					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 10, 1);
-				} else if (Bookshelf.version.equals("1.14") || Bookshelf.version.equals("1.15")) {
+				} else {
 					if (random == 1) {
 						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 10, 1);
 					} else if (random == 2) {
@@ -853,11 +884,11 @@ public class Events implements Listener {
 		        	if (i < inventorySize) {
 		        		Location loc = BookshelfUtils.keyLoc(entry.getKey());
 						double random = Math.floor(Math.random() * 3) + 1;
-						if (Bookshelf.version.contains("OLD")) {
+						if (Bookshelf.version.isOld()) {
 							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 10, 1);
-		        		} else if (Bookshelf.version.contains("legacy") || Bookshelf.version.equals("1.13") || Bookshelf.version.equals("1.13.1")) {
+						} else if (Bookshelf.version.isLegacy() || Bookshelf.version.equals(MCVersion.V1_13) || Bookshelf.version.equals(MCVersion.V1_13_1)) {
 							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 10, 1);
-						} else if (Bookshelf.version.equals("1.14") || Bookshelf.version.equals("1.15")) {
+						} else {
 							if (random == 1) {
 								event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 10, 1);
 							} else if (random == 2) {
@@ -887,7 +918,7 @@ public class Events implements Listener {
 			return;
 		}
 		
-		if (!Bookshelf.version.contains("OLD")) {
+		if (!Bookshelf.version.isOld()) {
 			if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
 				return;
 			}

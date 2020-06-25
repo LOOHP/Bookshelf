@@ -12,17 +12,22 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import com.loohp.bookshelf.Bookshelf;
 
-import net.md_5.bungee.api.ChatColor;
-import world.bentobox.bentobox.BentoBox;
-import world.bentobox.bentobox.api.user.User;
-import world.bentobox.bentobox.lists.Flags;
+import me.angeschossen.lands.api.integration.LandsIntegration;
+import me.angeschossen.lands.api.land.Land;
+import me.angeschossen.lands.api.role.enums.RoleSetting;
 
-public class BentoBoxEvents implements Listener {
+public class LandEvents implements Listener {
+	
+	private static LandsIntegration landsAddon;
+	
+	public static void setup() {
+		landsAddon = (landsAddon == null || !(landsAddon instanceof LandsIntegration)) ? new LandsIntegration(Bookshelf.plugin, false) : landsAddon;
+	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBBCheck(PlayerInteractEvent event) {
+	public void onRSCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.BentoBoxHook == false) {
+		if (Bookshelf.LandHook == false) {
 			return;
 		}
 		
@@ -58,17 +63,16 @@ public class BentoBoxEvents implements Listener {
 			return;
 		}
 		
-		User user = User.getInstance(player);
-		  
-		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).isPresent()) {
+		Land land = landsAddon.getLand(event.getClickedBlock().getLocation());
+		
+		if (land == null || !land.exists()) {
 			return;
 		}
-			
-		if (!BentoBox.getInstance().getIslands().getIslandAt(event.getClickedBlock().getLocation()).get().isAllowed(user, Flags.CONTAINER)) {
-			String message = BentoBox.getInstance().getLocalesManager().get("protection.protected").replace("[description]", BentoBox.getInstance().getLocalesManager().get("protection.flags.CONTAINER.hint"));
-			player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+		
+		if (!land.canSetting(player, RoleSetting.INTERACT_CONTAINER, true)) {
 			event.setCancelled(true);
 		}
+
 	}
 	
 }

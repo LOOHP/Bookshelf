@@ -34,6 +34,7 @@ import com.loohp.bookshelf.Listeners.BentoBoxEvents;
 import com.loohp.bookshelf.Listeners.Events;
 import com.loohp.bookshelf.Listeners.GriefPreventionEvents;
 import com.loohp.bookshelf.Listeners.LWCEvents;
+import com.loohp.bookshelf.Listeners.LandEvents;
 import com.loohp.bookshelf.Listeners.RedProtectEvents;
 import com.loohp.bookshelf.Listeners.ResidenceEvents;
 import com.loohp.bookshelf.Listeners.SuperiorSkyblock2Events;
@@ -46,13 +47,14 @@ import com.loohp.bookshelf.Utils.BookshelfUtils;
 import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.Utils.HopperUtils;
 import com.loohp.bookshelf.Utils.LegacyConfigConverter;
+import com.loohp.bookshelf.Utils.MCVersion;
 import com.loohp.bookshelf.Utils.ParticlesUtils;
 
 public class Bookshelf extends JavaPlugin {
 	
 	public static Plugin plugin = null;
 	
-	public static String version = "";
+	public static MCVersion version;
 	
 	public static FileConfiguration config;
 	public static File cfile;
@@ -67,6 +69,7 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean ResidenceHook = false;
 	public static boolean TownyHook = false;
 	public static boolean SuperiorSkyblock2Hook = false;
+	public static boolean LandHook = false;
 	
 	public static boolean EnableHopperSupport = true;
 	public static boolean EnableDropperSupport = true;
@@ -209,33 +212,17 @@ public class Bookshelf extends JavaPlugin {
 			SuperiorSkyblock2Hook = true;
 		}
 		
-		String packageName = getServer().getClass().getPackage().getName();
+		String Lands = "Lands";
+		if (Bukkit.getServer().getPluginManager().getPlugin(Lands) != null) {
+			hookMessage(Lands);
+			getServer().getPluginManager().registerEvents(new LandEvents(), this);
+			LandEvents.setup();
+			LandHook = true;
+		}
+		
+		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 
-        if (packageName.contains("1_15_R1")) {
-            version = "1.15";
-        } else if (packageName.contains("1_14_R1")) {
-            version = "1.14";
-        } else if (packageName.contains("1_13_R2")) {
-            version = "1.13.1";
-        } else if (packageName.contains("1_13_R1")) {
-            version = "1.13";
-        } else if (packageName.contains("1_12_R1")) {
-            version = "legacy1.12";
-        } else if (packageName.contains("1_11_R1")) {
-            version = "legacy1.11";
-        } else if (packageName.contains("1_10_R1")) {
-            version = "legacy1.10";
-        } else if (packageName.contains("1_9_R2")) {
-            version = "legacy1.9.4";
-        } else if (packageName.contains("1_9_R1")) {
-            version = "legacy1.9";
-        } else if (packageName.contains("1_8_R3")) {
-            version = "OLDlegacy1.8.4";
-        } else if (packageName.contains("1_8_R2")) {
-            version = "OLDlegacy1.8.3";
-        } else if (packageName.contains("1_8_R1")) {
-            version = "OLDlegacy1.8";
-        } else {
+		if (!version.isSupported()) {
 	    	getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of minecraft is unsupported!");
 	    }
 		
@@ -446,7 +433,7 @@ public class Bookshelf extends JavaPlugin {
 	public void particles() {
 		new BukkitRunnable() {
 			public void run() {
-				if (particlesEnabled == true && !version.contains("legacy")) {
+				if (particlesEnabled == true && !version.isLegacy()) {
 					isEmittingParticle.clear();
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.getOpenInventory() != null) {

@@ -299,7 +299,7 @@ public class HopperUtils {
     @SuppressWarnings("deprecation")
 	public static List<Block> getHoppersIn(Block block, BlockFace... faces) {
         List<Block> hoppers = new ArrayList<Block>();
-        if (!Bookshelf.version.contains("legacy")) {
+        if (!Bookshelf.version.isLegacy()) {
 	        for (BlockFace face : faces) {
 	            Block relative = block.getRelative(face);
 	            if (relative.getType().equals(Material.HOPPER)) {
