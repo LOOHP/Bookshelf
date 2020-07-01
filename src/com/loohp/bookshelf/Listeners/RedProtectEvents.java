@@ -17,7 +17,7 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 public class RedProtectEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onRPCheck(PlayerInteractEvent event) {
+	public void onRedProtectCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.RedProtectHook == false) {
 			return;

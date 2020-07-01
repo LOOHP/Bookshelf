@@ -18,7 +18,7 @@ import com.loohp.bookshelf.Bookshelf;
 public class SuperiorSkyblock2Events implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onRSCheck(PlayerInteractEvent event) {
+	public void onSuperiorSkyblock2Check(PlayerInteractEvent event) {
 		
 		if (Bookshelf.TownyHook == false) {
 			return;

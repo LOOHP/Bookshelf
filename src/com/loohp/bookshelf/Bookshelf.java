@@ -35,6 +35,7 @@ import com.loohp.bookshelf.Listeners.Events;
 import com.loohp.bookshelf.Listeners.GriefPreventionEvents;
 import com.loohp.bookshelf.Listeners.LWCEvents;
 import com.loohp.bookshelf.Listeners.LandEvents;
+import com.loohp.bookshelf.Listeners.PlotSquaredEvents;
 import com.loohp.bookshelf.Listeners.RedProtectEvents;
 import com.loohp.bookshelf.Listeners.ResidenceEvents;
 import com.loohp.bookshelf.Listeners.SuperiorSkyblock2Events;
@@ -70,6 +71,7 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean TownyHook = false;
 	public static boolean SuperiorSkyblock2Hook = false;
 	public static boolean LandHook = false;
+	public static boolean PlotSquaredHook = false;
 	
 	public static boolean EnableHopperSupport = true;
 	public static boolean EnableDropperSupport = true;
@@ -218,6 +220,13 @@ public class Bookshelf extends JavaPlugin {
 			getServer().getPluginManager().registerEvents(new LandEvents(), this);
 			LandEvents.setup();
 			LandHook = true;
+		}
+		
+		String PlotSquared = "PlotSquared";
+		if (Bukkit.getServer().getPluginManager().getPlugin(PlotSquared) != null) {
+			hookMessage(PlotSquared);
+			getServer().getPluginManager().registerEvents(new PlotSquaredEvents(), this);
+			PlotSquaredHook = true;
 		}
 		
 		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());

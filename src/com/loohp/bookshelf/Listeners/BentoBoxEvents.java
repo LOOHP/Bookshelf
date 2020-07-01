@@ -20,7 +20,7 @@ import world.bentobox.bentobox.lists.Flags;
 public class BentoBoxEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBBCheck(PlayerInteractEvent event) {
+	public void onBentoBoxCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.BentoBoxHook == false) {
 			return;

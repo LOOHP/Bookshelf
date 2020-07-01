@@ -17,7 +17,7 @@ import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
 public class TownyEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onRSCheck(PlayerInteractEvent event) {
+	public void onTownyEventsCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.TownyHook == false) {
 			return;

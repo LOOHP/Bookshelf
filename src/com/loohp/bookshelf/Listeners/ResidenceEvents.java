@@ -18,7 +18,7 @@ import com.loohp.bookshelf.Bookshelf;
 public class ResidenceEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onRSCheck(PlayerInteractEvent event) {
+	public void onResidenceCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.ResidenceHook == false) {
 			return;

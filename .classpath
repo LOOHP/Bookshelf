@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/LandsAPI.jar"/>
 	<classpathentry kind="lib" path="D:/Users/LOOHP/Downloads/BentoBox (1)/bentobox-1.13.1.jar"/>
 	<classpathentry kind="lib" path="D:/Users/LOOHP/Desktop 2/test/buildtools/spigot-1.16.1.jar"/>
+	<classpathentry kind="lib" path="D:/Users/LOOHP/Desktop 2/test/spigot/PlotSquared-Bukkit-4.4.495.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

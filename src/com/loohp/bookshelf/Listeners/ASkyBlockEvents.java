@@ -19,7 +19,7 @@ import net.md_5.bungee.api.ChatColor;
 public class ASkyBlockEvents implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onASCheck(PlayerInteractEvent event) {
+	public void onASkyBlockCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.ASkyBlockHook == false) {
 			return;

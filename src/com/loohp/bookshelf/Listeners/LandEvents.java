@@ -25,7 +25,7 @@ public class LandEvents implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onRSCheck(PlayerInteractEvent event) {
+	public void onLandCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.LandHook == false) {
 			return;

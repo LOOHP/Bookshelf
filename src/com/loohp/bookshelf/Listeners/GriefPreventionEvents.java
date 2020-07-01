@@ -18,12 +18,8 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 public class GriefPreventionEvents implements Listener {
 
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.LOW)
-	public void onGPCheck(PlayerInteractEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
+	public void onGriefPreventionCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.GriefPreventionHook == false) {
 			return;

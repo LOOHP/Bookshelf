@@ -34,7 +34,7 @@ public class WorldGuardEvents implements Listener {
 
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onWGCheck(PlayerInteractEvent event) {
+	public void onWorldGuardCheck(PlayerInteractEvent event) {
 		
 		if (Bookshelf.WorldGuardHook == false) {
 			return;
