@@ -19,7 +19,7 @@ public class RedProtectEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onRedProtectCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.RedProtectHook == false) {
+		if (!Bookshelf.RedProtectHook) {
 			return;
 		}
 		
@@ -42,7 +42,7 @@ public class RedProtectEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {

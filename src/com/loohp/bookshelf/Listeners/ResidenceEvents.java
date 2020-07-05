@@ -20,7 +20,7 @@ public class ResidenceEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onResidenceCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.ResidenceHook == false) {
+		if (!Bookshelf.ResidenceHook) {
 			return;
 		}
 		
@@ -43,7 +43,7 @@ public class ResidenceEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {
@@ -63,7 +63,7 @@ public class ResidenceEvents implements Listener {
 			return;
 		}
 		
-		if (area.getPermissions().playerHas(player, Flags.container, true) == false) {
+		if (!area.getPermissions().playerHas(player, Flags.container, true)) {
 			event.setCancelled(true);
 			String message = Residence.getInstance().getLM().getMessage("Language.Flag.Deny").replace("%1", Flags.container.name());
 			player.sendMessage(message);

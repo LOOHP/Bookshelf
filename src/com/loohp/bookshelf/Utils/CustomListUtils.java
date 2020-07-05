@@ -4,10 +4,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ReverseList<T> implements Iterable<T> {
+public class CustomListUtils<T> implements Iterable<T> {
     private final List<T> original;
 
-    public ReverseList(List<T> original) {
+    public CustomListUtils(List<T> original) {
         this.original = original;
     }
 
@@ -21,7 +21,7 @@ public class ReverseList<T> implements Iterable<T> {
         };
     }
 
-    public static <T> ReverseList<T> reversed(List<T> original) {
-        return new ReverseList<T>(original);
+    public static <T> CustomListUtils<T> reverse(List<T> original) {
+        return new CustomListUtils<T>(original);
     }
 }

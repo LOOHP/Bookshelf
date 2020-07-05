@@ -16,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -44,15 +43,12 @@ public class BookshelfUtils {
 	
 	public static List<Block> getAllBookshelvesInChunk(Chunk chunk) {
 		List<Block> list = new ArrayList<Block>();
-		for (int x = (chunk.getX() * 16); x < ((chunk.getX() + 1) * 16 - 1); x = x + 1) {
-			for (int z = (chunk.getZ() * 16); z < ((chunk.getZ() + 1) * 16 - 1); z = z + 1) {
-				for (int y = 0; y < 256; y = y + 1) {
-					Location loc = new Location(chunk.getWorld(), x, y, z);
-					Block block = loc.getBlock();
-					if (block != null) {
-						if (block.getType().equals(Material.BOOKSHELF)) {
-							list.add(block);
-						}
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				for (int y = 0; y < 256; y++) {
+					Block block = chunk.getBlock(x, y, z);
+					if (block.getType().equals(Material.BOOKSHELF)) {
+						list.add(block);
 					}
 				}
 			}
@@ -96,12 +92,8 @@ public class BookshelfUtils {
 		if (loc == null || loc.equals("null")) {
 			return;
 		}
-		if (remove == true) {
-			new BukkitRunnable() {
-				public void run() {				
-					Bookshelf.bookshelfContent.remove(loc);
-				}
-			}.runTaskLater(Bookshelf.plugin, 300);
+		if (remove) {
+			Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.bookshelfContent.remove(loc), 300);
 		}
 	}
 	
@@ -123,7 +115,7 @@ public class BookshelfUtils {
 		String[] breakdown = key.split("_");
 		String worldString = "";
 		List<String> list = new ArrayList<String>();
-		for (int i = 0; i < (breakdown.length - 3); i = i + 1) {
+		for (int i = 0; i < (breakdown.length - 3); i++) {
 			list.add(breakdown[i]);
 		}
 		worldString = String.join("_", list);
@@ -131,8 +123,7 @@ public class BookshelfUtils {
 		int x = Integer.parseInt(breakdown[breakdown.length - 3]);
 		int y = Integer.parseInt(breakdown[breakdown.length - 2]);
 		int z = Integer.parseInt(breakdown[breakdown.length - 1]);
-		Location loc = new Location(world, x, y, z);
-		return loc;
+		return new Location(world, x, y, z);
 	}
 	
 	public static String toBase64(Inventory inventory) throws IllegalStateException {

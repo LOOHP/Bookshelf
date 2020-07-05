@@ -21,7 +21,7 @@ public class ASkyBlockEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onASkyBlockCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.ASkyBlockHook == false) {
+		if (!Bookshelf.ASkyBlockHook) {
 			return;
 		}
 		
@@ -44,7 +44,7 @@ public class ASkyBlockEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {

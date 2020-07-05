@@ -28,7 +28,7 @@ public class PlotSquaredEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlotSquaredCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.PlotSquaredHook == false) {
+		if (!Bookshelf.PlotSquaredHook) {
 			return;
 		}
 		
@@ -51,7 +51,7 @@ public class PlotSquaredEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (bukkitPlayer.isSneaking() == true) {
+		if (bukkitPlayer.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {
@@ -89,7 +89,10 @@ public class PlotSquaredEvents implements Listener {
 			}
 		}
 		
-		MainUtil.sendMessage(player, Captions.FLAG_TUTORIAL_USAGE, Captions.FLAG_USE);
+		try {
+			MainUtil.sendMessage(player, Captions.FLAG_TUTORIAL_USAGE, Captions.FLAG_USE);
+		} catch (Exception ignore) {}
+		
 		event.setCancelled(true);
 	}
 	

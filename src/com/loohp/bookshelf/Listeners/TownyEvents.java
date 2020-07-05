@@ -19,7 +19,7 @@ public class TownyEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onTownyEventsCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.TownyHook == false) {
+		if (!Bookshelf.TownyHook) {
 			return;
 		}
 		
@@ -42,7 +42,7 @@ public class TownyEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {

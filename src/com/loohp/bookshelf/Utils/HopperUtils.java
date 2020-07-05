@@ -48,7 +48,7 @@ public class HopperUtils {
 					for (Entity entity : world.getEntities()) {
 						if (entity.getType().equals(EntityType.MINECART_HOPPER)) {
 							HopperMinecart hoppercart = (HopperMinecart) entity;
-							if (hoppercart.isEnabled() == false) {
+							if (!hoppercart.isEnabled()) {
 								continue;
 							}
 							if (hoppercart.getLocation().getBlock().getRelative(BlockFace.UP) == null) {
@@ -72,16 +72,16 @@ public class HopperUtils {
 				            	}
 				            	if (InventoryUtils.stillHaveSpace(inventory, item.getType())) {
 				            		
-				            		if (Bookshelf.BlockLockerHook == true) {
-										if (BlockLockerUtils.isLocked(bookshelfBlock) == true) {
+				            		if (Bookshelf.BlockLockerHook) {
+										if (BlockLockerUtils.isLocked(bookshelfBlock)) {
 											break;
 										}
 									}
-									if (Bookshelf.LWCHook == true) {
-										if (LWCUtils.checkHopperFlagOut(bookshelfBlock) == false) {
+									if (Bookshelf.LWCHook) {
+										if (!LWCUtils.checkHopperFlagOut(bookshelfBlock)) {
 											break;
 										}
-										if (LWCUtils.checkHopperFlagIn(hoppercart) == false) {
+										if (!LWCUtils.checkHopperFlagIn(hoppercart)) {
 											break;
 										}
 									}
@@ -209,19 +209,19 @@ public class HopperUtils {
 			            	if (item == null) {
 			            		continue;
 			            	}
-			            	if (Bookshelf.UseWhitelist == true) {
+			            	if (Bookshelf.UseWhitelist) {
 				            	if (Bookshelf.Whitelist.contains(item.getType().toString().toUpperCase())) {
 				            		if (InventoryUtils.stillHaveSpace(bookshelfInv, item.getType())) {
-				            			if (Bookshelf.LWCHook == true) {
-											if (LWCUtils.checkHopperFlagOut(hopper) == false) {
+				            			if (Bookshelf.LWCHook) {
+											if (!LWCUtils.checkHopperFlagOut(hopper)) {
 												break;
 											}
-											if (LWCUtils.checkHopperFlagIn(bookshelfBlock) == false) {
+											if (!LWCUtils.checkHopperFlagIn(bookshelfBlock)) {
 												break;
 											}
 										}
-				            			if (Bookshelf.BlockLockerHook == true) {
-				    						if (BlockLockerUtils.canRedstone(bookshelfBlock) == false) {
+				            			if (Bookshelf.BlockLockerHook) {
+				    						if (!BlockLockerUtils.canRedstone(bookshelfBlock)) {
 				    							break;
 				    						}
 				    					}
@@ -248,16 +248,16 @@ public class HopperUtils {
 				            	}
 			            	} else {
 			            		if (InventoryUtils.stillHaveSpace(bookshelfInv, item.getType())) {
-			            			if (Bookshelf.LWCHook == true) {
-										if (LWCUtils.checkHopperFlagOut(hopper) == false) {
+			            			if (Bookshelf.LWCHook) {
+										if (!LWCUtils.checkHopperFlagOut(hopper)) {
 											break;
 										}
-										if (LWCUtils.checkHopperFlagIn(bookshelfBlock) == false) {
+										if (!LWCUtils.checkHopperFlagIn(bookshelfBlock)) {
 											break;
 										}
 									}
-			            			if (Bookshelf.BlockLockerHook == true) {
-			    						if (BlockLockerUtils.canRedstone(bookshelfBlock) == false) {
+			            			if (Bookshelf.BlockLockerHook) {
+			    						if (!BlockLockerUtils.canRedstone(bookshelfBlock)) {
 			    							break;
 			    						}
 			    					}
@@ -360,16 +360,16 @@ public class HopperUtils {
     }
     
     public static boolean isAllow(Block block) {
-    	if (Bookshelf.BlockLockerHook == true) {
-			if (BlockLockerUtils.canRedstone(block) == false) {
+    	if (Bookshelf.BlockLockerHook) {
+			if (!BlockLockerUtils.canRedstone(block)) {
 				return false;
 			}
 		}
-		if (Bookshelf.LWCHook == true) {
-			if (LWCUtils.checkHopperFlagOut(block) == false) {
+		if (Bookshelf.LWCHook) {
+			if (!LWCUtils.checkHopperFlagOut(block)) {
 				return false;
 			}
-			if (LWCUtils.checkHopperFlagIn(block.getRelative(BlockFace.DOWN)) == false) {
+			if (!LWCUtils.checkHopperFlagIn(block.getRelative(BlockFace.DOWN))) {
 				return false;
 			}
 		}

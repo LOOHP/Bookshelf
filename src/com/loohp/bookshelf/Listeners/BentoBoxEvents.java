@@ -22,7 +22,7 @@ public class BentoBoxEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBentoBoxCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.BentoBoxHook == false) {
+		if (!Bookshelf.BentoBoxHook) {
 			return;
 		}
 		
@@ -45,7 +45,7 @@ public class BentoBoxEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {

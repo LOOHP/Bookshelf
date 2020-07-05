@@ -20,7 +20,7 @@ public class SuperiorSkyblock2Events implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onSuperiorSkyblock2Check(PlayerInteractEvent event) {
 		
-		if (Bookshelf.TownyHook == false) {
+		if (!Bookshelf.TownyHook) {
 			return;
 		}
 		
@@ -43,7 +43,7 @@ public class SuperiorSkyblock2Events implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {

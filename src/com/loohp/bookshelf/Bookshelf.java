@@ -2,13 +2,16 @@ package com.loohp.bookshelf;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -77,8 +80,8 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean EnableDropperSupport = true;
 	public static int HopperTaskID = -1;
 	public static int HopperMinecartTaskID = -1;
-	public static long HopperTicksPerTransfer = 8;
-	public static long HopperAmount = 1;
+	public static int HopperTicksPerTransfer = 8;
+	public static int HopperAmount = 1;
 	
 	public static ConcurrentHashMap<String, Inventory> bookshelfContent = new ConcurrentHashMap<String, Inventory>();
 	
@@ -90,10 +93,10 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static ConcurrentHashMap<Player, String> requestOpen = new ConcurrentHashMap<Player, String>();
 	
-	public static long BookShelfRows = 2;
+	public static int BookShelfRows = 2;
 	public static boolean UseWhitelist = true;
 	public static String Title = "Bookshelf";
-	public static List<String> Whitelist = new CopyOnWriteArrayList<String>();
+	public static Set<String> Whitelist = new HashSet<String>();
 	public static boolean particlesEnabled = true;
 	
 	public static String NoPermissionToReloadMessage = "&cYou do not have permission use this command!";
@@ -108,8 +111,8 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static ConcurrentHashMap<Player, Long> enchantSeed = new ConcurrentHashMap<Player, Long>();
 
-	private static long spawnchunks = 0;
-	private static long done = 0;
+	private static int spawnchunks = 0;
+	private static int done = 0;
 	private static String currentWorld = "world";
 	
 	public static long lastHopperTime = 0;
@@ -146,76 +149,76 @@ public class Bookshelf extends JavaPlugin {
 	    //------
 	    
 	    String GriefPrevention = "GriefPrevention";
-	    if (Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention") != null) {
+	    if (getServer().getPluginManager().getPlugin("GriefPrevention") != null) {
 	    	hookMessage(GriefPrevention);
 	    	getServer().getPluginManager().registerEvents(new GriefPreventionEvents(), this);
 			GriefPreventionHook = true;
 		}
 		
 	    String LWC = "LWC";
-		if (Bukkit.getServer().getPluginManager().getPlugin(LWC) != null) {
+		if (getServer().getPluginManager().getPlugin(LWC) != null) {
 			hookMessage(LWC);
 			LWCEvents.hookLWC();
 			LWCHook = true;
 		}
 		
 		String BlockLocker = "BlockLocker";
-		if (Bukkit.getServer().getPluginManager().getPlugin(BlockLocker) != null) {
+		if (getServer().getPluginManager().getPlugin(BlockLocker) != null) {
 			hookMessage(BlockLocker);
 			BlockLockerHook = true;
 		}
 		
 		String WorldGuard = "WorldGuard";
-		if (Bukkit.getServer().getPluginManager().getPlugin(WorldGuard) != null) {
+		if (getServer().getPluginManager().getPlugin(WorldGuard) != null) {
 			hookMessage(WorldGuard);
 			getServer().getPluginManager().registerEvents(new WorldGuardEvents(), this);
 			WorldGuardHook = true;
 		}
 		
 		String RedProtect = "RedProtect";
-		if (Bukkit.getServer().getPluginManager().getPlugin(RedProtect) != null) {
+		if (getServer().getPluginManager().getPlugin(RedProtect) != null) {
 			hookMessage(RedProtect);
 			getServer().getPluginManager().registerEvents(new RedProtectEvents(), this);
 			RedProtectHook = true;
 		}
 		
 		String BentoBox = "BentoBox";
-		if (Bukkit.getServer().getPluginManager().getPlugin(BentoBox) != null) {
+		if (getServer().getPluginManager().getPlugin(BentoBox) != null) {
 			hookMessage(BentoBox);
 			getServer().getPluginManager().registerEvents(new BentoBoxEvents(), this);
 			BentoBoxHook = true;
 		}
 		
 		String ASkyBlock = "ASkyBlock";
-		if (Bukkit.getServer().getPluginManager().getPlugin(ASkyBlock) != null) {
+		if (getServer().getPluginManager().getPlugin(ASkyBlock) != null) {
 			hookMessage(ASkyBlock);
 			getServer().getPluginManager().registerEvents(new ASkyBlockEvents(), this);
 			ASkyBlockHook = true;
 		}
 		
 		String Residence = "Residence";	
-		if (Bukkit.getServer().getPluginManager().getPlugin(Residence) != null) {
+		if (getServer().getPluginManager().getPlugin(Residence) != null) {
 			hookMessage(Residence);
 			getServer().getPluginManager().registerEvents(new ResidenceEvents(), this);
 			ResidenceHook = true;
 		}
 		
 		String Towny = "Towny";
-		if (Bukkit.getServer().getPluginManager().getPlugin(Towny) != null) {
+		if (getServer().getPluginManager().getPlugin(Towny) != null) {
 			hookMessage(Towny);
 			getServer().getPluginManager().registerEvents(new TownyEvents(), this);
 			TownyHook = true;
 		}
 		
 		String SuperiorSkyblock2 = "SuperiorSkyblock2";
-		if (Bukkit.getServer().getPluginManager().getPlugin(SuperiorSkyblock2) != null) {
+		if (getServer().getPluginManager().getPlugin(SuperiorSkyblock2) != null) {
 			hookMessage(SuperiorSkyblock2);
 			getServer().getPluginManager().registerEvents(new SuperiorSkyblock2Events(), this);
 			SuperiorSkyblock2Hook = true;
 		}
 		
 		String Lands = "Lands";
-		if (Bukkit.getServer().getPluginManager().getPlugin(Lands) != null) {
+		if (getServer().getPluginManager().getPlugin(Lands) != null) {
 			hookMessage(Lands);
 			getServer().getPluginManager().registerEvents(new LandEvents(), this);
 			LandEvents.setup();
@@ -223,7 +226,7 @@ public class Bookshelf extends JavaPlugin {
 		}
 		
 		String PlotSquared = "PlotSquared";
-		if (Bukkit.getServer().getPluginManager().getPlugin(PlotSquared) != null) {
+		if (getServer().getPluginManager().getPlugin(PlotSquared) != null) {
 			hookMessage(PlotSquared);
 			getServer().getPluginManager().registerEvents(new PlotSquaredEvents(), this);
 			PlotSquaredHook = true;
@@ -251,7 +254,8 @@ public class Bookshelf extends JavaPlugin {
 	    intervalLoad();
 	    intervalRemove();
 	    particles();
-	    loadBookshelf();
+	    
+	    loadBookshelf(getServer().getWorlds());	    
 	    
 	    Charts.loadCharts(metrics);
 		
@@ -277,9 +281,9 @@ public class Bookshelf extends JavaPlugin {
 	}
 	
 	public static void loadConfig() {	
-		BookShelfRows = plugin.getConfig().getLong("Options.BookShelfRows");
+		BookShelfRows = plugin.getConfig().getInt("Options.BookShelfRows");
 		UseWhitelist = plugin.getConfig().getBoolean("Options.UseWhitelist");
-		Whitelist = plugin.getConfig().getStringList("Options.Whitelist");
+		Whitelist = plugin.getConfig().getStringList("Options.Whitelist").stream().collect(Collectors.toSet());
 		Title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Options.Title"));
 		NoPermissionToReloadMessage = plugin.getConfig().getString("Options.NoPermissionToReloadMessage");
 		NoPermissionToUpdateMessage = plugin.getConfig().getString("Options.NoPermissionToUpdateMessage");
@@ -304,8 +308,8 @@ public class Bookshelf extends JavaPlugin {
 			Bukkit.getScheduler().cancelTask(HopperMinecartTaskID);
 		}
 		if (EnableHopperSupport == true) {
-			HopperTicksPerTransfer = Bukkit.spigot().getConfig().getLong("world-settings.default.ticks-per.hopper-transfer");
-			HopperAmount = Bukkit.spigot().getConfig().getLong("world-settings.default.hopper-amount");
+			HopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
+			HopperAmount = Bukkit.spigot().getConfig().getInt("world-settings.default.hopper-amount");
 			HopperUtils.hopperCheck();
 			HopperUtils.hopperMinecartCheck();
 		}
@@ -319,21 +323,27 @@ public class Bookshelf extends JavaPlugin {
 		}
 	}
 	
-	public void loadBookshelf() {
+	public static void loadBookshelf(World world) {
+		List<World> worlds = new ArrayList<World>(1);
+		worlds.add(world);
+		loadBookshelf(worlds);
+	}
+	
+	public synchronized static void loadBookshelf(List<World> worlds) {
 		long start = System.currentTimeMillis();
-		for (World world : Bukkit.getWorlds()) {
+		for (World world : worlds) {
 			spawnchunks = world.getLoadedChunks().length;
 			done = 0;
 			currentWorld = world.getName();
 			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Loading bookshelves in spawn chunks in " + world.getName());
 			loadBookshelfProgress();
-			for (Chunk chunk: world.getLoadedChunks()) {
+			for (Chunk chunk : world.getLoadedChunks()) {
 				for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 					String loc = BookshelfUtils.locKey(block.getLocation());
 					if (!bookshelfContent.containsKey(loc)) {
 						if (!BookshelfManager.contains(loc)) {
 							String bsTitle = Title;
-							bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
+							bookshelfContent.put(loc, Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
 							BookshelfManager.setTitle(loc, bsTitle);
 							BookshelfUtils.saveBookShelf(loc);
 						} else {
@@ -341,25 +351,32 @@ public class Bookshelf extends JavaPlugin {
 						}
 					}
 				}
-				done = done + 1;
+				done++;
 			}
 			Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks in " + currentWorld + ": 100%");
 		}
 		BookshelfManager.save();
 		BookshelfManager.intervalSaveToFile();
-		Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Bookshelf] Bookshelves loaded! (" + (System.currentTimeMillis() - start) + "ms)");
+		Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Bookshelf] Bookshelves loaded in " + worlds.size() + (worlds.size() == 1 ? " world" : " worlds") + "! (" + (System.currentTimeMillis() - start) + "ms)");
 	}
 	
-	public void loadBookshelfProgress() {
+	public static void loadBookshelfProgress() {
 		CompletableFuture.runAsync(()->{
+			long start = System.currentTimeMillis();
 			String thisWorld = currentWorld;
+			long lastDone = 0;
 			while (done < spawnchunks && thisWorld == currentWorld) {
 				Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks in " + currentWorld + ": " + Math.round((double) ((double) done / (double) spawnchunks) * 100) + "%");
+				if ((System.currentTimeMillis() - start) > 30000) {
+					return;
+				}
+				if (lastDone != done) {
+					start = System.currentTimeMillis();
+					lastDone = done;
+				}
 				try {
 					TimeUnit.MILLISECONDS.sleep(500);
-				} catch (InterruptedException e) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Error");
-				}
+				} catch (InterruptedException ignore) {}
 			}
 		});
 	}

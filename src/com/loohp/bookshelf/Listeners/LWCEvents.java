@@ -3,7 +3,6 @@ package com.loohp.bookshelf.Listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.model.Permission.Access;
@@ -49,29 +48,27 @@ public class LWCEvents implements Module {
 		if (!event.getPlayer().hasPermission("bookshelf.use")) {
 			return;
 		}
-		new BukkitRunnable() {
-			public void run() {
-				Player player = event.getPlayer();
-				if (!Bookshelf.requestOpen.containsKey(player)) {
-					return;
-				}
-				String loc = Bookshelf.requestOpen.get(player);
-				Protection protection = event.getProtection();
-				if (LWC.getInstance().getPlugin().getLWC().canAccessProtection(player, protection) == true || !event.getAccess().equals(Access.NONE)) {
-					if (event.getProtection().getType().equals(Type.DONATION)) {
-						if (!Bookshelf.isDonationView.contains(player)) {
-							Bookshelf.isDonationView.add(player);
-						}
-					}
-					Inventory inv = Bookshelf.bookshelfContent.get(loc);
-					Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(inv));
-					if (!Bookshelf.bookshelfSavePending.contains(loc)) {
-						Bookshelf.bookshelfSavePending.add(loc);
-					}
-				}
-				Bookshelf.requestOpen.remove(player);
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
+			Player player = event.getPlayer();
+			if (!Bookshelf.requestOpen.containsKey(player)) {
+				return;
 			}
-		}.runTaskLater(Bookshelf.plugin, 1);
+			String loc = Bookshelf.requestOpen.get(player);
+			Protection protection = event.getProtection();
+			if (LWC.getInstance().getPlugin().getLWC().canAccessProtection(player, protection) == true || !event.getAccess().equals(Access.NONE)) {
+				if (event.getProtection().getType().equals(Type.DONATION)) {
+					if (!Bookshelf.isDonationView.contains(player)) {
+						Bookshelf.isDonationView.add(player);
+					}
+				}
+				Inventory inv = Bookshelf.bookshelfContent.get(loc);
+				Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(inv));
+				if (!Bookshelf.bookshelfSavePending.contains(loc)) {
+					Bookshelf.bookshelfSavePending.add(loc);
+				}
+			}
+			Bookshelf.requestOpen.remove(player);
+		}, 1);
 	}
 
 	@Override
@@ -117,13 +114,11 @@ public class LWCEvents implements Module {
 	@Override
 	public void onPostRemoval(LWCProtectionRemovePostEvent event) {
 		Bookshelf.cancelOpen.add(event.getPlayer());
-		new BukkitRunnable() {
-			public void run() {
-				while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-					Bookshelf.cancelOpen.remove(event.getPlayer());
-				}
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
+			while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
+				Bookshelf.cancelOpen.remove(event.getPlayer());
 			}
-		}.runTaskLater(Bookshelf.plugin, 5);
+		}, 5);
 	}
 
 	@Override
@@ -132,13 +127,11 @@ public class LWCEvents implements Module {
 			return;
 		}
 		Bookshelf.cancelOpen.add(event.getPlayer());
-		new BukkitRunnable() {
-			public void run() {
-				while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-					Bookshelf.cancelOpen.remove(event.getPlayer());
-				}
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
+			while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
+				Bookshelf.cancelOpen.remove(event.getPlayer());
 			}
-		}.runTaskLater(Bookshelf.plugin, 5);
+		}, 5);
 	}
 
 	@Override
@@ -154,13 +147,11 @@ public class LWCEvents implements Module {
 	@Override
 	public void onRegisterProtection(LWCProtectionRegisterEvent event) {
 		Bookshelf.cancelOpen.add(event.getPlayer());
-		new BukkitRunnable() {
-			public void run() {
-				while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-					Bookshelf.cancelOpen.remove(event.getPlayer());
-				}
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
+			while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
+				Bookshelf.cancelOpen.remove(event.getPlayer());
 			}
-		}.runTaskLater(Bookshelf.plugin, 5);
+		}, 5);
 	}
 
 	@Override

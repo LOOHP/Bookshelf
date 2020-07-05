@@ -21,7 +21,7 @@ public class GriefPreventionEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void onGriefPreventionCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.GriefPreventionHook == false) {
+		if (!Bookshelf.GriefPreventionHook) {
 			return;
 		}
 		
@@ -44,7 +44,7 @@ public class GriefPreventionEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {
@@ -57,7 +57,7 @@ public class GriefPreventionEvents implements Listener {
 			return;
 		}
 		
-		if (GriefPrevention.instance.claimsEnabledForWorld(event.getClickedBlock().getWorld()) == false) {
+		if (!GriefPrevention.instance.claimsEnabledForWorld(event.getClickedBlock().getWorld())) {
 			return;
 		}
 		

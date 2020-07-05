@@ -27,7 +27,7 @@ public class LandEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onLandCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.LandHook == false) {
+		if (!Bookshelf.LandHook) {
 			return;
 		}
 		
@@ -50,7 +50,7 @@ public class LandEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {

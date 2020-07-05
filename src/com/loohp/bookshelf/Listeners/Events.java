@@ -46,6 +46,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -69,7 +70,7 @@ import com.loohp.bookshelf.Utils.LWCUtils;
 import com.loohp.bookshelf.Utils.MCVersion;
 import com.loohp.bookshelf.Utils.MaterialUtils;
 import com.loohp.bookshelf.Utils.NBTUtils;
-import com.loohp.bookshelf.Utils.ReverseList;
+import com.loohp.bookshelf.Utils.CustomListUtils;
 
 public class Events implements Listener {
 
@@ -122,11 +123,11 @@ public class Events implements Listener {
 		if (Bookshelf.version.isOld() || Bookshelf.version.equals(MCVersion.V1_9) || Bookshelf.version.equals(MCVersion.V1_9_4) || Bookshelf.version.equals(MCVersion.V1_10)) {
 			return;
 		}
-		if (Bookshelf.enchantmentTable == false) {
+		if (!Bookshelf.enchantmentTable) {
 			return;
 		}
 		
-		if (event.isCancelled() == true) {
+		if (event.isCancelled()) {
 			return;
 		}
 		
@@ -278,11 +279,11 @@ public class Events implements Listener {
 		if (Bookshelf.version.isOld() || Bookshelf.version.equals(MCVersion.V1_9) || Bookshelf.version.equals(MCVersion.V1_9_4) || Bookshelf.version.equals(MCVersion.V1_10)) {
 			return;
 		}
-		if (Bookshelf.enchantmentTable == false) {
+		if (!Bookshelf.enchantmentTable) {
 			return;
 		}
 		
-		if (event.isCancelled() == true) {
+		if (event.isCancelled()) {
 			return;
 		}
 		
@@ -307,7 +308,7 @@ public class Events implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onCreativePickBlock(InventoryCreativeEvent event) {
-		if (event.isCancelled() == true) {
+		if (event.isCancelled()) {
 			return;
 		}
 		if (event.getClick().equals(ClickType.CREATIVE)) {
@@ -352,10 +353,10 @@ public class Events implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onDropper(BlockDispenseEvent event) {
-		if (Bookshelf.EnableDropperSupport == false) {
+		if (!Bookshelf.EnableDropperSupport) {
 			return;
 		}
-		if (event.isCancelled() == true) {
+		if (event.isCancelled()) {
 			return;
 		}
 		if (!event.getBlock().getType().equals(Material.DROPPER)) {
@@ -376,14 +377,14 @@ public class Events implements Listener {
 				BookshelfUtils.loadBookShelf(key);
 			}
 		}
-		if (Bookshelf.LWCHook == true) {
-			if (LWCUtils.checkHopperFlagIn(relative) == false) {
+		if (Bookshelf.LWCHook) {
+			if (!LWCUtils.checkHopperFlagIn(relative)) {
 				event.setCancelled(true);
 				return;
 			}
 		}
-		if (Bookshelf.BlockLockerHook == true) {
-			if (BlockLockerUtils.canRedstone(relative) == false) {
+		if (Bookshelf.BlockLockerHook) {
+			if (!BlockLockerUtils.canRedstone(relative)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -400,12 +401,12 @@ public class Events implements Listener {
 			if (each == null) {
 				continue;
 			}
-			if (Bookshelf.UseWhitelist == true) {
+			if (Bookshelf.UseWhitelist) {
 				if (!Bookshelf.Whitelist.contains(each.getType().toString().toUpperCase())) {
 					continue;
 				}
 			}
-			if (InventoryUtils.stillHaveSpace(bookshelf, each.getType()) == false) {
+			if (!InventoryUtils.stillHaveSpace(bookshelf, each.getType())) {
 				continue;
 			}
 			ItemStack additem = each.clone();
@@ -424,7 +425,7 @@ public class Events implements Listener {
             		break;
             	}
 			}
-			if (removed == false) {
+			if (!removed) {
 				new BukkitRunnable() {
 					public void run() {
 						for (int i = 0; i < dropper.getSize(); i = i + 1) {
@@ -453,8 +454,13 @@ public class Events implements Listener {
 	}
 	
 	@EventHandler
+	public void onWorldLoad(WorldLoadEvent event) {
+		Bookshelf.loadBookshelf(event.getWorld());
+	}
+	
+	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event) {
-		if (Bookshelf.EnableHopperSupport == false) {
+		if (!Bookshelf.EnableHopperSupport) {
 			return;
 		}
 		Chunk chunk = event.getChunk();
@@ -466,7 +472,7 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onChunkUnload(ChunkUnloadEvent event) {
-		if (Bookshelf.EnableHopperSupport == false) {
+		if (!Bookshelf.EnableHopperSupport) {
 			return;
 		}
 		Chunk chunk = event.getChunk();
@@ -501,7 +507,7 @@ public class Events implements Listener {
 		}
 		
 		BlockFace dir = event.getDirection();
-		for (Block bookshelf : ReverseList.reversed(bookshelves)) {
+		for (Block bookshelf : CustomListUtils.reverse(bookshelves)) {
 			String key = BookshelfUtils.locKey(bookshelf.getLocation());
 			Inventory inv = Bookshelf.bookshelfContent.get(key);
 			Location newLoc = bookshelf.getRelative(dir).getLocation().clone();
@@ -544,7 +550,7 @@ public class Events implements Listener {
 		}
 		
 		BlockFace dir = event.getDirection();
-		for (Block bookshelf : ReverseList.reversed(bookshelves)) {
+		for (Block bookshelf : CustomListUtils.reverse(bookshelves)) {
 			String key = BookshelfUtils.locKey(bookshelf.getLocation());
 			Inventory inv = Bookshelf.bookshelfContent.get(key);
 			Location newLoc = bookshelf.getRelative(dir).getLocation().clone();
@@ -572,7 +578,7 @@ public class Events implements Listener {
 		}
 		
 		if (event.getBlockAgainst().getType().equals(Material.BOOKSHELF)) {
-			if (event.getPlayer().isSneaking() == false && Bookshelf.lastBlockFace.containsKey(event.getPlayer())) {
+			if (!event.getPlayer().isSneaking() && Bookshelf.lastBlockFace.containsKey(event.getPlayer())) {
 				BlockFace face = Bookshelf.lastBlockFace.get(event.getPlayer());				
 				
 				if (face.equals(BlockFace.EAST) || face.equals(BlockFace.SOUTH) || face.equals(BlockFace.WEST) || face.equals(BlockFace.NORTH)) {
@@ -631,8 +637,8 @@ public class Events implements Listener {
 		}
 		
 		String bsTitle = Bookshelf.Title;
-		if (event.getItemInHand().hasItemMeta() == true) {
-			if (event.getItemInHand().getItemMeta().hasDisplayName() == true) {
+		if (event.getItemInHand().hasItemMeta()) {
+			if (event.getItemInHand().getItemMeta().hasDisplayName()) {
 				if (!event.getItemInHand().getItemMeta().getDisplayName().equals("")) {
 					bsTitle = event.getItemInHand().getItemMeta().getDisplayName();
 				}
@@ -748,7 +754,7 @@ public class Events implements Listener {
 			}
 		}
 		
-		if (Bookshelf.UseWhitelist == false) {
+		if (!Bookshelf.UseWhitelist) {
 			return;
 		}
 		if (event.getAction().equals(InventoryAction.NOTHING) || event.getAction().equals(InventoryAction.UNKNOWN) || event.getAction().equals(InventoryAction.DROP_ALL_CURSOR) || event.getAction().equals(InventoryAction.DROP_ALL_SLOT) || event.getAction().equals(InventoryAction.DROP_ONE_CURSOR) || event.getAction().equals(InventoryAction.DROP_ONE_SLOT  )) {
@@ -823,9 +829,10 @@ public class Events implements Listener {
 			}
 		}
 		
-		if (putting == false) {
+		if (!putting) {
 			return;
 		}
+		
 		for (Entry<String, Inventory> entry : Bookshelf.bookshelfContent.entrySet()) {
 			if (entry.getValue().equals(event.getView().getTopInventory())) {
 				Location loc = BookshelfUtils.keyLoc(entry.getKey());
@@ -854,7 +861,7 @@ public class Events implements Listener {
 			return;
 		}
 		
-		if (Bookshelf.UseWhitelist == false) {
+		if (!Bookshelf.UseWhitelist) {
 			return;
 		}
 		
@@ -933,7 +940,7 @@ public class Events implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {
@@ -965,7 +972,7 @@ public class Events implements Listener {
 				BookshelfUtils.loadBookShelf(loc);
 			}
 		}
-		if (Bookshelf.LWCHook == true) {
+		if (Bookshelf.LWCHook) {
 			Location blockLoc = BookshelfUtils.keyLoc(loc);
 			Protection protection = LWC.getInstance().getPlugin().getLWC().findProtection(blockLoc.getBlock());
 			if (protection != null) {

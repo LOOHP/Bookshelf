@@ -36,7 +36,7 @@ public class WorldGuardEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onWorldGuardCheck(PlayerInteractEvent event) {
 		
-		if (Bookshelf.WorldGuardHook == false) {
+		if (!Bookshelf.WorldGuardHook) {
 			return;
 		}
 		
@@ -59,7 +59,7 @@ public class WorldGuardEvents implements Listener {
 		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
 			return;
 		}
-		if (player.isSneaking() == true) {
+		if (player.isSneaking()) {
 			return;
 		}
 		if (event.getClickedBlock() == null) {
@@ -74,7 +74,7 @@ public class WorldGuardEvents implements Listener {
 		
 		LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 		boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld());
-		if (canBypass == true) {
+		if (canBypass) {
 			return;
 		}
 		
@@ -104,7 +104,7 @@ public class WorldGuardEvents implements Listener {
 			} else if (testFlag(query, Flags.BUILD, loc, localPlayer).equals("true")) {
 				return;
 			} else {
-				if (isGlobal == false) {
+				if (!isGlobal) {
 					List<ProtectedRegion> regions = Lists.newArrayList();
 					
 					for (ProtectedRegion reg : set.getRegions()) {
