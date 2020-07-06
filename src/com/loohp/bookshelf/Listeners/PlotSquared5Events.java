@@ -90,6 +90,10 @@ public class PlotSquared5Events implements Listener {
 			}
 		}
 		
+		if (plot.getOwners().contains(player.getUUID())) {
+			return;
+		}
+		
 		if (plot.getTrusted().contains(player.getUUID())) {
 			return;
 		}

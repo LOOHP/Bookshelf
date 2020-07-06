@@ -63,6 +63,7 @@ import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.Special;
 import com.loohp.bookshelf.Utils.BlockLockerUtils;
 import com.loohp.bookshelf.Utils.BookshelfUtils;
+import com.loohp.bookshelf.Utils.CustomListUtils;
 import com.loohp.bookshelf.Utils.DropperUtils;
 import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.Utils.InventoryUtils;
@@ -70,7 +71,6 @@ import com.loohp.bookshelf.Utils.LWCUtils;
 import com.loohp.bookshelf.Utils.MCVersion;
 import com.loohp.bookshelf.Utils.MaterialUtils;
 import com.loohp.bookshelf.Utils.NBTUtils;
-import com.loohp.bookshelf.Utils.CustomListUtils;
 
 public class Events implements Listener {
 

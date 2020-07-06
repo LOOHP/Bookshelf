@@ -79,6 +79,10 @@ public class PlotSquared4Events implements Listener {
 			return;
 		}
 		
+		if (plot.getOwners().contains(player.getUUID())) {
+			return;
+		}
+		
 		if (plot.getTrusted().contains(player.getUUID())) {
 			return;
 		}
