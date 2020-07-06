@@ -15,7 +15,6 @@ import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.loohp.bookshelf.Bookshelf;
@@ -74,17 +73,7 @@ public class PlotSquared4Events implements Listener {
 		org.bukkit.Location bukkitLocation = event.getClickedBlock().getLocation();
 		Location location = new Location(bukkitLocation.getWorld().getName(), bukkitLocation.getBlockX(), bukkitLocation.getBlockY(), bukkitLocation.getBlockZ());
 		
-		PlotArea plotarea = PlotSquared.get().getApplicablePlotArea(location);
-		
-		if (plotarea == null) {
-			return;
-		}
-		
-		Plot plot = plotarea.getPlot(location);
-		
-		if (plot == null) {
-			return;
-		}
+		Plot plot = PlotSquared.get().getApplicablePlotArea(location).getPlot(location);
 		
 		if (Flags.USE.contains(plot, worldeditBookshelfBlockState)) {
 			return;
