@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -38,7 +37,8 @@ import com.loohp.bookshelf.Listeners.Events;
 import com.loohp.bookshelf.Listeners.GriefPreventionEvents;
 import com.loohp.bookshelf.Listeners.LWCEvents;
 import com.loohp.bookshelf.Listeners.LandEvents;
-import com.loohp.bookshelf.Listeners.PlotSquaredEvents;
+import com.loohp.bookshelf.Listeners.PlotSquared4Events;
+import com.loohp.bookshelf.Listeners.PlotSquared5Events;
 import com.loohp.bookshelf.Listeners.RedProtectEvents;
 import com.loohp.bookshelf.Listeners.ResidenceEvents;
 import com.loohp.bookshelf.Listeners.SuperiorSkyblock2Events;
@@ -53,6 +53,8 @@ import com.loohp.bookshelf.Utils.HopperUtils;
 import com.loohp.bookshelf.Utils.LegacyConfigConverter;
 import com.loohp.bookshelf.Utils.MCVersion;
 import com.loohp.bookshelf.Utils.ParticlesUtils;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class Bookshelf extends JavaPlugin {
 	
@@ -134,6 +136,8 @@ public class Bookshelf extends JavaPlugin {
 		int pluginId = 6748;
 
 		Metrics metrics = new Metrics(this, pluginId);
+		
+		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 	    
 	    getServer().getPluginManager().registerEvents(new Events(), this);
 	    
@@ -227,12 +231,19 @@ public class Bookshelf extends JavaPlugin {
 		
 		String PlotSquared = "PlotSquared";
 		if (getServer().getPluginManager().getPlugin(PlotSquared) != null) {
-			hookMessage(PlotSquared);
-			getServer().getPluginManager().registerEvents(new PlotSquaredEvents(), this);
-			PlotSquaredHook = true;
+			String plotSquaredVersion = getServer().getPluginManager().getPlugin(PlotSquared).getDescription().getVersion();
+			if (plotSquaredVersion.startsWith("5.")) {
+				hookMessage(PlotSquared + " (v5)");
+				getServer().getPluginManager().registerEvents(new PlotSquared5Events(), this);
+				PlotSquaredHook = true;
+			} else if (plotSquaredVersion.startsWith("4.")) {
+				hookMessage(PlotSquared + " (v4)");
+				getServer().getPluginManager().registerEvents(new PlotSquared4Events(), this);
+				PlotSquaredHook = true;
+			} else {
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of PlotSquared is not supported, only v4 and v5 is supported so far.");
+			}
 		}
-		
-		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 
 		if (!version.isSupported()) {
 	    	getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of minecraft is unsupported!");

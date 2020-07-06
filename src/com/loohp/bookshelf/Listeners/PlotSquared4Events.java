@@ -21,7 +21,7 @@ import com.loohp.bookshelf.Bookshelf;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockState;
 
-public class PlotSquaredEvents implements Listener {
+public class PlotSquared4Events implements Listener {
 	
 	BlockState worldeditBookshelfBlockState = BukkitAdapter.adapt(Bukkit.createBlockData(Material.BOOKSHELF));
 
