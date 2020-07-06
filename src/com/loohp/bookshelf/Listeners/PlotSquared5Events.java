@@ -18,6 +18,7 @@ import com.plotsquared.core.configuration.Captions;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.flag.PlotFlag;
 import com.plotsquared.core.plot.flag.implementations.UseFlag;
 import com.plotsquared.core.plot.flag.types.BlockTypeWrapper;
@@ -78,7 +79,17 @@ public class PlotSquared5Events implements Listener {
 		org.bukkit.Location bukkitLocation = event.getClickedBlock().getLocation();
 		Location location = new Location(bukkitLocation.getWorld().getName(), bukkitLocation.getBlockX(), bukkitLocation.getBlockY(), bukkitLocation.getBlockZ());
 		
-		Plot plot = PlotSquared.get().getApplicablePlotArea(location).getPlot(location);
+		PlotArea plotarea = PlotSquared.get().getApplicablePlotArea(location);
+		
+		if (plotarea == null) {
+			return;
+		}
+		
+		Plot plot = plotarea.getPlot(location);
+		
+		if (plot == null) {
+			return;
+		}
 		
 		for (PlotFlag<?, ?> flag : plot.getFlags()) {
 			if (flag instanceof UseFlag) {
