@@ -26,7 +26,7 @@ import com.loohp.bookshelf.BookshelfManager;
 public class BookshelfUtils {
 	
 	public static void safeRemoveBookself(String key) {
-		Inventory remove = Bookshelf.bookshelfContent.get(key);
+		Inventory remove = Bookshelf.keyToContentMapping.get(key);
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getOpenInventory() != null) {
 				if (player.getOpenInventory().getTopInventory() != null) {
@@ -37,7 +37,7 @@ public class BookshelfUtils {
 				}
 			}
 		}
-		Bookshelf.bookshelfContent.remove(key);
+		Bookshelf.removeBookshelfFromMapping(key);
 		BookshelfManager.removeShelf(key);
 	}
 	
@@ -81,11 +81,11 @@ public class BookshelfUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Bookshelf.bookshelfContent.put(loc, inv);
+		Bookshelf.addBookshelfToMapping(loc, inv);
 	}
 	
 	public static void saveBookShelf(String loc, boolean remove){
-		Inventory inv = Bookshelf.bookshelfContent.get(loc);
+		Inventory inv = Bookshelf.keyToContentMapping.get(loc);
 		String hash = "";
 		hash = BookshelfUtils.toBase64(inv);
 		BookshelfManager.setInventoryHash(loc, hash);
@@ -93,12 +93,12 @@ public class BookshelfUtils {
 			return;
 		}
 		if (remove) {
-			Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.bookshelfContent.remove(loc), 300);
+			Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.removeBookshelfFromMapping(loc), 300);
 		}
 	}
 	
 	public static void saveBookShelf(String loc){
-		Inventory inv = Bookshelf.bookshelfContent.get(loc);
+		Inventory inv = Bookshelf.keyToContentMapping.get(loc);
 		String hash = "";
 		hash = BookshelfUtils.toBase64(inv);
 		BookshelfManager.setInventoryHash(loc, hash);

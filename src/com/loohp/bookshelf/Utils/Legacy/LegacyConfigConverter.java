@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Utils;
+package com.loohp.bookshelf.Utils.Legacy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +24,7 @@ import net.md_5.bungee.api.ChatColor;
 public class LegacyConfigConverter {
 	
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static void convert() {
 		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Legacy v1.0.0 data format detected!");
 		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Converting bookshelf data to v2.0.0 JSON format!");

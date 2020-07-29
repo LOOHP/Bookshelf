@@ -1,7 +1,6 @@
 package com.loohp.bookshelf.API;
 
 import java.io.IOException;
-import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,13 +16,12 @@ import com.loohp.bookshelf.Utils.BookshelfUtils;
 
 public class BookshelfAPI {
 	
+	public static int getBookshelfSize() {
+		return Bookshelf.BookShelfRows * 9;
+	}
+	
 	public static String getKeyFromInventory(Inventory inventory) {
-		for (Entry<String, Inventory> entry : Bookshelf.bookshelfContent.entrySet()) {
-			if (entry.getValue().equals(inventory)) {
-				return entry.getKey();
-			}
-		}
-		return null;
+		return Bookshelf.contentToKeyMapping.get(inventory);
 	}
 	
 	public static boolean isBookshelf(Block block) {
@@ -34,31 +32,25 @@ public class BookshelfAPI {
 	}
 	
 	public static Block getPlayerOpeningBookshelf(Player player) {
-		if (player.getOpenInventory().getTopInventory() == null) {
+		Inventory inventory = player.getOpenInventory().getTopInventory();
+		if (inventory == null) {
 			return null;
 		}
-		for (Entry<String, Inventory> entry : Bookshelf.bookshelfContent.entrySet()) {
-			if (entry.getValue().equals(player.getOpenInventory().getTopInventory())) {
-				Location loc = BookshelfUtils.keyLoc(entry.getKey());
-				return loc.getBlock();
-			}
+		String key = Bookshelf.contentToKeyMapping.get(inventory);
+		if (key != null) {
+			Location loc = BookshelfUtils.keyLoc(key);
+			return loc.getBlock();
 		}
 		return null;
 	}
 
 	public static Inventory getBookshelfInventory(Location location) {
 		String key = BookshelfUtils.locKey(location);
-		if (Bookshelf.bookshelfContent.containsKey(key)) {
-			return Bookshelf.bookshelfContent.get(key);
-		}
-		return null;
+		return Bookshelf.keyToContentMapping.get(key);
 	}
 	
 	public static Inventory getBookshelfInventory(String key) {
-		if (Bookshelf.bookshelfContent.containsKey(key)) {
-			return Bookshelf.bookshelfContent.get(key);
-		}
-		return null;
+		return Bookshelf.keyToContentMapping.get(key);
 	}
 	
 	public static Inventory loadBookshelfFromStorage(Location location) {
@@ -75,8 +67,8 @@ public class BookshelfAPI {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] Unable to load bookshelf inventory");
 			e.printStackTrace();
 		}
-		Bookshelf.bookshelfContent.put(key, inv);
-		return Bookshelf.bookshelfContent.get(key);
+		Bookshelf.addBookshelfToMapping(key, inv);
+		return Bookshelf.keyToContentMapping.get(key);
 	}
 	
 	public static Inventory loadBookshelfFromStorage(String key) {
@@ -91,8 +83,8 @@ public class BookshelfAPI {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Bookshelf.bookshelfContent.put(key, inv);
-		return Bookshelf.bookshelfContent.get(key);
+		Bookshelf.addBookshelfToMapping(key, inv);
+		return Bookshelf.keyToContentMapping.get(key);
 	}
 	
 	public static String getBookshelfTitle(Location location) {
@@ -112,10 +104,10 @@ public class BookshelfAPI {
 	
 	public static boolean createBookshelf(Location location) {
 		String key = BookshelfUtils.locKey(location);
-		if (!Bookshelf.bookshelfContent.containsKey(key)) {
+		if (!Bookshelf.keyToContentMapping.containsKey(key)) {
 			if (!BookshelfManager.contains(key)) {
 				String bsTitle = Bookshelf.Title;
-				Bookshelf.bookshelfContent.put(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
 				BookshelfManager.setTitle(key, bsTitle);
 				BookshelfUtils.saveBookShelf(key);
 				return true;
@@ -125,10 +117,10 @@ public class BookshelfAPI {
 	}
 	
 	public static boolean createBookshelf(String key) {
-		if (!Bookshelf.bookshelfContent.containsKey(key)) {
+		if (!Bookshelf.keyToContentMapping.containsKey(key)) {
 			if (!BookshelfManager.contains(key)) {
 				String bsTitle = Bookshelf.Title;
-				Bookshelf.bookshelfContent.put(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
 				BookshelfManager.setTitle(key, bsTitle);
 				BookshelfUtils.saveBookShelf(key);
 				return true;
@@ -154,14 +146,14 @@ public class BookshelfAPI {
 	
 	public static boolean isBookshelfLoaded(Location location) {
 		String key = BookshelfUtils.locKey(location);
-		if (Bookshelf.bookshelfContent.containsKey(key)) {
+		if (Bookshelf.keyToContentMapping.containsKey(key)) {
 			return true;
 		}
 		return false;
 	}
 	
 	public static boolean isBookshelfLoaded(String key) {
-		if (Bookshelf.bookshelfContent.containsKey(key)) {
+		if (Bookshelf.keyToContentMapping.containsKey(key)) {
 			return true;
 		}
 		return false;

@@ -1,15 +1,14 @@
 package com.loohp.bookshelf;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -22,37 +21,43 @@ import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.bookshelf.Debug.Debug;
-import com.loohp.bookshelf.Listeners.ASkyBlockEvents;
-import com.loohp.bookshelf.Listeners.BentoBoxEvents;
-import com.loohp.bookshelf.Listeners.Events;
-import com.loohp.bookshelf.Listeners.GriefPreventionEvents;
-import com.loohp.bookshelf.Listeners.LWCEvents;
-import com.loohp.bookshelf.Listeners.LandEvents;
-import com.loohp.bookshelf.Listeners.PlotSquared4Events;
-import com.loohp.bookshelf.Listeners.PlotSquared5Events;
-import com.loohp.bookshelf.Listeners.RedProtectEvents;
-import com.loohp.bookshelf.Listeners.ResidenceEvents;
-import com.loohp.bookshelf.Listeners.SuperiorSkyblock2Events;
-import com.loohp.bookshelf.Listeners.TownyEvents;
-import com.loohp.bookshelf.Listeners.WorldGuardEvents;
+import com.loohp.bookshelf.Hooks.InteractionVisualizerAnimations;
+import com.loohp.bookshelf.Listeners.BookshelfEvents;
+import com.loohp.bookshelf.Listeners.CreativeEvents;
+import com.loohp.bookshelf.Listeners.DispenserEvents;
+import com.loohp.bookshelf.Listeners.EnchantingEvents;
+import com.loohp.bookshelf.Listeners.PistonEvents;
+import com.loohp.bookshelf.Listeners.Hooks.ASkyBlockEvents;
+import com.loohp.bookshelf.Listeners.Hooks.BentoBoxEvents;
+import com.loohp.bookshelf.Listeners.Hooks.GriefPreventionEvents;
+import com.loohp.bookshelf.Listeners.Hooks.LWCEvents;
+import com.loohp.bookshelf.Listeners.Hooks.LandEvents;
+import com.loohp.bookshelf.Listeners.Hooks.PlotSquared4Events;
+import com.loohp.bookshelf.Listeners.Hooks.PlotSquared5Events;
+import com.loohp.bookshelf.Listeners.Hooks.RedProtectEvents;
+import com.loohp.bookshelf.Listeners.Hooks.ResidenceEvents;
+import com.loohp.bookshelf.Listeners.Hooks.SuperiorSkyblock2Events;
+import com.loohp.bookshelf.Listeners.Hooks.TownyEvents;
+import com.loohp.bookshelf.Listeners.Hooks.WorldGuardEvents;
 import com.loohp.bookshelf.Metrics.Charts;
 import com.loohp.bookshelf.Metrics.Metrics;
+import com.loohp.bookshelf.ObjectHolders.LWCRequestOpenData;
 import com.loohp.bookshelf.Updater.Updater;
 import com.loohp.bookshelf.Utils.BookshelfUtils;
 import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.Utils.HopperUtils;
-import com.loohp.bookshelf.Utils.LegacyConfigConverter;
 import com.loohp.bookshelf.Utils.MCVersion;
+import com.loohp.bookshelf.Utils.OpenInvUtils;
 import com.loohp.bookshelf.Utils.ParticlesUtils;
+import com.loohp.bookshelf.Utils.VanishUtils;
+import com.loohp.bookshelf.Utils.Legacy.LegacyConfigConverter;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -62,9 +67,10 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static MCVersion version;
 	
-	public static FileConfiguration config;
-	public static File cfile;
-	
+	public static boolean VanishHook = false;
+	public static boolean CMIHook = false;
+	public static boolean EssentialsHook = false;
+	public static boolean OpenInvHook = false;
 	public static boolean LWCHook = false;
 	public static boolean WorldGuardHook = false;
 	public static boolean GriefPreventionHook = false;
@@ -77,6 +83,7 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean SuperiorSkyblock2Hook = false;
 	public static boolean LandHook = false;
 	public static boolean PlotSquaredHook = false;
+	public static boolean InteractionVisualizerHook = false;
 	
 	public static boolean EnableHopperSupport = true;
 	public static boolean EnableDropperSupport = true;
@@ -85,7 +92,8 @@ public class Bookshelf extends JavaPlugin {
 	public static int HopperTicksPerTransfer = 8;
 	public static int HopperAmount = 1;
 	
-	public static ConcurrentHashMap<String, Inventory> bookshelfContent = new ConcurrentHashMap<String, Inventory>();
+	public static ConcurrentHashMap<String, Inventory> keyToContentMapping = new ConcurrentHashMap<String, Inventory>();
+	public static ConcurrentHashMap<Inventory, String> contentToKeyMapping = new ConcurrentHashMap<Inventory, String>();
 	
 	public static ConcurrentLinkedQueue<String> bookshelfSavePending = new ConcurrentLinkedQueue<String>();
 	public static ConcurrentLinkedQueue<Chunk> bookshelfLoadPending = new ConcurrentLinkedQueue<Chunk>();
@@ -93,7 +101,7 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static ConcurrentHashMap<Player, BlockFace> lastBlockFace = new ConcurrentHashMap<Player, BlockFace>();
 	
-	public static ConcurrentHashMap<Player, String> requestOpen = new ConcurrentHashMap<Player, String>();
+	public static ConcurrentHashMap<Player, LWCRequestOpenData> requestOpen = new ConcurrentHashMap<Player, LWCRequestOpenData>();
 	
 	public static int BookShelfRows = 2;
 	public static boolean UseWhitelist = true;
@@ -104,10 +112,10 @@ public class Bookshelf extends JavaPlugin {
 	public static String NoPermissionToReloadMessage = "&cYou do not have permission use this command!";
 	public static String NoPermissionToUpdateMessage = "&cYou do not have permission use this command!";
 	
-	public static List<Player> cancelOpen = new CopyOnWriteArrayList<Player>();
-	public static ConcurrentLinkedQueue<Player> isDonationView = new ConcurrentLinkedQueue<Player>();
+	public static Set<Player> lwcCancelOpen = ConcurrentHashMap.newKeySet();
+	public static Set<Player> isDonationView = ConcurrentHashMap.newKeySet();
 	
-	public static ConcurrentLinkedQueue<String> isEmittingParticle = new ConcurrentLinkedQueue<String>();
+	public static Set<String> isEmittingParticle = new HashSet<String>();
 	
 	public static ConcurrentHashMap<Long, Location> tempRedstone = new ConcurrentHashMap<Long, Location>();
 	
@@ -128,8 +136,9 @@ public class Bookshelf extends JavaPlugin {
 	public static int UpdaterTaskID = -1;
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void onEnable() {	
-		plugin = (Plugin)getServer().getPluginManager().getPlugin("BookShelf");
+		plugin = this;
 		
 		getServer().getPluginManager().registerEvents(new Debug(), this);
 		
@@ -139,18 +148,47 @@ public class Bookshelf extends JavaPlugin {
 		
 		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 	    
-	    getServer().getPluginManager().registerEvents(new Events(), this);
+	    getServer().getPluginManager().registerEvents(new BookshelfEvents(), this);
+	    getServer().getPluginManager().registerEvents(new CreativeEvents(), this);
+	    getServer().getPluginManager().registerEvents(new DispenserEvents(), this);
+	    getServer().getPluginManager().registerEvents(new EnchantingEvents(), this);
+	    getServer().getPluginManager().registerEvents(new PistonEvents(), this);
 	    
 	    getCommand("bookshelf").setExecutor(new Commands());
 		
-	    plugin.getConfig().options().copyDefaults(true);
-	    plugin.saveConfig();
+	    getConfig().options().copyDefaults(true);
+	    saveConfig();
 
 	    //v2.0.0 upgrade
 	    if (plugin.getConfig().contains("BookShelfData")) {
 	    	LegacyConfigConverter.convert();
 	    }
 	    //------
+	    
+	    String SuperVanish = "SuperVanish";
+	    String PremiumVanish = "PremiumVanish";
+	    if (getServer().getPluginManager().getPlugin(SuperVanish) != null || getServer().getPluginManager().getPlugin(PremiumVanish) != null) {
+			hookMessage(SuperVanish + "/" + PremiumVanish);
+			VanishHook = true;
+		}
+	    
+	    String CMI = "CMI";
+		if (getServer().getPluginManager().getPlugin(CMI) != null) {
+			hookMessage(CMI);
+			CMIHook = true;
+		}
+		
+		String Essentials = "Essentials";
+		if (getServer().getPluginManager().getPlugin(Essentials) != null) {
+			hookMessage(Essentials);
+			EssentialsHook = true;
+		}
+	    
+	    String OpenInv = "OpenInv";
+	    if (getServer().getPluginManager().getPlugin(OpenInv) != null) {
+			hookMessage(OpenInv);
+			OpenInvHook = true;
+		}
 	    
 	    String GriefPrevention = "GriefPrevention";
 	    if (getServer().getPluginManager().getPlugin("GriefPrevention") != null) {
@@ -244,6 +282,13 @@ public class Bookshelf extends JavaPlugin {
 				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of PlotSquared is not supported, only v4 and v5 is supported so far.");
 			}
 		}
+		
+		String InteractionVisualizer = "InteractionVisualizer";
+		if (getServer().getPluginManager().getPlugin(InteractionVisualizer) != null) {
+			hookMessage(InteractionVisualizer);
+			getServer().getPluginManager().registerEvents(new InteractionVisualizerAnimations(), this);
+			InteractionVisualizerHook = true;
+		}
 
 		if (!version.isSupported()) {
 	    	getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of minecraft is unsupported!");
@@ -277,9 +322,9 @@ public class Bookshelf extends JavaPlugin {
 	public void onDisable() {
 		getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Saving all pending bookshelves..");
 		long start = System.currentTimeMillis();
-		for (String entry : bookshelfSavePending) {
-			if (bookshelfContent.containsKey(entry)) {
-				BookshelfUtils.saveBookShelf(entry);
+		for (String key : bookshelfSavePending) {
+			if (keyToContentMapping.containsKey(key)) {
+				BookshelfUtils.saveBookShelf(key);
 			}
 		}
 		BookshelfManager.save();
@@ -334,6 +379,31 @@ public class Bookshelf extends JavaPlugin {
 		}
 	}
 	
+	public static boolean removeBookshelfFromMapping(String key) {
+		Inventory inventory = keyToContentMapping.remove(key);
+		if (inventory != null) {
+			contentToKeyMapping.remove(inventory);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static boolean removeBookshelfFromMapping(Inventory inventory) {
+		String key = contentToKeyMapping.remove(inventory);
+		if (key != null) {
+			keyToContentMapping.remove(key);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static void addBookshelfToMapping(String key, Inventory inventory) {
+		keyToContentMapping.put(key, inventory);
+		contentToKeyMapping.put(inventory, key);
+	}
+	
 	public static void loadBookshelf(World world) {
 		List<World> worlds = new ArrayList<World>(1);
 		worlds.add(world);
@@ -351,10 +421,10 @@ public class Bookshelf extends JavaPlugin {
 			for (Chunk chunk : world.getLoadedChunks()) {
 				for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
 					String loc = BookshelfUtils.locKey(block.getLocation());
-					if (!bookshelfContent.containsKey(loc)) {
+					if (!keyToContentMapping.containsKey(loc)) {
 						if (!BookshelfManager.contains(loc)) {
 							String bsTitle = Title;
-							bookshelfContent.put(loc, Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
+							addBookshelfToMapping(loc, Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
 							BookshelfManager.setTitle(loc, bsTitle);
 							BookshelfUtils.saveBookShelf(loc);
 						} else {
@@ -393,144 +463,139 @@ public class Bookshelf extends JavaPlugin {
 	}
 	
 	public void intervalSave() {
-		new BukkitRunnable() {
-			public void run() {
-				List<String> removeList = new ArrayList<String>();
-				for (String entry : bookshelfSavePending) {
-					if (bookshelfContent.containsKey(entry)) {
-						if (!removeList.contains(entry)) {
-							BookshelfUtils.saveBookShelf(entry);
-						}
+		Bukkit.getScheduler().runTaskTimer(this, () -> {
+			List<String> removeList = new ArrayList<String>();
+			for (String key : bookshelfSavePending) {
+				if (keyToContentMapping.containsKey(key)) {
+					if (!removeList.contains(key)) {
+						BookshelfUtils.saveBookShelf(key);
 					}
-					removeList.add(entry);
 				}
-				bookshelfSavePending.clear();
-				removeList.clear();
+				removeList.add(key);
 			}
-		}.runTaskTimer(this, 0, 40);
+			bookshelfSavePending.clear();
+		}, 0, 40);
 	}
 	
 	public void intervalLoad() {
-		new BukkitRunnable() {
-			public void run() {
-				List<Chunk> remove = new ArrayList<Chunk>();
-				int i = 1;
-				for (Chunk chunk : bookshelfLoadPending) {
-					for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
-						String loc = BookshelfUtils.locKey(block.getLocation());
-						if (!bookshelfContent.containsKey(loc)) {
-							if (!BookshelfManager.contains(loc)) {
-								String bsTitle = Title;
-								bookshelfContent.put(loc , Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
-								BookshelfManager.setTitle(loc, bsTitle);
-								BookshelfUtils.saveBookShelf(loc);
-							} else {
-								BookshelfUtils.loadBookShelf(loc);
-							}
+		Bukkit.getScheduler().runTaskTimer(this, () -> {
+			List<Chunk> remove = new ArrayList<Chunk>();
+			int i = 1;
+			for (Chunk chunk : bookshelfLoadPending) {
+				for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
+					String loc = BookshelfUtils.locKey(block.getLocation());
+					if (!keyToContentMapping.containsKey(loc)) {
+						if (!BookshelfManager.contains(loc)) {
+							String bsTitle = Title;
+							addBookshelfToMapping(loc , Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
+							BookshelfManager.setTitle(loc, bsTitle);
+							BookshelfUtils.saveBookShelf(loc);
+						} else {
+							BookshelfUtils.loadBookShelf(loc);
 						}
 					}
-					remove.add(chunk);
-					i++;
-					if (i > 2) {
-						break;
-					}
 				}
-				for (Chunk chunk : remove) {
-					bookshelfLoadPending.remove(chunk);
+				remove.add(chunk);
+				i++;
+				if (i > 2) {
+					break;
 				}
 			}
-		}.runTaskTimer(this, 0, 1);
+			for (Chunk chunk : remove) {
+				bookshelfLoadPending.remove(chunk);
+			}
+		}, 0, 1);
 	}
 	
 	public void intervalRemove() {
-		new BukkitRunnable() {
-			public void run() {
-				List<Chunk> remove = new ArrayList<Chunk>();
-				int i = 1;
-				for (Chunk chunk : bookshelfRemovePending) {
-					for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
-						String loc = BookshelfUtils.locKey(block.getLocation());
-						if (bookshelfContent.containsKey(loc)) {
-							BookshelfUtils.saveBookShelf(loc, true);
-						}
-					}
-					remove.add(chunk);
-					i++;
-					if (i > 2) {
-						break;
+		Bukkit.getScheduler().runTaskTimer(this, () -> {
+			int i = 1;
+			Iterator<Chunk> itr = bookshelfRemovePending.iterator();
+			while (itr.hasNext()) {
+				Chunk chunk = itr.next();
+				for (Block block : BookshelfUtils.getAllBookshelvesInChunk(chunk)) {
+					String loc = BookshelfUtils.locKey(block.getLocation());
+					if (keyToContentMapping.containsKey(loc)) {
+						BookshelfUtils.saveBookShelf(loc, true);
 					}
 				}
-				for (Chunk chunk : remove) {
-					bookshelfRemovePending.remove(chunk);
+				itr.remove();
+				i++;
+				if (i > 2) {
+					break;
 				}
 			}
-		}.runTaskTimer(this, 0, 1);
+		}, 0, 1);
 	}
 	
 	public void particles() {
-		new BukkitRunnable() {
-			public void run() {
-				if (particlesEnabled == true && !version.isLegacy()) {
-					isEmittingParticle.clear();
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getOpenInventory() != null) {
-							for (Entry<String, Inventory> entry : bookshelfContent.entrySet()) {
-								if (!isEmittingParticle.contains(entry.getKey())) {
-									if (entry.getValue().equals(player.getOpenInventory().getTopInventory())) {
-										Location loc = BookshelfUtils.keyLoc(entry.getKey());
+		Bukkit.getScheduler().runTaskTimer(this, () -> {
+			if (particlesEnabled == true && !version.isLegacy()) {
+				isEmittingParticle.clear();
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					if (OpenInvUtils.isSlientChest(player)) {
+						continue;
+					}
+					if (VanishUtils.isVanished(player)) {
+						continue;
+					}
+					if (player.getOpenInventory() != null) {
+						for (Entry<String, Inventory> entry : keyToContentMapping.entrySet()) {
+							if (!isEmittingParticle.contains(entry.getKey())) {
+								if (entry.getValue().equals(player.getOpenInventory().getTopInventory())) {
+									Location loc = BookshelfUtils.keyLoc(entry.getKey());
+									Location loc2 = loc.clone().add(1,1,1);
+									DustOptions purple = new DustOptions(Color.fromRGB(153, 51, 255), 1);
+									DustOptions yellow = new DustOptions(Color.fromRGB(255, 255, 0), 1);
+									for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
+										double random = Math.random() * 100;
+										if (random > 95) {
+											double ranColor = Math.floor(Math.random() * 2) + 1;
+											if (ranColor == 1) {
+												loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, yellow);
+											} else if (ranColor == 2) {
+												loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, purple);
+											}
+										}
+									}
+									isEmittingParticle.add(entry.getKey());
+								}
+							}
+						}
+						if (enchantmentTable == true) {
+							if (player.getOpenInventory().getTopInventory().getType().equals(InventoryType.ENCHANTING)) {
+								for (Block block : EnchantmentTableUtils.getBookshelves(player.getOpenInventory().getTopInventory().getLocation().getBlock())) {
+									String key = BookshelfUtils.locKey(block.getLocation());
+									if (!isEmittingParticle.contains(key)) {
+										Location loc = block.getLocation().clone();
 										Location loc2 = loc.clone().add(1,1,1);
-										DustOptions purple = new DustOptions(Color.fromRGB(153, 51, 255), 1);
-										DustOptions yellow = new DustOptions(Color.fromRGB(255, 255, 0), 1);
+										DustOptions purple = new DustOptions(Color.fromRGB(204, 0, 204), 1);
+										DustOptions blue = new DustOptions(Color.fromRGB(51, 51, 255), 1);
 										for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
 											double random = Math.random() * 100;
 											if (random > 95) {
 												double ranColor = Math.floor(Math.random() * 2) + 1;
 												if (ranColor == 1) {
-													loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, yellow);
+													loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, blue);
 												} else if (ranColor == 2) {
 													loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, purple);
 												}
 											}
 										}
-										isEmittingParticle.add(entry.getKey());
-									}
-								}
-							}
-							if (enchantmentTable == true) {
-								if (player.getOpenInventory().getTopInventory().getType().equals(InventoryType.ENCHANTING)) {
-									for (Block block : EnchantmentTableUtils.getBookshelves(player.getOpenInventory().getTopInventory().getLocation().getBlock())) {
-										String key = BookshelfUtils.locKey(block.getLocation());
-										if (!isEmittingParticle.contains(key)) {
-											Location loc = block.getLocation().clone();
-											Location loc2 = loc.clone().add(1,1,1);
-											DustOptions purple = new DustOptions(Color.fromRGB(204, 0, 204), 1);
-											DustOptions blue = new DustOptions(Color.fromRGB(51, 51, 255), 1);
-											for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
-												double random = Math.random() * 100;
-												if (random > 95) {
-													double ranColor = Math.floor(Math.random() * 2) + 1;
-													if (ranColor == 1) {
-														loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, blue);
-													} else if (ranColor == 2) {
-														loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, purple);
-													}
-												}
-											}
-											isEmittingParticle.add(key);
-										}
-									}
-									String key = BookshelfUtils.locKey(player.getOpenInventory().getTopInventory().getLocation());
-									if (!isEmittingParticle.contains(key)) {
-										Location pos = player.getOpenInventory().getTopInventory().getLocation().clone().add(0.5, 0.5, 0.5);
-										pos.getWorld().spawnParticle(Particle.PORTAL, pos, 75);
 										isEmittingParticle.add(key);
 									}
+								}
+								String key = BookshelfUtils.locKey(player.getOpenInventory().getTopInventory().getLocation());
+								if (!isEmittingParticle.contains(key)) {
+									Location pos = player.getOpenInventory().getTopInventory().getLocation().clone().add(0.5, 0.5, 0.5);
+									pos.getWorld().spawnParticle(Particle.PORTAL, pos, 75);
+									isEmittingParticle.add(key);
 								}
 							}
 						}
 					}
 				}
 			}
-		}.runTaskTimerAsynchronously(this, 0, 5);
+		}, 0, 5);
 	}
 }

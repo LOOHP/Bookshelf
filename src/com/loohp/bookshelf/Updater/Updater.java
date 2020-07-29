@@ -34,6 +34,7 @@ public class Updater {
 		}.runTaskTimerAsynchronously(Bookshelf.plugin, 500, 600).getTaskId();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static void sendUpdateMessage(String version) {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.hasPermission("bookshelf.update")) {

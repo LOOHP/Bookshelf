@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.Listeners.Hooks;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,6 +26,8 @@ import com.griefcraft.scripting.event.LWCRedstoneEvent;
 import com.griefcraft.scripting.event.LWCReloadEvent;
 import com.griefcraft.scripting.event.LWCSendLocaleEvent;
 import com.loohp.bookshelf.Bookshelf;
+import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.ObjectHolders.LWCRequestOpenData;
 
 public class LWCEvents implements Module {
 	
@@ -53,7 +55,8 @@ public class LWCEvents implements Module {
 			if (!Bookshelf.requestOpen.containsKey(player)) {
 				return;
 			}
-			String loc = Bookshelf.requestOpen.get(player);
+			LWCRequestOpenData data = Bookshelf.requestOpen.get(player);
+			String loc = data.getKey();
 			Protection protection = event.getProtection();
 			if (LWC.getInstance().getPlugin().getLWC().canAccessProtection(player, protection) == true || !event.getAccess().equals(Access.NONE)) {
 				if (event.getProtection().getType().equals(Type.DONATION)) {
@@ -61,10 +64,16 @@ public class LWCEvents implements Module {
 						Bookshelf.isDonationView.add(player);
 					}
 				}
-				Inventory inv = Bookshelf.bookshelfContent.get(loc);
-				Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(inv));
-				if (!Bookshelf.bookshelfSavePending.contains(loc)) {
-					Bookshelf.bookshelfSavePending.add(loc);
+				
+				PlayerOpenBookshelfEvent pobe = new PlayerOpenBookshelfEvent(player, loc, data.getBlockFace(), data.isCancelled());
+				Bukkit.getPluginManager().callEvent(pobe);
+				
+				if (!pobe.isCancelled()) {
+					Inventory inv = Bookshelf.keyToContentMapping.get(loc);
+					Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(inv));
+					if (!Bookshelf.bookshelfSavePending.contains(loc)) {
+						Bookshelf.bookshelfSavePending.add(loc);
+					}
 				}
 			}
 			Bookshelf.requestOpen.remove(player);
@@ -113,12 +122,8 @@ public class LWCEvents implements Module {
 
 	@Override
 	public void onPostRemoval(LWCProtectionRemovePostEvent event) {
-		Bookshelf.cancelOpen.add(event.getPlayer());
-		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
-			while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-				Bookshelf.cancelOpen.remove(event.getPlayer());
-			}
-		}, 5);
+		Bookshelf.lwcCancelOpen.add(event.getPlayer());
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(event.getPlayer()), 5);
 	}
 
 	@Override
@@ -126,12 +131,8 @@ public class LWCEvents implements Module {
 		if (!event.getResult().equals(Result.CANCEL)) {
 			return;
 		}
-		Bookshelf.cancelOpen.add(event.getPlayer());
-		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
-			while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-				Bookshelf.cancelOpen.remove(event.getPlayer());
-			}
-		}, 5);
+		Bookshelf.lwcCancelOpen.add(event.getPlayer());
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(event.getPlayer()), 5);
 	}
 
 	@Override
@@ -146,12 +147,8 @@ public class LWCEvents implements Module {
 
 	@Override
 	public void onRegisterProtection(LWCProtectionRegisterEvent event) {
-		Bookshelf.cancelOpen.add(event.getPlayer());
-		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
-			while (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-				Bookshelf.cancelOpen.remove(event.getPlayer());
-			}
-		}, 5);
+		Bookshelf.lwcCancelOpen.add(event.getPlayer());
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(event.getPlayer()), 5);
 	}
 
 	@Override

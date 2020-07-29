@@ -1,6 +1,6 @@
 name: BookShelf
 author: loohp
-version: 2.6.3
+version: 2.6.4
 main: com.loohp.bookshelf.Bookshelf
 api-version: 1.13
 description: Actual BookShelf in Minecraft
@@ -18,6 +18,12 @@ softdepend:
   - SuperiorSkyblock2
   - Lands
   - PlotSquared
+  - OpenInv
+  - InteractionVisualizer
+  - SuperVanish
+  - PremiumVanish
+  - CMI
+  - Essentials
 prefix: BookShelf
 
 commands:

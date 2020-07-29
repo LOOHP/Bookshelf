@@ -1,18 +1,15 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.Listeners.Hooks;
 
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
 import com.loohp.bookshelf.Bookshelf;
+import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.configuration.Captions;
 import com.plotsquared.core.location.Location;
@@ -31,44 +28,14 @@ public class PlotSquared5Events implements Listener {
 	BlockType worldeditBookshelfBlockType = BukkitAdapter.asBlockType(Material.BOOKSHELF);
 
 	@SuppressWarnings("unchecked")
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlotSquaredCheck(PlayerInteractEvent event) {
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onPlotSquaredCheck(PlayerOpenBookshelfEvent event) {
 		
 		if (!Bookshelf.PlotSquaredHook) {
 			return;
 		}
 		
-		if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			return;
-		}
-		
-		if (!Bookshelf.version.isOld()) {
-			if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
-				return;
-			}
-		}
-		
 		org.bukkit.entity.Player bukkitPlayer = event.getPlayer();
-		
-		if (!bukkitPlayer.hasPermission("bookshelf.use")) {
-			return;
-		}
-		
-		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-			return;
-		}
-		if (bukkitPlayer.isSneaking()) {
-			return;
-		}
-		if (event.getClickedBlock() == null) {
-			return;
-		}
-		if (!event.getClickedBlock().getType().equals(Material.BOOKSHELF)) {
-			return;
-		}
-		if (event.getBlockFace().equals(BlockFace.UP) || event.getBlockFace().equals(BlockFace.DOWN)) {
-			return;
-		}
 		
 		PlotPlayer<?> player = PlotPlayer.wrap(bukkitPlayer);
 		
@@ -76,7 +43,7 @@ public class PlotSquared5Events implements Listener {
 			return;
 		}
 		
-		org.bukkit.Location bukkitLocation = event.getClickedBlock().getLocation();
+		org.bukkit.Location bukkitLocation = event.getLocation();
 		Location location = new Location(bukkitLocation.getWorld().getName(), bukkitLocation.getBlockX(), bukkitLocation.getBlockY(), bukkitLocation.getBlockZ());
 		
 		PlotArea plotarea = PlotSquared.get().getApplicablePlotArea(location);

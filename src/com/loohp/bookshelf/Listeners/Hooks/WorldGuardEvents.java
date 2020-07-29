@@ -1,20 +1,16 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.Listeners.Hooks;
 
 import java.util.List;
 
 import org.bukkit.Effect;
-import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
 import com.google.common.collect.Lists;
 import com.loohp.bookshelf.Bookshelf;
+import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -33,44 +29,14 @@ import net.md_5.bungee.api.ChatColor;
 public class WorldGuardEvents implements Listener {
 
 	@SuppressWarnings("deprecation")
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onWorldGuardCheck(PlayerInteractEvent event) {
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onWorldGuardCheck(PlayerOpenBookshelfEvent event) {
 		
 		if (!Bookshelf.WorldGuardHook) {
 			return;
 		}
 		
-		if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			return;
-		}
-		
-		if (!Bookshelf.version.isOld()) {
-			if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
-				return;
-			}
-		}
-		
 		Player player = event.getPlayer();
-		
-		if (!player.hasPermission("bookshelf.use")) {
-			return;
-		}
-		
-		if (Bookshelf.cancelOpen.contains(event.getPlayer())) {
-			return;
-		}
-		if (player.isSneaking()) {
-			return;
-		}
-		if (event.getClickedBlock() == null) {
-			return;
-		}
-		if (!event.getClickedBlock().getType().equals(Material.BOOKSHELF)) {
-			return;
-		}
-		if (event.getBlockFace().equals(BlockFace.UP) || event.getBlockFace().equals(BlockFace.DOWN)) {
-			return;
-		}
 		
 		LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 		boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld());
@@ -78,7 +44,7 @@ public class WorldGuardEvents implements Listener {
 			return;
 		}
 		
-		com.sk89q.worldedit.util.Location loc = BukkitAdapter.adapt(event.getClickedBlock().getLocation().clone());
+		com.sk89q.worldedit.util.Location loc = BukkitAdapter.adapt(event.getLocation().clone());
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 		RegionQuery query = container.createQuery();
 		ApplicableRegionSet set = query.getApplicableRegions(loc);
@@ -91,7 +57,7 @@ public class WorldGuardEvents implements Listener {
 		if (testFlag(query, Flags.CHEST_ACCESS, loc, localPlayer).equals("false")) {
 			event.setCancelled(true);
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-			player.playEffect(event.getClickedBlock().getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
+			player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
 			return;
 		} else if (testFlag(query, Flags.CHEST_ACCESS, loc, localPlayer).equals("true")) {
 			return;
@@ -99,7 +65,7 @@ public class WorldGuardEvents implements Listener {
 			if (testFlag(query, Flags.BUILD, loc, localPlayer).equals("false")) {
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-				player.playEffect(event.getClickedBlock().getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
+				player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
 				return;
 			} else if (testFlag(query, Flags.BUILD, loc, localPlayer).equals("true")) {
 				return;
@@ -116,12 +82,12 @@ public class WorldGuardEvents implements Listener {
 					if (setTestFlag(setNoGlobal, Flags.PASSTHROUGH, localPlayer).equals("false")) {
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-						player.playEffect(event.getClickedBlock().getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
+						player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
 						return;
 					} else if (setTestFlag(setNoGlobal, Flags.PASSTHROUGH, localPlayer).equals("null")) {
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-						player.playEffect(event.getClickedBlock().getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
+						player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
 						return;
 					} else {
 						return;
@@ -134,7 +100,7 @@ public class WorldGuardEvents implements Listener {
 					if (setTestFlag(setOnlyGlobal, Flags.PASSTHROUGH, localPlayer).equals("false")) {
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-						player.playEffect(event.getClickedBlock().getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
+						player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
 						return;
 					} else {
 						return;
