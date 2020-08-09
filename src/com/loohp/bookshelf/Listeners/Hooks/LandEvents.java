@@ -9,7 +9,7 @@ import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
 
 import me.angeschossen.lands.api.integration.LandsIntegration;
-import me.angeschossen.lands.api.land.Land;
+import me.angeschossen.lands.api.land.Area;
 import me.angeschossen.lands.api.role.enums.RoleSetting;
 
 public class LandEvents implements Listener {
@@ -17,7 +17,7 @@ public class LandEvents implements Listener {
 	private static LandsIntegration landsAddon;
 	
 	public static void setup() {
-		landsAddon = (landsAddon == null || !(landsAddon instanceof LandsIntegration)) ? new LandsIntegration(Bookshelf.plugin, false) : landsAddon;
+		landsAddon = (landsAddon == null || !(landsAddon instanceof LandsIntegration)) ? new LandsIntegration(Bookshelf.plugin) : landsAddon;
 	}
 
 	@EventHandler(priority=EventPriority.LOWEST)
@@ -29,13 +29,13 @@ public class LandEvents implements Listener {
 		
 		Player player = event.getPlayer();
 		
-		Land land = landsAddon.getLand(event.getLocation());
+		Area area = landsAddon.getAreaByLoc(event.getLocation());
 		
-		if (land == null || !land.exists()) {
+		if (area == null) {
 			return;
 		}
 		
-		if (!land.canSetting(player, RoleSetting.INTERACT_CONTAINER, true)) {
+		if (!area.canSetting(player, RoleSetting.INTERACT_CONTAINER, true)) {
 			event.setCancelled(true);
 		}
 

@@ -2,12 +2,14 @@ package com.loohp.bookshelf;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -17,6 +19,7 @@ import java.util.TreeMap;
 import org.bukkit.Bukkit;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,45 +40,47 @@ public class BookshelfManager {
     }
 
     public synchronized static void reload() {
-        try {
-        	if (!Bookshelf.plugin.getDataFolder().exists()) {
-        		Bookshelf.plugin.getDataFolder().mkdir();
+    	if (!Bookshelf.plugin.getDataFolder().exists()) {
+    		Bookshelf.plugin.getDataFolder().mkdir();
+		}
+		file = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/bookshelfdata.json");
+    	if (!file.exists()) {
+			try (PrintWriter pw = new PrintWriter(file, "UTF-8")) {
+				pw.print("{");
+	    	    pw.print("}");
+	    	    pw.flush();
+			} catch (FileNotFoundException | UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+    	} else {
+    		String fileName = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").format(new Date());
+    		BackupFolder.mkdirs();
+            File outputfile = new File(BackupFolder, fileName);
+            try (InputStream in = new FileInputStream(file)) {
+                Files.copy(in, outputfile.toPath());
+            } catch (IOException e) {
+                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] Failed to make backup for bookshelfdata.json");
+            }
+    	}
+    	if (BackupFolder.exists()) {
+    		for (File file : BackupFolder.listFiles()) {
+    			try {
+        			String fileName = file.getName();
+        			if (fileName.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}_.*_bookshelfdata\\.json$")) {
+        				Date timestamp = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").parse(fileName);
+        				if ((System.currentTimeMillis() - timestamp.getTime()) > 2592000000L) {
+							Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Removing Backup/Backup/" + fileName + " as it is from 30 days ago.");
+							file.delete();						
+						}
+        			}
+    			} catch (Exception ignore) {}
     		}
-    		file = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/bookshelfdata.json");
-        	if (!file.exists()) {
-        	    PrintWriter pw = new PrintWriter(file, "UTF-8");
-        	    pw.print("{");
-        	    pw.print("}");
-        	    pw.flush();
-        	    pw.close();
-        	} else {
-        		String fileName = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").format(new Date());
-        		BackupFolder.mkdirs();
-                File outputfile = new File(BackupFolder, fileName);
-                try (InputStream in = new FileInputStream(file)) {
-                    Files.copy(in, outputfile.toPath());
-                } catch (IOException e) {
-                    Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] Failed to make backup for bookshelfdata.json");
-                }
-        	}
-        	if (BackupFolder.exists()) {
-        		for (File file : BackupFolder.listFiles()) {
-        			try {
-	        			String fileName = file.getName();
-	        			if (fileName.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}_.*_bookshelfdata\\.json$")) {
-	        				Date timestamp = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").parse(fileName);
-	        				if ((System.currentTimeMillis() - timestamp.getTime()) > 2592000000L) {
-								Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Removing Backup/Backup/" + fileName + " as it is from 30 days ago.");
-								file.delete();						
-							}
-	        			}
-        			} catch (Exception ignore) {}
-        		}
-        	}
-        	json = (JSONObject) parser.parse(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+    	}
+    	try {
+			json = (JSONObject) parser.parse(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
     }
     
     @SuppressWarnings("unchecked")

@@ -465,8 +465,13 @@ public class BookshelfEvents implements Listener {
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onOpen(PlayerInteractEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+		
 		if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			return;
 		}

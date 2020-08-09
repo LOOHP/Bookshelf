@@ -322,7 +322,9 @@ public class Bookshelf extends JavaPlugin {
 	public void onDisable() {
 		getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Saving all pending bookshelves..");
 		long start = System.currentTimeMillis();
-		for (String key : bookshelfSavePending) {
+		bookshelfSavePending.addAll(keyToContentMapping.keySet());
+		Set<String> save = new HashSet<String>(bookshelfSavePending);
+		for (String key : save) {
 			if (keyToContentMapping.containsKey(key)) {
 				BookshelfUtils.saveBookShelf(key);
 			}

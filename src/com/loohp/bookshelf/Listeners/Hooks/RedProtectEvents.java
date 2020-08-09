@@ -26,7 +26,7 @@ public class RedProtectEvents implements Listener {
 		}
 
 		if (!RedProtect.get().getAPI().getRegion(event.getLocation()).canChest(player)) {
-			player.sendMessage(RedProtect.get().lang.get("_redprotect.prefix") + " " + RedProtect.get().lang.get("playerlistener.region.cantdoor"));
+			player.sendMessage(RedProtect.get().getLanguageManager().get("_redprotect.prefix") + " " + RedProtect.get().getLanguageManager().get("playerlistener.region.cantdoor"));
 			event.setCancelled(true);
 		}
 	}
