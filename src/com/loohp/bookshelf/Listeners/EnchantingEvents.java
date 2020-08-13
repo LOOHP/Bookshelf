@@ -79,14 +79,14 @@ public class EnchantingEvents implements Listener {
 				for (Entry<Enchantment, Integer> entry : map.entrySet()) {
 					if (!enchants.containsKey(entry.getKey())) {
 						HashMap<String, Object> value = new HashMap<String, Object>();
-						value.put("Occurance", (int) 1);
+						value.put("Occurrence", (int) 1);
 						List<Integer> lvl = new ArrayList<Integer>();
 						lvl.add(entry.getValue());
 						value.put("Level", lvl);
 						enchants.put(entry.getKey(), value);
 					} else {
 						HashMap<String, Object> value = enchants.get(entry.getKey());
-						value.put("Occurance", (int) value.get("Occurance") + 1);
+						value.put("Occurrence", (int) value.get("Occurrence") + 1);
 						List<Integer> lvl = (List<Integer>) value.get("Level");
 						lvl.add(entry.getValue());
 						value.put("Level", lvl);
@@ -99,10 +99,10 @@ public class EnchantingEvents implements Listener {
 			return;
 		}
 		HashMap<Enchantment, HashMap<String, Integer>> list = new HashMap<Enchantment, HashMap<String, Integer>>();
-		int totalOccurance = 0;
+		int totalOccurrence = 0;
 		for (Entry<Enchantment, HashMap<String, Object>> entry : enchants.entrySet()) {
-			int occurance = (int) entry.getValue().get("Occurance");
-			totalOccurance = totalOccurance + occurance;
+			int occurrence = (int) entry.getValue().get("Occurrence");
+			totalOccurrence = totalOccurrence + occurrence;
 			List<Integer> levels = (List<Integer>) entry.getValue().get("Level");
 			int sum = 0;
 			for (int each : levels) {
@@ -110,7 +110,7 @@ public class EnchantingEvents implements Listener {
 			}
 			int level = (int) Math.floor((double) sum / (double) levels.size());
 			HashMap<String, Integer> map = new HashMap<String, Integer>();
-			map.put("Occurance", occurance);
+			map.put("Occurrence", occurrence);
 			map.put("Level", level);
 			list.put(entry.getKey(), map);
 		}
@@ -131,11 +131,14 @@ public class EnchantingEvents implements Listener {
 			if (entry.getKey().equals(Enchantment.VANISHING_CURSE)) {
 				continue;
 			}
+			if (entry.getKey().equals(Enchantment.SOUL_SPEED)) {
+				continue;
+			}
 			if (!entry.getKey().canEnchantItem(event.getItem()) && !event.getItem().getType().equals(Material.BOOK)) {
 				continue;
 			}
-			int occurance = entry.getValue().get("Occurance");
-			for (int i = 0; i < occurance; i++) {
+			int occurrence = entry.getValue().get("Occurrence");
+			for (int i = 0; i < occurrence; i++) {
 				if (!Bookshelf.version.isLegacy()) {
 					pick.add(entry.getKey().getKey());
 				} else {
