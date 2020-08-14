@@ -35,6 +35,10 @@ public class PlotSquared5Events implements Listener {
 			return;
 		}
 		
+		if (!PlotSquared.get().hasPlotArea(event.getLocation().getWorld().getName())) {
+			return;
+		}
+		
 		org.bukkit.entity.Player bukkitPlayer = event.getPlayer();
 		
 		PlotPlayer<?> player = PlotPlayer.wrap(bukkitPlayer);
