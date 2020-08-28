@@ -53,7 +53,7 @@ public class BookshelfManager {
 				e.printStackTrace();
 			}
     	} else {
-    		String fileName = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").format(new Date());
+    		String fileName = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").format(new Date()).replace(":", ";");
     		BackupFolder.mkdirs();
             File outputfile = new File(BackupFolder, fileName);
             try (InputStream in = new FileInputStream(file)) {
@@ -67,7 +67,7 @@ public class BookshelfManager {
     			try {
         			String fileName = file.getName();
         			if (fileName.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}_.*_bookshelfdata\\.json$")) {
-        				Date timestamp = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").parse(fileName);
+        				Date timestamp = new SimpleDateFormat("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'_'zzz'_bookshelfdata.json'").parse(fileName.replace(";", ":"));
         				if ((System.currentTimeMillis() - timestamp.getTime()) > 2592000000L) {
 							Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Removing Backup/Backup/" + fileName + " as it is from 30 days ago.");
 							file.delete();						
