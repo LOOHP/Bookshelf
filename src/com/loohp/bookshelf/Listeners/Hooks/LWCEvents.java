@@ -61,8 +61,8 @@ public class LWCEvents implements Module {
 			Protection protection = event.getProtection();
 			if (LWC.getInstance().getPlugin().getLWC().canAccessProtection(player, protection) == true || !event.getAccess().equals(Access.NONE)) {
 				if (event.getProtection().getType().equals(Type.DONATION)) {
-					if (!Bookshelf.isDonationView.contains(player)) {
-						Bookshelf.isDonationView.add(player);
+					if (!Bookshelf.isDonationView.contains(player.getUniqueId())) {
+						Bookshelf.isDonationView.add(player.getUniqueId());
 					}
 				}
 				
@@ -123,17 +123,25 @@ public class LWCEvents implements Module {
 
 	@Override
 	public void onPostRemoval(LWCProtectionRemovePostEvent event) {
-		Bookshelf.lwcCancelOpen.add(event.getPlayer());
-		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(event.getPlayer()), 5);
+		Player player = event.getPlayer();
+		if (player == null) {
+			return;
+		}
+		Bookshelf.lwcCancelOpen.add(player.getUniqueId());
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5);
 	}
 
 	@Override
 	public void onProtectionInteract(LWCProtectionInteractEvent event) {
+		Player player = event.getPlayer();
 		if (!event.getResult().equals(Result.CANCEL)) {
 			return;
 		}
-		Bookshelf.lwcCancelOpen.add(event.getPlayer());
-		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(event.getPlayer()), 5);
+		if (player == null) {
+			return;
+		}
+		Bookshelf.lwcCancelOpen.add(player.getUniqueId());
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5);
 	}
 
 	@Override
@@ -148,8 +156,12 @@ public class LWCEvents implements Module {
 
 	@Override
 	public void onRegisterProtection(LWCProtectionRegisterEvent event) {
-		Bookshelf.lwcCancelOpen.add(event.getPlayer());
-		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(event.getPlayer()), 5);
+		Player player = event.getPlayer();
+		if (player == null) {
+			return;
+		}
+		Bookshelf.lwcCancelOpen.add(player.getUniqueId());
+		Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5);
 	}
 
 	@Override

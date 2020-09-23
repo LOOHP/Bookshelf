@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -112,8 +113,8 @@ public class Bookshelf extends JavaPlugin {
 	public static String NoPermissionToReloadMessage = "&cYou do not have permission use this command!";
 	public static String NoPermissionToUpdateMessage = "&cYou do not have permission use this command!";
 	
-	public static Set<Player> lwcCancelOpen = ConcurrentHashMap.newKeySet();
-	public static Set<Player> isDonationView = ConcurrentHashMap.newKeySet();
+	public static Set<UUID> lwcCancelOpen = ConcurrentHashMap.newKeySet();
+	public static Set<UUID> isDonationView = ConcurrentHashMap.newKeySet();
 	
 	public static Set<String> isEmittingParticle = new HashSet<String>();
 	

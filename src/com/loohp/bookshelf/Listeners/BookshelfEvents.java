@@ -299,7 +299,7 @@ public class BookshelfEvents implements Listener {
 		
 		Player player = (Player) event.getWhoClicked();
 		
-		if (Bookshelf.isDonationView.contains(player)) {
+		if (Bookshelf.isDonationView.contains(player.getUniqueId())) {
 			Inventory clicked = event.getClickedInventory();
 			if (Bookshelf.contentToKeyMapping.containsKey(clicked)) {
 				if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getAction().equals(InventoryAction.PICKUP_SOME) || event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.PICKUP_ONE) || event.getAction().equals(InventoryAction.PICKUP_HALF)) {
@@ -493,7 +493,7 @@ public class BookshelfEvents implements Listener {
 		if (!event.getClickedBlock().getType().equals(Material.BOOKSHELF)) {
 			return;
 		}
-		if (Bookshelf.lwcCancelOpen.contains(event.getPlayer())) {
+		if (Bookshelf.lwcCancelOpen.contains(event.getPlayer().getUniqueId())) {
 			return;
 		}
 		
@@ -558,6 +558,6 @@ public class BookshelfEvents implements Listener {
 			
 			Bookshelf.bookshelfSavePending.add(key);
 		}
-		Bookshelf.isDonationView.remove(event.getPlayer());
+		Bookshelf.isDonationView.remove(event.getPlayer().getUniqueId());
 	}	
 }
