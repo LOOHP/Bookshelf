@@ -391,16 +391,16 @@ public class BookshelfEvents implements Listener {
 				Location loc = BookshelfUtils.keyLoc(entry.getKey());
 				double random = Math.floor(Math.random() * 3) + 1;
 				if (Bookshelf.version.isOld()) {
-					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 10, 1);
+					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 3, 1);
         		} else if (Bookshelf.version.isLegacy() || Bookshelf.version.equals(MCVersion.V1_13) || Bookshelf.version.equals(MCVersion.V1_13_1)) {
-					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 10, 1);
+					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
 				} else {
 					if (random == 1) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 10, 1);
+						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 3, 1);
 					} else if (random == 2) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 10, 1);
+						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
 					} else if (random == 3) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PAGE_TURN"), 10, 1);
+						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PAGE_TURN"), 3, 1);
 					}
 				}
 				break;
@@ -445,16 +445,16 @@ public class BookshelfEvents implements Listener {
 	        		Location loc = BookshelfUtils.keyLoc(key);
 					double random = Math.floor(Math.random() * 3) + 1;
 					if (Bookshelf.version.isOld()) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 10, 1);
+						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 3, 1);
 					} else if (Bookshelf.version.isLegacy() || Bookshelf.version.equals(MCVersion.V1_13) || Bookshelf.version.equals(MCVersion.V1_13_1)) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 10, 1);
+						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
 					} else {
 						if (random == 1) {
-							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 10, 1);
+							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 3, 1);
 						} else if (random == 2) {
-							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 10, 1);
+							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
 						} else if (random == 3) {
-							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PAGE_TURN"), 10, 1);
+							event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PAGE_TURN"), 3, 1);
 						}
 					}
 					break;
