@@ -378,7 +378,7 @@ public class Bookshelf extends JavaPlugin {
 		}
 		UpdaterEnabled = plugin.getConfig().getBoolean("Options.Updater");
 		if (UpdaterEnabled == true) {
-			Updater.updaterInterval();
+			Bukkit.getPluginManager().registerEvents(new Updater(), Bookshelf.plugin);
 		}
 	}
 	

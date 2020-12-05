@@ -8,9 +8,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.bookshelf.Updater.Updater;
+import com.loohp.bookshelf.Updater.Updater.UpdaterResponse;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -43,16 +43,18 @@ public class Commands implements CommandExecutor, TabCompleter {
 			if (sender.hasPermission("bookshelf.update")) {
 				sender.sendMessage(ChatColor.AQUA + "[Bookshelf] BookShelf written by LOOHP!");
 				sender.sendMessage(ChatColor.GOLD + "[Bookshelf] You are running BookShelf version: " + Bookshelf.plugin.getDescription().getVersion());
-				new BukkitRunnable() {
-					public void run() {
-						String version = Updater.checkUpdate();
-						if (version.equals("latest")) {
+				Bukkit.getScheduler().runTaskAsynchronously(Bookshelf.plugin, () -> {
+					UpdaterResponse version = Updater.checkUpdate();
+					if (version.getResult().equals("latest")) {
+						if (version.isDevBuildLatest()) {
 							sender.sendMessage(ChatColor.GREEN + "[Bookshelf] You are running the latest version!");
 						} else {
-							Updater.sendUpdateMessage(version);
+							Updater.sendUpdateMessage(sender, version.getResult(), version.getSpigotPluginId(), true);
 						}
+					} else {
+						Updater.sendUpdateMessage(sender, version.getResult(), version.getSpigotPluginId());
 					}
-				}.runTaskAsynchronously(Bookshelf.plugin);
+				});
 			} else {
 				sender.sendMessage(Bookshelf.NoPermissionToUpdateMessage);
 			}

@@ -33,6 +33,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @version 7.16
  * @author BananaPuncher714
  */
+@SuppressWarnings({"deprecation", "unchecked"})
 public final class NBTUtils {
 	private static final Map< String, Class<?> > classCache;
 	private static final Map< String, Method > methodCache;
@@ -319,7 +320,6 @@ public final class NBTUtils {
 	 * @return
 	 * An item stack with count of 1
 	 */
-	@SuppressWarnings("deprecation")
 	public static ItemStack getHead( String skinURL ) {
 		Material material = Material.getMaterial( "SKULL_ITEM" );
 		if ( material == null ) {
@@ -373,7 +373,6 @@ public final class NBTUtils {
 	 * @return
 	 * The URL of the texture
 	 */
-	@SuppressWarnings("unchecked")
 	public static String getTexture( ItemStack head ) {
 		ItemMeta meta = head.getItemMeta();
 		Field profileField = null;
@@ -1032,7 +1031,6 @@ public final class NBTUtils {
 	 * @return
 	 * A set of keys
 	 */
-	@SuppressWarnings("unchecked")
 	public static Collection< String > getKeys( Object object, Object... keys ) {
 		Object compound;
 		if ( object instanceof ItemStack ) {
@@ -1117,7 +1115,6 @@ public final class NBTUtils {
 	 * @return
 	 * The new item stack if the object provided is an item, else original object
 	 */
-	@SuppressWarnings("unchecked")
 	public static < T > T set( T object, Object value, Object... keys ) {
 		if ( object instanceof ItemStack ) {
 			return ( T ) setItemTag( ( ItemStack ) object, value, keys );
@@ -1279,7 +1276,6 @@ public final class NBTUtils {
 		}
 	}
 
-	@SuppressWarnings( "unchecked" )
 	private static Object getTags( Object tag ) {
 		Map< Object, Object > tags = new HashMap< Object, Object >();
 		try {
