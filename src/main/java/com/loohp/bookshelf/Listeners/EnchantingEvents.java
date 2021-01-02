@@ -35,7 +35,7 @@ public class EnchantingEvents implements Listener {
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPreEnchantTable(PrepareItemEnchantEvent event) {
-		if (Bookshelf.version.isOld() || Bookshelf.version.equals(MCVersion.V1_9) || Bookshelf.version.equals(MCVersion.V1_9_4) || Bookshelf.version.equals(MCVersion.V1_10)) {
+		if (Bookshelf.version.isOlderOrEqualTo(MCVersion.V1_10)) {
 			return;
 		}
 		if (!Bookshelf.enchantmentTable) {
@@ -194,7 +194,7 @@ public class EnchantingEvents implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEnchant(EnchantItemEvent event) {
-		if (Bookshelf.version.isOld() || Bookshelf.version.equals(MCVersion.V1_9) || Bookshelf.version.equals(MCVersion.V1_9_4) || Bookshelf.version.equals(MCVersion.V1_10)) {
+		if (Bookshelf.version.isOlderOrEqualTo(MCVersion.V1_10)) {
 			return;
 		}
 		if (!Bookshelf.enchantmentTable) {

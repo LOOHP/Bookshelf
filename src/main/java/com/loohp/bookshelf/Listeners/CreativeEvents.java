@@ -36,7 +36,7 @@ public class CreativeEvents implements Listener {
 			ItemStack item = event.getCursor();
 			if (item.getType().equals(Material.BOOKSHELF) && player.getGameMode().equals(GameMode.CREATIVE) && player.isSneaking() && player.hasPermission("bookshelf.copynbt")) {
 				Block block = null;
-				if (!Bookshelf.version.isLegacy() && !Bookshelf.version.equals(MCVersion.V1_13) && !Bookshelf.version.equals(MCVersion.V1_13_1)) {
+				if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_14)) {
 					block = player.getTargetBlockExact(10, FluidCollisionMode.NEVER);
 				} else {
 					block = player.getTargetBlock(MaterialUtils.getNonSolidSet(), 10);
@@ -55,7 +55,7 @@ public class CreativeEvents implements Listener {
 					}
 					String hash = BookshelfUtils.toBase64(Bookshelf.keyToContentMapping.get(key));
 					String title = BookshelfManager.getTitle(key);
-					if (Bookshelf.version.isLegacy() || Bookshelf.version.equals(MCVersion.V1_13) || Bookshelf.version.equals(MCVersion.V1_13_1)) {
+					if (Bookshelf.version.isOlderOrEqualTo(MCVersion.V1_13_1)) {
 						item = NBTUtils.set(item, hash, "BookshelfContent");
 						item = NBTUtils.set(item, title, "BookshelfTitle");
 					} else {
