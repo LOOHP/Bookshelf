@@ -29,6 +29,8 @@ import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.Utils.OpenInvUtils;
 import com.loohp.bookshelf.Utils.VanishUtils;
 import com.loohp.interactionvisualizer.InteractionVisualizer;
+import com.loohp.interactionvisualizer.API.InteractionVisualizerAPI;
+import com.loohp.interactionvisualizer.API.InteractionVisualizerAPI.Modules;
 import com.loohp.interactionvisualizer.EntityHolders.Item;
 import com.loohp.interactionvisualizer.Managers.PacketManager;
 import com.loohp.interactionvisualizer.Utils.InventoryUtils;
@@ -149,7 +151,7 @@ public class InteractionVisualizerAnimations implements Listener {
 		}
 		
 		if (isMove == true) {
-			PacketManager.sendHandMovement(InteractionVisualizer.getOnlinePlayers(), player);
+			PacketManager.sendHandMovement(InteractionVisualizerAPI.getPlayers(), player);
 			if (itemstack != null) {
 				Item item = new Item(location.clone());
 				Vector offset = new Vector(0.0, 0.15, 0.0);
@@ -160,7 +162,7 @@ public class InteractionVisualizerAnimations implements Listener {
 					vector = location.clone().toVector().subtract(player.getEyeLocation().clone().toVector()).multiply(0.15).add(offset);
 					item.setVelocity(vector);
 				}
-				PacketManager.sendItemSpawn(InteractionVisualizer.itemDrop, item);
+				PacketManager.sendItemSpawn(InteractionVisualizerAPI.getPlayerModuleList(Modules.ITEMDROP), item);
 				item.setItemStack(itemstack);
 				item.setPickupDelay(32767);
 				item.setGravity(true);
@@ -182,7 +184,7 @@ public class InteractionVisualizerAnimations implements Listener {
 					PacketManager.updateItem(item);
 				}, 7);
 				Bukkit.getScheduler().runTaskLater(InteractionVisualizer.plugin, () -> {
-					PacketManager.removeItem(InteractionVisualizer.getOnlinePlayers(), item);
+					PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
 					list.remove(item);
 				}, 20);
 			}						
@@ -237,7 +239,7 @@ public class InteractionVisualizerAnimations implements Listener {
 		
 		for (int slot : event.getRawSlots()) {
 			if (slot >= 0 && slot < BookshelfAPI.getBookshelfSize()) {
-				PacketManager.sendHandMovement(InteractionVisualizer.getOnlinePlayers(), player);
+				PacketManager.sendHandMovement(InteractionVisualizerAPI.getPlayers(), player);
 				
 				ItemStack itemstack = event.getOldCursor();
 				if (itemstack != null) {
@@ -251,7 +253,7 @@ public class InteractionVisualizerAnimations implements Listener {
 					Vector offset = new Vector(0.0, 0.15, 0.0);
 					Vector vector = location.clone().toVector().subtract(player.getEyeLocation().clone().toVector()).multiply(0.15).add(offset);
 					item.setVelocity(vector);
-					PacketManager.sendItemSpawn(InteractionVisualizer.itemDrop, item);
+					PacketManager.sendItemSpawn(InteractionVisualizerAPI.getPlayerModuleList(Modules.ITEMDROP), item);
 					item.setItemStack(itemstack);
 					item.setCustomName(System.currentTimeMillis() + "");
 					item.setPickupDelay(32767);
@@ -269,7 +271,7 @@ public class InteractionVisualizerAnimations implements Listener {
 						PacketManager.updateItem(item);
 					}, 7);
 					Bukkit.getScheduler().runTaskLater(InteractionVisualizer.plugin, () -> {
-						PacketManager.removeItem(InteractionVisualizer.getOnlinePlayers(), item);
+						PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
 						list.remove(item);
 					}, 20);
 				}
@@ -307,7 +309,7 @@ public class InteractionVisualizerAnimations implements Listener {
 		Iterator<Item> itr = list.iterator();
 		while (itr.hasNext()) {
 			Item item = itr.next();
-			PacketManager.removeItem(InteractionVisualizer.getOnlinePlayers(), item);
+			PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
 		}
 		
 		link.remove((Player) event.getPlayer());
