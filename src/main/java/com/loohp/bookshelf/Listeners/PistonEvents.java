@@ -51,7 +51,7 @@ public class PistonEvents implements Listener {
 			Inventory inv = Bookshelf.keyToContentMapping.get(key);
 			Location newLoc = bookshelf.getRelative(dir).getLocation().clone();
 			String newKey = BookshelfUtils.locKey(newLoc);
-			String bsTitle = Bookshelf.Title;
+			String bsTitle = Bookshelf.title;
 			if (BookshelfManager.getTitle(key) != null) {
 				bsTitle = BookshelfManager.getTitle(key);
 			}
@@ -94,7 +94,7 @@ public class PistonEvents implements Listener {
 			Inventory inv = Bookshelf.keyToContentMapping.get(key);
 			Location newLoc = bookshelf.getRelative(dir).getLocation().clone();
 			String newKey = BookshelfUtils.locKey(newLoc);
-			String bsTitle = Bookshelf.Title;
+			String bsTitle = Bookshelf.title;
 			if (BookshelfManager.getTitle(key) != null) {
 				bsTitle = BookshelfManager.getTitle(key);
 			}

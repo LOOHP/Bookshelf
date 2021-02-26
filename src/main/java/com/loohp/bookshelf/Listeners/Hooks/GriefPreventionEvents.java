@@ -17,7 +17,7 @@ public class GriefPreventionEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onGriefPreventionCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.GriefPreventionHook) {
+		if (!Bookshelf.griefPreventionHook) {
 			return;
 		}
 		

@@ -15,7 +15,7 @@ public class RedProtectEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onRedProtectCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.RedProtectHook) {
+		if (!Bookshelf.redProtectHook) {
 			return;
 		}
 		

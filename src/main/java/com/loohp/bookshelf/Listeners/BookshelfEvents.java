@@ -101,7 +101,7 @@ public class BookshelfEvents implements Listener {
 	
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event) {
-		if (!Bookshelf.EnableHopperSupport) {
+		if (!Bookshelf.enableHopperSupport) {
 			return;
 		}
 		Chunk chunk = event.getChunk();
@@ -113,7 +113,7 @@ public class BookshelfEvents implements Listener {
 	
 	@EventHandler
 	public void onChunkUnload(ChunkUnloadEvent event) {
-		if (!Bookshelf.EnableHopperSupport) {
+		if (!Bookshelf.enableHopperSupport) {
 			return;
 		}
 		Chunk chunk = event.getChunk();
@@ -191,7 +191,7 @@ public class BookshelfEvents implements Listener {
 			return;
 		}
 		
-		String bsTitle = Bookshelf.Title;
+		String bsTitle = Bookshelf.title;
 		if (event.getItemInHand().hasItemMeta()) {
 			if (event.getItemInHand().getItemMeta().hasDisplayName()) {
 				if (!event.getItemInHand().getItemMeta().getDisplayName().equals("")) {
@@ -199,7 +199,7 @@ public class BookshelfEvents implements Listener {
 				}
 			}
 		}
-		Bookshelf.addBookshelfToMapping(loc, Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+		Bookshelf.addBookshelfToMapping(loc, Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
 		BookshelfManager.setTitle(loc, bsTitle);
 		BookshelfUtils.saveBookShelf(loc);
 	}
@@ -309,7 +309,7 @@ public class BookshelfEvents implements Listener {
 			}
 		}
 		
-		if (!Bookshelf.UseWhitelist) {
+		if (!Bookshelf.useWhitelist) {
 			return;
 		}
 		if (event.getAction().equals(InventoryAction.NOTHING) || event.getAction().equals(InventoryAction.UNKNOWN) || event.getAction().equals(InventoryAction.DROP_ALL_CURSOR) || event.getAction().equals(InventoryAction.DROP_ALL_SLOT) || event.getAction().equals(InventoryAction.DROP_ONE_CURSOR) || event.getAction().equals(InventoryAction.DROP_ONE_SLOT  )) {
@@ -324,7 +324,7 @@ public class BookshelfEvents implements Listener {
 			int inventorySize = event.getView().getTopInventory().getSize();
 			if (slot < inventorySize) {
 				if (event.getWhoClicked().getInventory().getItem(event.getHotbarButton()) != null) {
-					if (!Bookshelf.Whitelist.contains(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()).getType().toString().toUpperCase())) { 
+					if (!Bookshelf.whitelist.contains(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()).getType().toString().toUpperCase())) { 
 						event.setCancelled(true);
 						return;
 					}
@@ -342,7 +342,7 @@ public class BookshelfEvents implements Listener {
 
 		        if (clickedOn != null) {
 		        	if (!clickedOn.getType().equals(Material.AIR)) {
-			        	if (!Bookshelf.Whitelist.contains(clickedOn.getType().toString().toUpperCase())) {
+			        	if (!Bookshelf.whitelist.contains(clickedOn.getType().toString().toUpperCase())) {
 			            	event.setCancelled(true);
 			            	return;
 			            }
@@ -356,7 +356,7 @@ public class BookshelfEvents implements Listener {
 
 		        if (onCursor != null){
 		        	if (!onCursor.getType().equals(Material.AIR)) {
-			        	if (!Bookshelf.Whitelist.contains(onCursor.getType().toString().toUpperCase())) {
+			        	if (!Bookshelf.whitelist.contains(onCursor.getType().toString().toUpperCase())) {
 		            		event.setCancelled(true);
 		            		return;
 		            	}
@@ -414,7 +414,7 @@ public class BookshelfEvents implements Listener {
 			return;
 		}
 		
-		if (!Bookshelf.UseWhitelist) {
+		if (!Bookshelf.useWhitelist) {
 			return;
 		}
 		
@@ -427,7 +427,7 @@ public class BookshelfEvents implements Listener {
 		if (key != null) {
 			ItemStack dragged = event.getOldCursor(); // This is the item that is being dragged
 
-		    if (!Bookshelf.Whitelist.contains(dragged.getType().toString().toUpperCase())) {
+		    if (!Bookshelf.whitelist.contains(dragged.getType().toString().toUpperCase())) {
 		        int inventorySize = inv.getSize();
 
 		        for (int i : event.getRawSlots()) {
@@ -515,15 +515,15 @@ public class BookshelfEvents implements Listener {
 		String loc = BookshelfUtils.locKey(event.getClickedBlock().getLocation());
 		if (!Bookshelf.keyToContentMapping.containsKey(loc)) {
 			if (!BookshelfManager.contains(loc)) {
-				String bsTitle = Bookshelf.Title;
-				Bookshelf.addBookshelfToMapping(loc , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+				String bsTitle = Bookshelf.title;
+				Bookshelf.addBookshelfToMapping(loc , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
 				BookshelfManager.setTitle(loc, bsTitle);
 				BookshelfUtils.saveBookShelf(loc);
 			} else {
 				BookshelfUtils.loadBookShelf(loc);
 			}
 		}
-		if (Bookshelf.LWCHook) {
+		if (Bookshelf.lwcHook) {
 			Location blockLoc = BookshelfUtils.keyLoc(loc);
 			Protection protection = LWC.getInstance().getPlugin().getLWC().findProtection(blockLoc.getBlock());
 			if (protection != null) {

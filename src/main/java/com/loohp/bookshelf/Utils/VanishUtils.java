@@ -14,18 +14,18 @@ import de.myzelyam.api.vanish.VanishAPI;
 public class VanishUtils {
 	
 	public static boolean isVanished(Player player) {
-		if (Bookshelf.VanishHook) {
+		if (Bookshelf.vanishHook) {
 			if (VanishAPI.isInvisible(player)) {
 				return true;
 			}
 		}
-		if (Bookshelf.CMIHook) {
+		if (Bookshelf.cmiHook) {
 			CMIUser user = CMI.getInstance().getPlayerManager().getUser(player);
 			if (user.isVanished()) {
 				return true;
 			}
 		}
-		if (Bookshelf.EssentialsHook) {
+		if (Bookshelf.essentialsHook) {
 			Essentials ess3 = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
 			User user = ess3.getUser(player);
 			if (user.isVanished()) {

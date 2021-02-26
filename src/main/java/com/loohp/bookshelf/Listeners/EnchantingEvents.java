@@ -49,7 +49,7 @@ public class EnchantingEvents implements Listener {
 		Block eTable = event.getEnchantBlock();
 		List<Block> blocks = EnchantmentTableUtils.getBookshelves(eTable);
 		Map<Enchantment, HashMap<String, Object>> enchants = new HashMap<Enchantment, HashMap<String, Object>>();
-		int totalSlots = (int) (Bookshelf.BookShelfRows * 9 * 15);
+		int totalSlots = (int) (Bookshelf.bookShelfRows * 9 * 15);
 		if (blocks.isEmpty()) {
 			return;
 		}
@@ -57,8 +57,8 @@ public class EnchantingEvents implements Listener {
 			String key = BookshelfUtils.locKey(block.getLocation());
 			if (!Bookshelf.keyToContentMapping.containsKey(key)) {
 				if (!BookshelfManager.contains(key)) {
-					String bsTitle = Bookshelf.Title;
-					Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+					String bsTitle = Bookshelf.title;
+					Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
 					BookshelfManager.setTitle(key, bsTitle);
 					BookshelfUtils.saveBookShelf(key);
 				} else {

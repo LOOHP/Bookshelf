@@ -16,7 +16,7 @@ public class SuperiorSkyblock2Events implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onSuperiorSkyblock2Check(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.TownyHook) {
+		if (!Bookshelf.townyHook) {
 			return;
 		}
 		

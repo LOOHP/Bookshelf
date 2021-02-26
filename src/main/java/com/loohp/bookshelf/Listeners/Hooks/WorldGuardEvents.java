@@ -32,7 +32,7 @@ public class WorldGuardEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onWorldGuardCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.WorldGuardHook) {
+		if (!Bookshelf.worldGuardHook) {
 			return;
 		}
 		

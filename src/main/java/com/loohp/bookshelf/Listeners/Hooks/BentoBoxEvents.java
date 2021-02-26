@@ -22,7 +22,7 @@ public class BentoBoxEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onBentoBoxCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.BentoBoxHook) {
+		if (!Bookshelf.bentoBoxHook) {
 			return;
 		}
 		

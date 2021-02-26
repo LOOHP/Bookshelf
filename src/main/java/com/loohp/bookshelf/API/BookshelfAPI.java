@@ -17,7 +17,7 @@ import com.loohp.bookshelf.Utils.BookshelfUtils;
 public class BookshelfAPI {
 	
 	public static int getBookshelfSize() {
-		return Bookshelf.BookShelfRows * 9;
+		return Bookshelf.bookShelfRows * 9;
 	}
 	
 	public static String getKeyFromInventory(Inventory inventory) {
@@ -106,8 +106,8 @@ public class BookshelfAPI {
 		String key = BookshelfUtils.locKey(location);
 		if (!Bookshelf.keyToContentMapping.containsKey(key)) {
 			if (!BookshelfManager.contains(key)) {
-				String bsTitle = Bookshelf.Title;
-				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+				String bsTitle = Bookshelf.title;
+				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
 				BookshelfManager.setTitle(key, bsTitle);
 				BookshelfUtils.saveBookShelf(key);
 				return true;
@@ -119,8 +119,8 @@ public class BookshelfAPI {
 	public static boolean createBookshelf(String key) {
 		if (!Bookshelf.keyToContentMapping.containsKey(key)) {
 			if (!BookshelfManager.contains(key)) {
-				String bsTitle = Bookshelf.Title;
-				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+				String bsTitle = Bookshelf.title;
+				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
 				BookshelfManager.setTitle(key, bsTitle);
 				BookshelfUtils.saveBookShelf(key);
 				return true;

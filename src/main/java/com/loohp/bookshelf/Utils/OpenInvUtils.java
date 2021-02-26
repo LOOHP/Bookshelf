@@ -18,7 +18,7 @@ public class OpenInvUtils {
 	}
 	
 	public static boolean isSlientChest(Player player) {
-		if (!Bookshelf.OpenInvHook) {
+		if (!Bookshelf.openInvHook) {
 			return false;
 		}
 		OpenInv openinv = getOpenInvInstance();

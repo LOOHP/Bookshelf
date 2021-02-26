@@ -18,7 +18,7 @@ public class ASkyBlockEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onASkyBlockCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.ASkyBlockHook) {
+		if (!Bookshelf.aSkyBlockHook) {
 			return;
 		}
 		

@@ -39,7 +39,7 @@ public class HopperUtils {
 				PerWorldHopperTransferAmount.put(world, amount);
 			}
 		}
-		Bookshelf.HopperMinecartTaskID = Bukkit.getScheduler().runTaskTimer(Bookshelf.plugin, () -> {
+		Bookshelf.hopperMinecartTaskID = Bukkit.getScheduler().runTaskTimer(Bookshelf.plugin, () -> {
 			long start = System.currentTimeMillis();
 			long startNano = System.nanoTime();
 			for (World world : Bukkit.getWorlds()) {
@@ -70,12 +70,12 @@ public class HopperUtils {
 			            	}
 			            	if (InventoryUtils.stillHaveSpace(inventory, item.getType())) {
 			            		
-			            		if (Bookshelf.BlockLockerHook) {
+			            		if (Bookshelf.blockLockerHook) {
 									if (BlockLockerUtils.isLocked(bookshelfBlock)) {
 										break;
 									}
 								}
-								if (Bookshelf.LWCHook) {
+								if (Bookshelf.lwcHook) {
 									if (!LWCUtils.checkHopperFlagOut(bookshelfBlock)) {
 										break;
 									}
@@ -114,7 +114,7 @@ public class HopperUtils {
 	}
 	
 	public static void hopperCheck() {
-		Bookshelf.HopperTaskID = Bukkit.getScheduler().runTaskTimer(Bookshelf.plugin, () -> {
+		Bookshelf.hopperTaskID = Bukkit.getScheduler().runTaskTimer(Bookshelf.plugin, () -> {
 			long start = System.currentTimeMillis();
 			long startNano = System.nanoTime();
 			HashMap<World, Long> perform = new HashMap<World, Long>();
@@ -123,7 +123,7 @@ public class HopperUtils {
 				if (PerWorldHopperTransferCurrentTick.containsKey(world)) {
 					currentTick = PerWorldHopperTransferCurrentTick.get(world);
 				}
-				long rate = Bookshelf.HopperTicksPerTransfer;
+				long rate = Bookshelf.hopperTicksPerTransfer;
 				if (PerWorldHopperTransferSpeed.containsKey(world)) {
 					rate = PerWorldHopperTransferSpeed.get(world);
 				}
@@ -133,7 +133,7 @@ public class HopperUtils {
 				}
 				PerWorldHopperTransferCurrentTick.put(world, currentTick);
 				if (currentTick == 1) {
-					long amount = Bookshelf.HopperAmount;
+					long amount = Bookshelf.hopperAmount;
 					if (PerWorldHopperTransferAmount.containsKey(world)) {
 						amount = PerWorldHopperTransferAmount.get(world);
 					}
@@ -205,10 +205,10 @@ public class HopperUtils {
 		            	if (item == null) {
 		            		continue;
 		            	}
-		            	if (Bookshelf.UseWhitelist) {
-			            	if (Bookshelf.Whitelist.contains(item.getType().toString().toUpperCase())) {
+		            	if (Bookshelf.useWhitelist) {
+			            	if (Bookshelf.whitelist.contains(item.getType().toString().toUpperCase())) {
 			            		if (InventoryUtils.stillHaveSpace(bookshelfInv, item.getType())) {
-			            			if (Bookshelf.LWCHook) {
+			            			if (Bookshelf.lwcHook) {
 										if (!LWCUtils.checkHopperFlagOut(hopper)) {
 											break;
 										}
@@ -216,7 +216,7 @@ public class HopperUtils {
 											break;
 										}
 									}
-			            			if (Bookshelf.BlockLockerHook) {
+			            			if (Bookshelf.blockLockerHook) {
 			    						if (!BlockLockerUtils.canRedstone(bookshelfBlock)) {
 			    							break;
 			    						}
@@ -244,7 +244,7 @@ public class HopperUtils {
 			            	}
 		            	} else {
 		            		if (InventoryUtils.stillHaveSpace(bookshelfInv, item.getType())) {
-		            			if (Bookshelf.LWCHook) {
+		            			if (Bookshelf.lwcHook) {
 									if (!LWCUtils.checkHopperFlagOut(hopper)) {
 										break;
 									}
@@ -252,7 +252,7 @@ public class HopperUtils {
 										break;
 									}
 								}
-		            			if (Bookshelf.BlockLockerHook) {
+		            			if (Bookshelf.blockLockerHook) {
 		    						if (!BlockLockerUtils.canRedstone(bookshelfBlock)) {
 		    							break;
 		    						}
@@ -355,12 +355,12 @@ public class HopperUtils {
     }
     
     public static boolean isAllow(Block block) {
-    	if (Bookshelf.BlockLockerHook) {
+    	if (Bookshelf.blockLockerHook) {
 			if (!BlockLockerUtils.canRedstone(block)) {
 				return false;
 			}
 		}
-		if (Bookshelf.LWCHook) {
+		if (Bookshelf.lwcHook) {
 			if (!LWCUtils.checkHopperFlagOut(block)) {
 				return false;
 			}

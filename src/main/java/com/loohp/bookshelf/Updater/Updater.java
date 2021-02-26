@@ -24,7 +24,7 @@ public class Updater implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		Bukkit.getScheduler().runTaskLaterAsynchronously(Bookshelf.plugin, () -> {
-			if (Bookshelf.UpdaterEnabled) {
+			if (Bookshelf.updaterEnabled) {
 				Player player = event.getPlayer();
 				if (player.hasPermission("Bookshelf.update")) {
 					UpdaterResponse version = Updater.checkUpdate();

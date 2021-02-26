@@ -29,7 +29,7 @@ public class DispenserEvents implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onDropper(BlockDispenseEvent event) {
-		if (!Bookshelf.EnableDropperSupport) {
+		if (!Bookshelf.enableDropperSupport) {
 			return;
 		}
 		if (event.isCancelled()) {
@@ -45,21 +45,21 @@ public class DispenserEvents implements Listener {
 		String key = BookshelfUtils.locKey(relative.getLocation());
 		if (!Bookshelf.keyToContentMapping.containsKey(key)) {
 			if (!BookshelfManager.contains(key)) {
-				String bsTitle = Bookshelf.Title;
-				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+				String bsTitle = Bookshelf.title;
+				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
 				BookshelfManager.setTitle(key, bsTitle);
 				BookshelfUtils.saveBookShelf(key);
 			} else {
 				BookshelfUtils.loadBookShelf(key);
 			}
 		}
-		if (Bookshelf.LWCHook) {
+		if (Bookshelf.lwcHook) {
 			if (!LWCUtils.checkHopperFlagIn(relative)) {
 				event.setCancelled(true);
 				return;
 			}
 		}
-		if (Bookshelf.BlockLockerHook) {
+		if (Bookshelf.blockLockerHook) {
 			if (!BlockLockerUtils.canRedstone(relative)) {
 				event.setCancelled(true);
 				return;
@@ -77,8 +77,8 @@ public class DispenserEvents implements Listener {
 			if (each == null) {
 				continue;
 			}
-			if (Bookshelf.UseWhitelist) {
-				if (!Bookshelf.Whitelist.contains(each.getType().toString().toUpperCase())) {
+			if (Bookshelf.useWhitelist) {
+				if (!Bookshelf.whitelist.contains(each.getType().toString().toUpperCase())) {
 					continue;
 				}
 			}

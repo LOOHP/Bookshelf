@@ -15,7 +15,7 @@ public class TownyEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onTownyEventsCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.TownyHook) {
+		if (!Bookshelf.townyHook) {
 			return;
 		}
 		

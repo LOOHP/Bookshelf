@@ -26,7 +26,7 @@ public class PlotSquared4Events implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlotSquaredCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.PlotSquaredHook) {
+		if (!Bookshelf.plotSquaredHook) {
 			return;
 		}
 		

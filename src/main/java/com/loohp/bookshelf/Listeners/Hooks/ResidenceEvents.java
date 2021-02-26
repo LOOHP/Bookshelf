@@ -17,7 +17,7 @@ public class ResidenceEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onResidenceCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.ResidenceHook) {
+		if (!Bookshelf.residenceHook) {
 			return;
 		}
 		

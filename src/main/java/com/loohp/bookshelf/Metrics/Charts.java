@@ -19,7 +19,7 @@ public class Charts {
 	        @Override
 	        public String call() throws Exception {
 	        	String string = "Disabled";
-	        	if (Bookshelf.EnableHopperSupport == true) {
+	        	if (Bookshelf.enableHopperSupport == true) {
 	        		string = "Enabled";
 	        	}
 	            return string;
@@ -30,7 +30,7 @@ public class Charts {
 	        @Override
 	        public String call() throws Exception {
 	        	String string = "Disabled";
-	        	if (Bookshelf.EnableDropperSupport == true) {
+	        	if (Bookshelf.enableDropperSupport == true) {
 	        		string = "Enabled";
 	        	}
 	            return string;

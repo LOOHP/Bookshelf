@@ -1,6 +1,6 @@
 package com.loohp.bookshelf;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -34,7 +34,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 				Bookshelf.loadConfig();
 				sender.sendMessage(ChatColor.GREEN + "[Bookshelf] BookShelf has been reloaded!");
 			} else {
-				sender.sendMessage(Bookshelf.NoPermissionToReloadMessage);
+				sender.sendMessage(Bookshelf.noPermissionToReloadMessage);
 			}
 			return true;
 		}		
@@ -56,7 +56,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 					}
 				});
 			} else {
-				sender.sendMessage(Bookshelf.NoPermissionToUpdateMessage);
+				sender.sendMessage(Bookshelf.noPermissionToUpdateMessage);
 			}
 			return true;
 		}
@@ -67,7 +67,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-		List<String> tab = new ArrayList<String>();
+		List<String> tab = new LinkedList<>();
 		if (!label.equalsIgnoreCase("bookshelf")) {
 			return tab;
 		}

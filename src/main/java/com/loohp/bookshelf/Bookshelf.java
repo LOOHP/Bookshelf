@@ -64,34 +64,36 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Bookshelf extends JavaPlugin {
 	
+	public static final int BSTATS_PLUGIN_ID = 6748;
+	
 	public static Plugin plugin = null;
 	
 	public static MCVersion version;
 	
-	public static boolean VanishHook = false;
-	public static boolean CMIHook = false;
-	public static boolean EssentialsHook = false;
-	public static boolean OpenInvHook = false;
-	public static boolean LWCHook = false;
-	public static boolean WorldGuardHook = false;
-	public static boolean GriefPreventionHook = false;
-	public static boolean BlockLockerHook = false;
-	public static boolean RedProtectHook = false;
-	public static boolean BentoBoxHook = false;
-	public static boolean ASkyBlockHook = false;
-	public static boolean ResidenceHook = false;
-	public static boolean TownyHook = false;
-	public static boolean SuperiorSkyblock2Hook = false;
-	public static boolean LandHook = false;
-	public static boolean PlotSquaredHook = false;
-	public static boolean InteractionVisualizerHook = false;
+	public static boolean vanishHook = false;
+	public static boolean cmiHook = false;
+	public static boolean essentialsHook = false;
+	public static boolean openInvHook = false;
+	public static boolean lwcHook = false;
+	public static boolean worldGuardHook = false;
+	public static boolean griefPreventionHook = false;
+	public static boolean blockLockerHook = false;
+	public static boolean redProtectHook = false;
+	public static boolean bentoBoxHook = false;
+	public static boolean aSkyBlockHook = false;
+	public static boolean residenceHook = false;
+	public static boolean townyHook = false;
+	public static boolean superiorSkyblock2Hook = false;
+	public static boolean landHook = false;
+	public static boolean plotSquaredHook = false;
+	public static boolean interactionVisualizerHook = false;
 	
-	public static boolean EnableHopperSupport = true;
-	public static boolean EnableDropperSupport = true;
-	public static int HopperTaskID = -1;
-	public static int HopperMinecartTaskID = -1;
-	public static int HopperTicksPerTransfer = 8;
-	public static int HopperAmount = 1;
+	public static boolean enableHopperSupport = true;
+	public static boolean enableDropperSupport = true;
+	public static int hopperTaskID = -1;
+	public static int hopperMinecartTaskID = -1;
+	public static int hopperTicksPerTransfer = 8;
+	public static int hopperAmount = 1;
 	
 	public static ConcurrentHashMap<String, Inventory> keyToContentMapping = new ConcurrentHashMap<String, Inventory>();
 	public static ConcurrentHashMap<Inventory, String> contentToKeyMapping = new ConcurrentHashMap<Inventory, String>();
@@ -104,14 +106,14 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static ConcurrentHashMap<Player, LWCRequestOpenData> requestOpen = new ConcurrentHashMap<Player, LWCRequestOpenData>();
 	
-	public static int BookShelfRows = 2;
-	public static boolean UseWhitelist = true;
-	public static String Title = "Bookshelf";
-	public static Set<String> Whitelist = new HashSet<String>();
+	public static int bookShelfRows = 2;
+	public static boolean useWhitelist = true;
+	public static String title = "Bookshelf";
+	public static Set<String> whitelist = new HashSet<String>();
 	public static boolean particlesEnabled = true;
 	
-	public static String NoPermissionToReloadMessage = "&cYou do not have permission use this command!";
-	public static String NoPermissionToUpdateMessage = "&cYou do not have permission use this command!";
+	public static String noPermissionToReloadMessage = "&cYou do not have permission use this command!";
+	public static String noPermissionToUpdateMessage = "&cYou do not have permission use this command!";
 	
 	public static Set<UUID> lwcCancelOpen = ConcurrentHashMap.newKeySet();
 	public static Set<UUID> isDonationView = ConcurrentHashMap.newKeySet();
@@ -133,8 +135,8 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static int eTableMulti = 1;
 	
-	public static boolean UpdaterEnabled = true;
-	public static int UpdaterTaskID = -1;
+	public static boolean updaterEnabled = true;
+	public static int updaterTaskID = -1;
 
 	@Override
 	@SuppressWarnings("deprecation")
@@ -142,10 +144,8 @@ public class Bookshelf extends JavaPlugin {
 		plugin = this;
 		
 		getServer().getPluginManager().registerEvents(new Debug(), this);
-		
-		int pluginId = 6748;
 
-		Metrics metrics = new Metrics(this, pluginId);
+		Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID);
 		
 		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 	    
@@ -170,94 +170,94 @@ public class Bookshelf extends JavaPlugin {
 	    String PremiumVanish = "PremiumVanish";
 	    if (getServer().getPluginManager().getPlugin(SuperVanish) != null || getServer().getPluginManager().getPlugin(PremiumVanish) != null) {
 			hookMessage(SuperVanish + "/" + PremiumVanish);
-			VanishHook = true;
+			vanishHook = true;
 		}
 	    
 	    String CMI = "CMI";
 		if (getServer().getPluginManager().getPlugin(CMI) != null) {
 			hookMessage(CMI);
-			CMIHook = true;
+			cmiHook = true;
 		}
 		
 		String Essentials = "Essentials";
 		if (getServer().getPluginManager().getPlugin(Essentials) != null) {
 			hookMessage(Essentials);
-			EssentialsHook = true;
+			essentialsHook = true;
 		}
 	    
 	    String OpenInv = "OpenInv";
 	    if (getServer().getPluginManager().getPlugin(OpenInv) != null) {
 			hookMessage(OpenInv);
-			OpenInvHook = true;
+			openInvHook = true;
 		}
 	    
 	    String GriefPrevention = "GriefPrevention";
 	    if (getServer().getPluginManager().getPlugin("GriefPrevention") != null) {
 	    	hookMessage(GriefPrevention);
 	    	getServer().getPluginManager().registerEvents(new GriefPreventionEvents(), this);
-			GriefPreventionHook = true;
+			griefPreventionHook = true;
 		}
 		
 	    String LWC = "LWC";
 		if (getServer().getPluginManager().getPlugin(LWC) != null) {
 			hookMessage(LWC);
 			LWCEvents.hookLWC();
-			LWCHook = true;
+			lwcHook = true;
 		}
 		
 		String BlockLocker = "BlockLocker";
 		if (getServer().getPluginManager().getPlugin(BlockLocker) != null) {
 			hookMessage(BlockLocker);
-			BlockLockerHook = true;
+			blockLockerHook = true;
 		}
 		
 		String WorldGuard = "WorldGuard";
 		if (getServer().getPluginManager().getPlugin(WorldGuard) != null) {
 			hookMessage(WorldGuard);
 			getServer().getPluginManager().registerEvents(new WorldGuardEvents(), this);
-			WorldGuardHook = true;
+			worldGuardHook = true;
 		}
 		
 		String RedProtect = "RedProtect";
 		if (getServer().getPluginManager().getPlugin(RedProtect) != null) {
 			hookMessage(RedProtect);
 			getServer().getPluginManager().registerEvents(new RedProtectEvents(), this);
-			RedProtectHook = true;
+			redProtectHook = true;
 		}
 		
 		String BentoBox = "BentoBox";
 		if (getServer().getPluginManager().getPlugin(BentoBox) != null) {
 			hookMessage(BentoBox);
 			getServer().getPluginManager().registerEvents(new BentoBoxEvents(), this);
-			BentoBoxHook = true;
+			bentoBoxHook = true;
 		}
 		
 		String ASkyBlock = "ASkyBlock";
 		if (getServer().getPluginManager().getPlugin(ASkyBlock) != null) {
 			hookMessage(ASkyBlock);
 			getServer().getPluginManager().registerEvents(new ASkyBlockEvents(), this);
-			ASkyBlockHook = true;
+			aSkyBlockHook = true;
 		}
 		
 		String Residence = "Residence";	
 		if (getServer().getPluginManager().getPlugin(Residence) != null) {
 			hookMessage(Residence);
 			getServer().getPluginManager().registerEvents(new ResidenceEvents(), this);
-			ResidenceHook = true;
+			residenceHook = true;
 		}
 		
 		String Towny = "Towny";
 		if (getServer().getPluginManager().getPlugin(Towny) != null) {
 			hookMessage(Towny);
 			getServer().getPluginManager().registerEvents(new TownyEvents(), this);
-			TownyHook = true;
+			townyHook = true;
 		}
 		
 		String SuperiorSkyblock2 = "SuperiorSkyblock2";
 		if (getServer().getPluginManager().getPlugin(SuperiorSkyblock2) != null) {
 			hookMessage(SuperiorSkyblock2);
 			getServer().getPluginManager().registerEvents(new SuperiorSkyblock2Events(), this);
-			SuperiorSkyblock2Hook = true;
+			superiorSkyblock2Hook = true;
 		}
 		
 		String Lands = "Lands";
@@ -265,7 +265,7 @@ public class Bookshelf extends JavaPlugin {
 			hookMessage(Lands);
 			getServer().getPluginManager().registerEvents(new LandEvents(), this);
 			LandEvents.setup();
-			LandHook = true;
+			landHook = true;
 		}
 		
 		String PlotSquared = "PlotSquared";
@@ -274,11 +274,11 @@ public class Bookshelf extends JavaPlugin {
 			if (plotSquaredVersion.startsWith("5.")) {
 				hookMessage(PlotSquared + " (v5)");
 				getServer().getPluginManager().registerEvents(new PlotSquared5Events(), this);
-				PlotSquaredHook = true;
+				plotSquaredHook = true;
 			} else if (plotSquaredVersion.startsWith("4.")) {
 				hookMessage(PlotSquared + " (v4)");
 				getServer().getPluginManager().registerEvents(new PlotSquared4Events(), this);
-				PlotSquaredHook = true;
+				plotSquaredHook = true;
 			} else {
 				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of PlotSquared is not supported, only v4 and v5 is supported so far.");
 			}
@@ -288,7 +288,7 @@ public class Bookshelf extends JavaPlugin {
 		if (getServer().getPluginManager().getPlugin(InteractionVisualizer) != null) {
 			hookMessage(InteractionVisualizer);
 			getServer().getPluginManager().registerEvents(new InteractionVisualizerAnimations(), this);
-			InteractionVisualizerHook = true;
+			interactionVisualizerHook = true;
 		}
 
 		if (!version.isSupported()) {
@@ -340,15 +340,15 @@ public class Bookshelf extends JavaPlugin {
 	}
 	
 	public static void loadConfig() {	
-		BookShelfRows = plugin.getConfig().getInt("Options.BookShelfRows");
-		UseWhitelist = plugin.getConfig().getBoolean("Options.UseWhitelist");
-		Whitelist = plugin.getConfig().getStringList("Options.Whitelist").stream().collect(Collectors.toSet());
-		Title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Options.Title"));
-		NoPermissionToReloadMessage = plugin.getConfig().getString("Options.NoPermissionToReloadMessage");
-		NoPermissionToUpdateMessage = plugin.getConfig().getString("Options.NoPermissionToUpdateMessage");
+		bookShelfRows = plugin.getConfig().getInt("Options.BookShelfRows");
+		useWhitelist = plugin.getConfig().getBoolean("Options.UseWhitelist");
+		whitelist = plugin.getConfig().getStringList("Options.Whitelist").stream().collect(Collectors.toSet());
+		title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Options.Title"));
+		noPermissionToReloadMessage = plugin.getConfig().getString("Options.NoPermissionToReloadMessage");
+		noPermissionToUpdateMessage = plugin.getConfig().getString("Options.NoPermissionToUpdateMessage");
 		particlesEnabled = plugin.getConfig().getBoolean("Options.ParticlesWhenOpened");
-		EnableHopperSupport = plugin.getConfig().getBoolean("Options.EnableHopperSupport");
-		EnableDropperSupport = plugin.getConfig().getBoolean("Options.EnableDropperSupport");
+		enableHopperSupport = plugin.getConfig().getBoolean("Options.EnableHopperSupport");
+		enableDropperSupport = plugin.getConfig().getBoolean("Options.EnableDropperSupport");
 		enchantmentTable = plugin.getConfig().getBoolean("Options.EnableEnchantmentTableBoosting");
 		int eTableChance = plugin.getConfig().getInt("Options.EnchantmentTableBoostingMaxPercentage");
 		if (eTableChance > 100) {
@@ -360,24 +360,24 @@ public class Bookshelf extends JavaPlugin {
 		
 		lastHopperTime = 0;
 		lastHoppercartTime = 0;
-		if (HopperTaskID >= 0) {
-			Bukkit.getScheduler().cancelTask(HopperTaskID);
+		if (hopperTaskID >= 0) {
+			Bukkit.getScheduler().cancelTask(hopperTaskID);
 		}
-		if (HopperMinecartTaskID >= 0) {
-			Bukkit.getScheduler().cancelTask(HopperMinecartTaskID);
+		if (hopperMinecartTaskID >= 0) {
+			Bukkit.getScheduler().cancelTask(hopperMinecartTaskID);
 		}
-		if (EnableHopperSupport == true) {
-			HopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
-			HopperAmount = Bukkit.spigot().getConfig().getInt("world-settings.default.hopper-amount");
+		if (enableHopperSupport == true) {
+			hopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
+			hopperAmount = Bukkit.spigot().getConfig().getInt("world-settings.default.hopper-amount");
 			HopperUtils.hopperCheck();
 			HopperUtils.hopperMinecartCheck();
 		}
 		
-		if (UpdaterTaskID >= 0) {
-			Bukkit.getScheduler().cancelTask(UpdaterTaskID);
+		if (updaterTaskID >= 0) {
+			Bukkit.getScheduler().cancelTask(updaterTaskID);
 		}
-		UpdaterEnabled = plugin.getConfig().getBoolean("Options.Updater");
-		if (UpdaterEnabled == true) {
+		updaterEnabled = plugin.getConfig().getBoolean("Options.Updater");
+		if (updaterEnabled == true) {
 			Bukkit.getPluginManager().registerEvents(new Updater(), Bookshelf.plugin);
 		}
 	}
@@ -426,8 +426,8 @@ public class Bookshelf extends JavaPlugin {
 					String loc = BookshelfUtils.locKey(block.getLocation());
 					if (!keyToContentMapping.containsKey(loc)) {
 						if (!BookshelfManager.contains(loc)) {
-							String bsTitle = Title;
-							addBookshelfToMapping(loc, Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
+							String bsTitle = title;
+							addBookshelfToMapping(loc, Bukkit.createInventory(null, (int) (bookShelfRows * 9), bsTitle));
 							BookshelfManager.setTitle(loc, bsTitle);
 							BookshelfUtils.saveBookShelf(loc);
 						} else {
@@ -489,8 +489,8 @@ public class Bookshelf extends JavaPlugin {
 					String loc = BookshelfUtils.locKey(block.getLocation());
 					if (!keyToContentMapping.containsKey(loc)) {
 						if (!BookshelfManager.contains(loc)) {
-							String bsTitle = Title;
-							addBookshelfToMapping(loc , Bukkit.createInventory(null, (int) (BookShelfRows * 9), bsTitle));
+							String bsTitle = title;
+							addBookshelfToMapping(loc , Bukkit.createInventory(null, (int) (bookShelfRows * 9), bsTitle));
 							BookshelfManager.setTitle(loc, bsTitle);
 							BookshelfUtils.saveBookShelf(loc);
 						} else {

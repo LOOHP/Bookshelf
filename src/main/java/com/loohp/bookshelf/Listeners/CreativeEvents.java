@@ -45,8 +45,8 @@ public class CreativeEvents implements Listener {
 					String key = BookshelfUtils.locKey(block.getLocation());
 					if (!Bookshelf.keyToContentMapping.containsKey(key)) {
 						if (!BookshelfManager.contains(key)) {
-							String bsTitle = Bookshelf.Title;
-							Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.BookShelfRows * 9), bsTitle));
+							String bsTitle = Bookshelf.title;
+							Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
 							BookshelfManager.setTitle(key, bsTitle);
 							BookshelfUtils.saveBookShelf(key);
 						} else {

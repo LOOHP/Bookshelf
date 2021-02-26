@@ -23,7 +23,7 @@ public class LandEvents implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onLandCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.LandHook) {
+		if (!Bookshelf.landHook) {
 			return;
 		}
 		
