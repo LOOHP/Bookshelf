@@ -47,7 +47,6 @@ public class LWCEvents implements Module {
 
 	@Override
 	public void onAccessRequest(LWCAccessEvent event) {
-		Bukkit.getConsoleSender().sendMessage("000");
 		if (!event.getPlayer().hasPermission("bookshelf.use")) {
 			return;
 		}
