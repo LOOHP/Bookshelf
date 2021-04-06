@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.listeners;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,8 @@ import org.bukkit.inventory.Inventory;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
-import com.loohp.bookshelf.Utils.CustomListUtils;
+import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.CustomListUtils;
 
 public class PistonEvents implements Listener {
 	

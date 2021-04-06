@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners.Hooks;
+package com.loohp.bookshelf.listeners.hooks;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,7 +15,7 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockState;
 

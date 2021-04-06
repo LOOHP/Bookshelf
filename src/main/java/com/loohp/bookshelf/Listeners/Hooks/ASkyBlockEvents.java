@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners.Hooks;
+package com.loohp.bookshelf.listeners.hooks;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -7,7 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.wasteofplastic.askyblock.ASkyBlock;
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 

@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Updater;
+package com.loohp.bookshelf.updater;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.json.simple.JSONObject;
 
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.Utils.HTTPRequestUtils;
+import com.loohp.bookshelf.utils.HTTPRequestUtils;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;

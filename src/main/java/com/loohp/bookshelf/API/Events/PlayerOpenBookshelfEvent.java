@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.API.Events;
+package com.loohp.bookshelf.api.events;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -10,17 +10,17 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.BookshelfUtils;
 
 public class PlayerOpenBookshelfEvent extends Event implements Cancellable {
 	
-	Player player;
-	Block block;
-	BlockFace blockface;
-	Location location;
-	String key;
-	Inventory inventory;
-	boolean cancelled;
+	private Player player;
+	private Block block;
+	private BlockFace blockface;
+	private Location location;
+	private String key;
+	private Inventory inventory;
+	private boolean cancelled;
 	
 	public PlayerOpenBookshelfEvent (Player player, String key, BlockFace blockface, boolean cancelled) {
 		this.player = player;

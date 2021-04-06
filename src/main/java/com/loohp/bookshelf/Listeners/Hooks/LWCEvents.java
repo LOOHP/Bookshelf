@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners.Hooks;
+package com.loohp.bookshelf.listeners.hooks;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,8 +26,8 @@ import com.griefcraft.scripting.event.LWCRedstoneEvent;
 import com.griefcraft.scripting.event.LWCReloadEvent;
 import com.griefcraft.scripting.event.LWCSendLocaleEvent;
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
-import com.loohp.bookshelf.ObjectHolders.LWCRequestOpenData;
+import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
 
 public class LWCEvents implements Module {
 	

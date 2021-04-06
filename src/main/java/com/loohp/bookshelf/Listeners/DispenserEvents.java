@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.listeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,11 +19,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.Utils.BlockLockerUtils;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
-import com.loohp.bookshelf.Utils.DropperUtils;
-import com.loohp.bookshelf.Utils.InventoryUtils;
-import com.loohp.bookshelf.Utils.LWCUtils;
+import com.loohp.bookshelf.utils.BlockLockerUtils;
+import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.DropperUtils;
+import com.loohp.bookshelf.utils.InventoryUtils;
+import com.loohp.bookshelf.utils.LWCUtils;
 
 public class DispenserEvents implements Listener {
 	

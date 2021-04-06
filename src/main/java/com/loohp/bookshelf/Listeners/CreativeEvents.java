@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
@@ -19,10 +19,10 @@ import org.bukkit.persistence.PersistentDataType;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
-import com.loohp.bookshelf.Utils.MCVersion;
-import com.loohp.bookshelf.Utils.MaterialUtils;
-import com.loohp.bookshelf.Utils.NBTUtils;
+import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.MCVersion;
+import com.loohp.bookshelf.utils.MaterialUtils;
+import com.loohp.bookshelf.utils.NBTUtils;
 
 public class CreativeEvents implements Listener {
 	

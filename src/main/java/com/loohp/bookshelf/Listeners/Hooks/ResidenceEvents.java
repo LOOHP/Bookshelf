@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners.Hooks;
+package com.loohp.bookshelf.listeners.hooks;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,7 +10,7 @@ import com.bekvon.bukkit.residence.api.ResidenceApi;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 
 public class ResidenceEvents implements Listener {
 

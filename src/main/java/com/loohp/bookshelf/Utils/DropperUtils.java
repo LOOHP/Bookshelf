@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Utils;
+package com.loohp.bookshelf.utils;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;

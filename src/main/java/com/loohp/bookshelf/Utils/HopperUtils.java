@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Utils;
+package com.loohp.bookshelf.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.API;
+package com.loohp.bookshelf.api;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import org.bukkit.inventory.Inventory;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.BookshelfUtils;
 
 public class BookshelfAPI {
 	

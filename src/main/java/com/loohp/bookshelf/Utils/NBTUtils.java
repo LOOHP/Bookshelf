@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Utils;
+package com.loohp.bookshelf.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

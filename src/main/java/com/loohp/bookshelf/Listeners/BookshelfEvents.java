@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.listeners;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,12 +42,12 @@ import com.griefcraft.lwc.LWC;
 import com.griefcraft.model.Protection;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.API.Events.PlayerCloseBookshelfEvent;
-import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
-import com.loohp.bookshelf.ObjectHolders.LWCRequestOpenData;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
-import com.loohp.bookshelf.Utils.MCVersion;
-import com.loohp.bookshelf.Utils.NBTUtils;
+import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
+import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
+import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.MCVersion;
+import com.loohp.bookshelf.utils.NBTUtils;
 
 public class BookshelfEvents implements Listener {
 

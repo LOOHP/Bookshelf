@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Metrics;
+package com.loohp.bookshelf.metrics;
 
 import java.util.concurrent.Callable;
 

@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Hooks;
+package com.loohp.bookshelf.hooks;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,17 +23,17 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.loohp.bookshelf.API.BookshelfAPI;
-import com.loohp.bookshelf.API.Events.PlayerCloseBookshelfEvent;
-import com.loohp.bookshelf.API.Events.PlayerOpenBookshelfEvent;
-import com.loohp.bookshelf.Utils.OpenInvUtils;
-import com.loohp.bookshelf.Utils.VanishUtils;
+import com.loohp.bookshelf.api.BookshelfAPI;
+import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
+import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.utils.InventoryUtils;
+import com.loohp.bookshelf.utils.OpenInvUtils;
+import com.loohp.bookshelf.utils.VanishUtils;
 import com.loohp.interactionvisualizer.InteractionVisualizer;
-import com.loohp.interactionvisualizer.API.InteractionVisualizerAPI;
-import com.loohp.interactionvisualizer.API.InteractionVisualizerAPI.Modules;
-import com.loohp.interactionvisualizer.EntityHolders.Item;
-import com.loohp.interactionvisualizer.Managers.PacketManager;
-import com.loohp.interactionvisualizer.Utils.InventoryUtils;
+import com.loohp.interactionvisualizer.api.InteractionVisualizerAPI;
+import com.loohp.interactionvisualizer.api.InteractionVisualizerAPI.Modules;
+import com.loohp.interactionvisualizer.entityholders.Item;
+import com.loohp.interactionvisualizer.managers.PacketManager;
 
 public class InteractionVisualizerAnimations implements Listener {
 	

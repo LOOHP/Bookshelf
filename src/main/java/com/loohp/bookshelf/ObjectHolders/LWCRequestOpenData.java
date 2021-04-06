@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.ObjectHolders;
+package com.loohp.bookshelf.objectholders;
 
 import org.bukkit.block.BlockFace;
 

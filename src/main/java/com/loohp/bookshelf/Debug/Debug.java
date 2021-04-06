@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Debug;
+package com.loohp.bookshelf.debug;
 
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;

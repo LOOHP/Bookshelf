@@ -9,8 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
-import com.loohp.bookshelf.Updater.Updater;
-import com.loohp.bookshelf.Updater.Updater.UpdaterResponse;
+import com.loohp.bookshelf.updater.Updater;
+import com.loohp.bookshelf.updater.Updater.UpdaterResponse;
 
 import net.md_5.bungee.api.ChatColor;
 

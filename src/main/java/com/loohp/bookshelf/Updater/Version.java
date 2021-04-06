@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Updater;
+package com.loohp.bookshelf.updater;
 
 public class Version implements Comparable<Version> {
 

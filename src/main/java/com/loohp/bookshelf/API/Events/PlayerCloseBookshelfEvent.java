@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.API.Events;
+package com.loohp.bookshelf.api.events;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -8,15 +8,15 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.BookshelfUtils;
 
 public class PlayerCloseBookshelfEvent extends Event{
 	
-	Player player;
-	Block block;
-	Location location;
-	String key;
-	Inventory inventory;
+	private Player player;
+	private Block block;
+	private Location location;
+	private String key;
+	private Inventory inventory;
 	
 	public PlayerCloseBookshelfEvent (Player player, String key) {
 		this.player = player;

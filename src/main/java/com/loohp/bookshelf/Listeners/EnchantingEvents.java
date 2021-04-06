@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Listeners;
+package com.loohp.bookshelf.listeners;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +26,9 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.EnchantmentOfferMapping;
-import com.loohp.bookshelf.Utils.BookshelfUtils;
-import com.loohp.bookshelf.Utils.EnchantmentTableUtils;
-import com.loohp.bookshelf.Utils.MCVersion;
+import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.EnchantmentTableUtils;
+import com.loohp.bookshelf.utils.MCVersion;
 
 public class EnchantingEvents implements Listener {
 	

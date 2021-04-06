@@ -1,4 +1,4 @@
-package com.loohp.bookshelf.Utils.Legacy;
+package com.loohp.bookshelf.utils.legacy;
 
 import java.io.File;
 import java.io.FileInputStream;
