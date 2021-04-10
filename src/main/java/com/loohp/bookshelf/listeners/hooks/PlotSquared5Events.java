@@ -65,10 +65,7 @@ public class PlotSquared5Events implements Listener {
 		for (PlotFlag<?, ?> flag : plot.getFlags()) {
 			if (flag instanceof UseFlag) {
 				for (BlockTypeWrapper blockTypeWarpper : (List<BlockTypeWrapper>) flag.getValue()) {
-					if (blockTypeWarpper.getBlockType() != null && blockTypeWarpper.getBlockType().equals(worldeditBookshelfBlockType)) {
-						return;
-					}
-					if (blockTypeWarpper.getBlockCategory() != null && blockTypeWarpper.getBlockCategory().contains(worldeditBookshelfBlockType)) {
+					if (blockTypeWarpper.accepts(worldeditBookshelfBlockType)) {
 						return;
 					}
 				}
