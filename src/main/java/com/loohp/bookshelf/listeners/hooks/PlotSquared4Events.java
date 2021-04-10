@@ -21,7 +21,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 
 public class PlotSquared4Events implements Listener {
 	
-	BlockState worldeditBookshelfBlockState = BukkitAdapter.adapt(Bukkit.createBlockData(Material.BOOKSHELF));
+	private static final BlockState ADAPTED_BOOKSHELF_TYPE = BukkitAdapter.adapt(Bukkit.createBlockData(Material.BOOKSHELF));
 
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlotSquaredCheck(PlayerOpenBookshelfEvent event) {
@@ -57,7 +57,7 @@ public class PlotSquared4Events implements Listener {
 			return;
 		}
 		
-		if (Flags.USE.contains(plot, worldeditBookshelfBlockState)) {
+		if (Flags.USE.contains(plot, ADAPTED_BOOKSHELF_TYPE)) {
 			return;
 		}
 		

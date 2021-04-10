@@ -25,7 +25,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 
 public class PlotSquared5Events implements Listener {
 	
-	BlockType worldeditBookshelfBlockType = BukkitAdapter.asBlockType(Material.BOOKSHELF);
+	private static final BlockType ADAPTED_BOOKSHELF_TYPE = BukkitAdapter.asBlockType(Material.BOOKSHELF);
 
 	@SuppressWarnings("unchecked")
 	@EventHandler(priority=EventPriority.LOWEST)
@@ -65,7 +65,7 @@ public class PlotSquared5Events implements Listener {
 		for (PlotFlag<?, ?> flag : plot.getFlags()) {
 			if (flag instanceof UseFlag) {
 				for (BlockTypeWrapper blockTypeWarpper : (List<BlockTypeWrapper>) flag.getValue()) {
-					if (blockTypeWarpper.accepts(worldeditBookshelfBlockType)) {
+					if (blockTypeWarpper.accepts(ADAPTED_BOOKSHELF_TYPE)) {
 						return;
 					}
 				}
