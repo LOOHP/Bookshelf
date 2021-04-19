@@ -24,6 +24,7 @@ Options:
   ParticlesWhenOpened: true
 
   #Whether to allow bookshelves to work with hoppers
+  #Performace heavy, not recommended
   EnableHopperSupport: false
 
   #Whether to allow bookshelves to work with droppers
