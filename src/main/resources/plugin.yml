@@ -1,4 +1,4 @@
-name: BookShelf
+name: Bookshelf
 author: loohp
 version: ${project.version}
 main: com.loohp.bookshelf.Bookshelf

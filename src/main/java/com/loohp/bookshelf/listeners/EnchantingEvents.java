@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -26,7 +25,8 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.EnchantmentOfferMapping;
-import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.objectholders.BlockPosition;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 
@@ -54,18 +54,8 @@ public class EnchantingEvents implements Listener {
 			return;
 		}
 		for (Block block : blocks) {
-			String key = BookshelfUtils.locKey(block.getLocation());
-			if (!Bookshelf.keyToContentMapping.containsKey(key)) {
-				if (!BookshelfManager.contains(key)) {
-					String bsTitle = Bookshelf.title;
-					Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
-					BookshelfManager.setTitle(key, bsTitle);
-					BookshelfUtils.saveBookShelf(key);
-				} else {
-					BookshelfUtils.loadBookShelf(key);
-				}
-			}
-			Inventory inv = Bookshelf.keyToContentMapping.get(key);
+			BookshelfHolder bookshelf = BookshelfManager.getBookshelfManager(block.getWorld()).getOrCreateBookself(new BlockPosition(block), Bookshelf.title);
+			Inventory inv = bookshelf.getInventory();
 			for (int i = 0; i < inv.getSize(); i++) {
 				ItemStack item = inv.getItem(i);
 				if (item == null) {

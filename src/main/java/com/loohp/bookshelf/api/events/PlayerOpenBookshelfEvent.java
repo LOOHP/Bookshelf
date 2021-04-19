@@ -7,10 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.Inventory;
 
-import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
 
 public class PlayerOpenBookshelfEvent extends Event implements Cancellable {
 	
@@ -18,17 +16,15 @@ public class PlayerOpenBookshelfEvent extends Event implements Cancellable {
 	private Block block;
 	private BlockFace blockface;
 	private Location location;
-	private String key;
-	private Inventory inventory;
+	private BookshelfHolder bookshelf;
 	private boolean cancelled;
 	
-	public PlayerOpenBookshelfEvent (Player player, String key, BlockFace blockface, boolean cancelled) {
+	public PlayerOpenBookshelfEvent (Player player, BookshelfHolder bookshelf, BlockFace blockface, boolean cancelled) {
 		this.player = player;
-		this.key = key;
-		this.location = BookshelfUtils.keyLoc(key);
+		this.bookshelf = bookshelf;
+		this.location = bookshelf.getPosition().getLocation();
 		this.block = location.getBlock();
 		this.blockface = blockface;
-		this.inventory = Bookshelf.keyToContentMapping.get(key);
 		this.cancelled = cancelled;
 	}
 	
@@ -43,17 +39,13 @@ public class PlayerOpenBookshelfEvent extends Event implements Cancellable {
 	public Location getLocation() {
 		return location;
 	}
-
-	public String getKey() {
-		return key;
-	}
 	
 	public BlockFace getClickedBlockFace() {
 		return blockface;
 	}
 
-	public Inventory getInventory() {
-		return inventory;
+	public BookshelfHolder getBookshelf() {
+		return bookshelf;
 	}
 
 	@Override

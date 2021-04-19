@@ -5,7 +5,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>2.6.10.2</version>
+	<version>3.0.0.0</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -206,6 +206,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>20.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>me.clip</groupId>
 			<artifactId>placeholderapi</artifactId>
 			<version>2.10.6</version>
@@ -368,7 +374,7 @@
 		<dependency>
 			<groupId>com.loohp</groupId>
 			<artifactId>InteractionVisualizer</artifactId>
-			<version>1.14.7.0</version>
+			<version>1.14.9.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

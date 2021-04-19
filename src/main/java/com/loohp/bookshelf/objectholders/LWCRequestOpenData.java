@@ -4,18 +4,18 @@ import org.bukkit.block.BlockFace;
 
 public class LWCRequestOpenData {
 	
-	String key;
-	BlockFace blockface;
-	boolean cancelled;
+	private BookshelfHolder bookshelf;
+	private BlockFace blockface;
+	private boolean cancelled;
 	
-	public LWCRequestOpenData(String key, BlockFace blockface, boolean cancelled) {
-		this.key = key;
+	public LWCRequestOpenData(BookshelfHolder bookshelf, BlockFace blockface, boolean cancelled) {
+		this.bookshelf = bookshelf;
 		this.cancelled = cancelled;
 		this.blockface = blockface;
 	}
 
-	public String getKey() {
-		return key;
+	public BookshelfHolder getBookshelf() {
+		return bookshelf;
 	}
 	
 	public BlockFace getBlockFace() {

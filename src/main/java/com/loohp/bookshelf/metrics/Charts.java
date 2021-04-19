@@ -8,10 +8,10 @@ import com.loohp.bookshelf.BookshelfManager;
 public class Charts {	
 	
 	public static void loadCharts(Metrics metrics) {
-		metrics.addCustomChart(new Metrics.SingleLineChart("total_bookshelves", new Callable<Integer>() {
+		metrics.addCustomChart(new Metrics.SingleLineChart("total_bookshelves_loaded", new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
-                return BookshelfManager.getJsonObject().size();
+                return BookshelfManager.getWorlds().stream().mapToInt(each -> BookshelfManager.getBookshelfManager(each).size()).sum();
             }
         }));
 	    

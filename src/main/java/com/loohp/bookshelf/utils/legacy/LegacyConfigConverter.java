@@ -3,21 +3,29 @@ package com.loohp.bookshelf.utils.legacy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.inventory.Inventory;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.loohp.bookshelf.Bookshelf;
+import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.objectholders.BlockPosition;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
+import com.loohp.bookshelf.objectholders.ChunkPosition;
+import com.loohp.bookshelf.utils.BookshelfUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -25,51 +33,73 @@ public class LegacyConfigConverter {
 	
 	@SuppressWarnings("unchecked")
 	@Deprecated
-	public static void convert() {
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Legacy v1.0.0 data format detected!");
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Converting bookshelf data to v2.0.0 JSON format!");
-		JSONObject json = new JSONObject();
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Loading legacy bookshelf data from config.yml..");
-		Map<String, Object> map = Bookshelf.plugin.getConfig().getConfigurationSection("BookShelfData").getValues(false);
-		for (Entry<String, Object> entry : map.entrySet()) {
-			JSONObject value = new JSONObject();
-			if (Bookshelf.plugin.getConfig().getString("BookShelfData." + entry.getKey() + ".Title") != null) {
-				value.put("Title", Bookshelf.plugin.getConfig().getString("BookShelfData." + entry.getKey() + ".Title"));
+	public static void mergeLegacy(File file, BookshelfManager manager) {
+		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Legacy v2.0.0 data format detected!");
+		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Converting bookshelf data to format!");
+		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Loading legacy bookshelf data..");
+		
+		Map<ChunkPosition, Map<BlockPosition, BookshelfHolder>> bookshelves = new HashMap<>();
+		World world = manager.getWorld();
+		
+		try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+			JSONObject json = (JSONObject) new JSONParser().parse(reader);
+			Iterator<Object> itr = json.keySet().iterator();
+			while (itr.hasNext()) {
+				Object obj = itr.next();
+				try {
+					String key = obj.toString();
+					if (!key.startsWith(world.getName())) {
+						continue;
+					}
+					JSONObject entry = (JSONObject) json.get(key);
+					key = key.replace(world.getName() + "_", "");
+					BlockPosition position = BookshelfUtils.keyPos(world, key);
+					Map<BlockPosition, BookshelfHolder> chunkEntry = bookshelves.get(position.getChunkPosition());
+					if (chunkEntry == null) {
+						chunkEntry = new ConcurrentHashMap<>();
+						bookshelves.put(position.getChunkPosition(), chunkEntry);
+					}					
+					String title = entry.get("Title").toString();
+					BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
+					Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title, bookshelf);
+					bookshelf.setInventory(inventory);					
+					chunkEntry.put(position, bookshelf);
+					itr.remove();
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
 			}
-			if (Bookshelf.plugin.getConfig().getString("BookShelfData." + entry.getKey() + ".Inventory") != null) {
-				value.put("Inventory", Bookshelf.plugin.getConfig().getString("BookShelfData." + entry.getKey() + ".Inventory"));
+			
+			reader.close();
+
+			if (json.isEmpty()) {
+				file.delete();
+			} else {
+	        	Gson g = new GsonBuilder().setPrettyPrinting().create();
+	            String prettyJsonString = g.toJson(json);
+	            
+	            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+	            	pw.println(prettyJsonString);
+	                pw.flush();
+	            } catch (Exception e) {
+	            	e.printStackTrace();
+	            }
 			}
-			json.put(entry.getKey(), value);
-		}
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Writing converted data to bookshelfdata.json..");
-		try {
-        	JSONObject toSave = json;
-        
-        	TreeMap<String, Object> treeMap = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
-        	treeMap.putAll(toSave);
-        	
-        	Gson g = new GsonBuilder().setPrettyPrinting().create();
-            String prettyJsonString = g.toJson(treeMap);
-            
-            File file = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/bookshelfdata.json");
-            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-            writer.write(prettyJsonString);
-            writer.flush();
-            writer.close();
-        } catch (Exception ex) {
-        	ex.printStackTrace();
-        }
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Creating backup of legacy bookshelf data..");
-		File backupfile = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/legacybackupdata.yml");
-		try {
-			InputStream in = new FileInputStream(new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/config.yml"));
-	        Files.copy(in, backupfile.toPath());
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Cleaning up config.yml to new formatting..");
-		Bookshelf.plugin.getConfig().set("BookShelfData", null);
-		Bookshelf.plugin.saveConfig();
-		Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Bookshelf] Upgrade to v2.0.0 done!");
+		
+		if (!bookshelves.isEmpty()) {
+			try {
+				Field field = manager.getClass().getDeclaredField("loadedBookshelves");
+				field.setAccessible(true);
+				((Map<ChunkPosition, Map<BlockPosition, BookshelfHolder>>) field.get(manager)).putAll(bookshelves);
+				field.setAccessible(false);
+			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Bookshelf] Upgraded to v3.0.0 done!");
 	}
 }

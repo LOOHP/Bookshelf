@@ -5,27 +5,23 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.Inventory;
 
-import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
 
 public class PlayerCloseBookshelfEvent extends Event{
 	
 	private Player player;
 	private Block block;
 	private Location location;
-	private String key;
-	private Inventory inventory;
+	private BookshelfHolder bookshelf;
 	
-	public PlayerCloseBookshelfEvent (Player player, String key) {
+	public PlayerCloseBookshelfEvent (Player player, BookshelfHolder bookshelf) {
 		this.player = player;
-		this.key = key;
-		this.location = BookshelfUtils.keyLoc(key);
+		this.location = bookshelf.getPosition().getLocation();
 		this.block = location.getBlock();
-		this.inventory = Bookshelf.keyToContentMapping.get(key);
+		this.bookshelf = bookshelf;
 	}
-	
+
 	public Player getPlayer() {
 		return player;
 	}
@@ -38,12 +34,8 @@ public class PlayerCloseBookshelfEvent extends Event{
 		return location;
 	}
 
-	public String getKey() {
-		return key;
-	}
-
-	public Inventory getInventory() {
-		return inventory;
+	public BookshelfHolder getBookshelf() {
+		return bookshelf;
 	}
 
 	private static final HandlerList HANDLERS = new HandlerList();

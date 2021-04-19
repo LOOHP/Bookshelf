@@ -3,7 +3,6 @@ package com.loohp.bookshelf.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +20,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.loohp.bookshelf.Bookshelf;
+import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.objectholders.BlockPosition;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
 
 public class HopperUtils {
 	
@@ -56,13 +58,9 @@ public class HopperUtils {
 						if (!bookshelfBlock.getType().equals(Material.BOOKSHELF)) {
 							continue;
 						}							
-						String key = BookshelfUtils.locKey(bookshelfBlock.getLocation());
-						if (!Bookshelf.keyToContentMapping.containsKey(key)) {
-							continue;
-						}			
-						
+
 						Inventory inventory = hoppercart.getInventory();
-						Inventory bookshelfInv = Bookshelf.keyToContentMapping.get(key);			           
+						Inventory bookshelfInv = BookshelfManager.getBookshelfManager(world).getOrCreateBookself(new BlockPosition(bookshelfBlock), Bookshelf.title).getInventory();	           
 			            for (int i = 0; i < bookshelfInv.getSize(); i++) {
 			            	ItemStack item = bookshelfInv.getItem(i);
 			            	if (item == null) {
@@ -97,7 +95,6 @@ public class HopperUtils {
 					            	bookshelfInv.setItem(i, item);		
 			            		}
 				            	inventory.addItem(additem);
-				            	Bookshelf.bookshelfSavePending.add(key);
 				            	break;
 			            	}
 			            }
@@ -140,8 +137,8 @@ public class HopperUtils {
 					perform.put(world, amount);
 				}
 			}
-			for (Entry<String, Inventory> entry : Bookshelf.keyToContentMapping.entrySet()) {
-				Location loc = BookshelfUtils.keyLoc(entry.getKey());	
+			for (BookshelfHolder bookshelf : BookshelfManager.getAllLoadedBookshelves()) {
+				Location loc = bookshelf.getPosition().getLocation();
 				if (!perform.containsKey(loc.getWorld())) {
 					continue;
 				}
@@ -155,7 +152,7 @@ public class HopperUtils {
 						if (!blockBelow.isBlockPowered() && !blockBelow.isBlockIndirectlyPowered()) {
 							org.bukkit.block.Hopper h = (org.bukkit.block.Hopper) blockBelow.getState();
 							Inventory inventory = h.getInventory();
-							Inventory bookshelfInv = entry.getValue();			           
+							Inventory bookshelfInv = bookshelf.getInventory();
 				            for (int i = 0; i < bookshelfInv.getSize(); i++) {
 				            	ItemStack item = bookshelfInv.getItem(i);
 				            	if (item == null) {
@@ -180,7 +177,6 @@ public class HopperUtils {
 							            	bookshelfInv.setItem(i, item);		
 					            		}         		
 						            	inventory.addItem(additem);
-						            	Bookshelf.bookshelfSavePending.add(entry.getKey());
 						            	break;
 				            		} else {
 				            			break;
@@ -199,7 +195,7 @@ public class HopperUtils {
 					}
 					org.bukkit.block.Hopper h = (org.bukkit.block.Hopper) hopper.getState();
 		            Inventory inventory = h.getInventory();
-		            Inventory bookshelfInv = entry.getValue();
+		            Inventory bookshelfInv = bookshelf.getInventory();
 		            for (int i = 0; i < inventory.getSize(); i++) {
 		            	ItemStack item = inventory.getItem(i);
 		            	if (item == null) {
@@ -238,7 +234,6 @@ public class HopperUtils {
 						            	inventory.setItem(i, item);		
 				            		}           
 				            		bookshelfInv.addItem(additem);
-				            		Bookshelf.bookshelfSavePending.add(entry.getKey());
 				            		break;
 			            		}
 			            	}
@@ -274,7 +269,6 @@ public class HopperUtils {
 					            	inventory.setItem(i, item);		
 			            		}                    
 			            		bookshelfInv.addItem(additem);
-			            		Bookshelf.bookshelfSavePending.add(entry.getKey());
 			            		break;
 		            		}
 		            	}

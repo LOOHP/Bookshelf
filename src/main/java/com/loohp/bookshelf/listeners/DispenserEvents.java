@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -19,8 +18,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.objectholders.BlockPosition;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.utils.BlockLockerUtils;
-import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.DropperUtils;
 import com.loohp.bookshelf.utils.InventoryUtils;
 import com.loohp.bookshelf.utils.LWCUtils;
@@ -42,17 +42,7 @@ public class DispenserEvents implements Listener {
 		if (!relative.getType().equals(Material.BOOKSHELF)) {
 			return;
 		}
-		String key = BookshelfUtils.locKey(relative.getLocation());
-		if (!Bookshelf.keyToContentMapping.containsKey(key)) {
-			if (!BookshelfManager.contains(key)) {
-				String bsTitle = Bookshelf.title;
-				Bookshelf.addBookshelfToMapping(key , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
-				BookshelfManager.setTitle(key, bsTitle);
-				BookshelfUtils.saveBookShelf(key);
-			} else {
-				BookshelfUtils.loadBookShelf(key);
-			}
-		}
+		BookshelfHolder bookshelf = BookshelfManager.getBookshelfManager(relative.getWorld()).getOrCreateBookself(new BlockPosition(relative), Bookshelf.title);
 		if (Bookshelf.lwcHook) {
 			if (!LWCUtils.checkHopperFlagIn(relative)) {
 				event.setCancelled(true);
@@ -66,7 +56,7 @@ public class DispenserEvents implements Listener {
 			}
 		}
 		event.setCancelled(true);
-		Inventory bookshelf = Bookshelf.keyToContentMapping.get(key);
+		Inventory inventory = bookshelf.getInventory();
 		org.bukkit.block.Dropper d = (org.bukkit.block.Dropper) event.getBlock().getState();
 		Inventory dropper = d.getInventory();
 		List<ItemStack> newList = new ArrayList<ItemStack>();
@@ -82,12 +72,12 @@ public class DispenserEvents implements Listener {
 					continue;
 				}
 			}
-			if (!InventoryUtils.stillHaveSpace(bookshelf, each.getType())) {
+			if (!InventoryUtils.stillHaveSpace(inventory, each.getType())) {
 				continue;
 			}
 			ItemStack additem = each.clone();
 			additem.setAmount(1);
-			bookshelf.addItem(additem);
+			inventory.addItem(additem);
 			boolean removed = false;
 			for (int i = 0; i < dropper.getSize(); i = i + 1) {
 				ItemStack removeitem = dropper.getItem(i);
@@ -118,7 +108,6 @@ public class DispenserEvents implements Listener {
 					}
 				}.runTaskLater(Bookshelf.plugin, 1);
 			}
-			Bookshelf.bookshelfSavePending.add(key);
 			if (!Bookshelf.version.isLegacy()) {
 				event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
 			}

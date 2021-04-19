@@ -1,15 +1,15 @@
 package com.loohp.bookshelf.listeners;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryAction;
@@ -28,15 +29,11 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.model.Protection;
@@ -44,10 +41,13 @@ import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.objectholders.BlockPosition;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.NBTUtils;
+import com.loohp.bookshelf.utils.legacy.LegacyConfigConverter;
 
 public class BookshelfEvents implements Listener {
 
@@ -94,35 +94,17 @@ public class BookshelfEvents implements Listener {
 	}
 */	
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onWorldLoad(WorldLoadEvent event) {
-		Bookshelf.loadBookshelf(event.getWorld());
-	}
-	
-	@EventHandler
-	public void onChunkLoad(ChunkLoadEvent event) {
-		if (!Bookshelf.enableHopperSupport) {
-			return;
-		}
-		Chunk chunk = event.getChunk();
-		Bookshelf.bookshelfLoadPending.add(chunk);
-		while (Bookshelf.bookshelfRemovePending.contains(chunk)) {
-			Bookshelf.bookshelfRemovePending.remove(chunk);
+		BookshelfManager manager = BookshelfManager.loadWorld(Bookshelf.plugin, event.getWorld());
+		File legacyData = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/bookshelfdata.json");
+		if (legacyData.exists()) {
+			LegacyConfigConverter.mergeLegacy(legacyData, manager);
 		}
 	}
 	
-	@EventHandler
-	public void onChunkUnload(ChunkUnloadEvent event) {
-		if (!Bookshelf.enableHopperSupport) {
-			return;
-		}
-		Chunk chunk = event.getChunk();
-		Bookshelf.bookshelfRemovePending.add(chunk);
-		while (Bookshelf.bookshelfLoadPending.contains(chunk)) {
-			Bookshelf.bookshelfLoadPending.remove(chunk);
-		}
-	}
-	
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlace(BlockPlaceEvent event) {
 		if (event.isCancelled()) {
@@ -147,47 +129,22 @@ public class BookshelfEvents implements Listener {
 			return;
 		}
 		
-		String loc = BookshelfUtils.locKey(event.getBlockPlaced().getLocation());
-		ItemStack item = event.getItemInHand();
-		if (Bookshelf.version.isOlderOrEqualTo(MCVersion.V1_13_1)) {
-			if (NBTUtils.contains(item, "BookshelfContent") && NBTUtils.contains(item, "BookshelfTitle")) {
-				String title = NBTUtils.getString(item, "BookshelfTitle");
-				if (!item.getItemMeta().getDisplayName().equals("")) {
-					title = item.getItemMeta().getDisplayName();
-				}
-				String hash = NBTUtils.getString(item, "BookshelfContent");
-				try {
-					Bookshelf.addBookshelfToMapping(loc, BookshelfUtils.fromBase64(hash, title));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}		
-				BookshelfManager.setTitle(loc, title);
-				BookshelfUtils.saveBookShelf(loc);
-				return;
-			}
-		} else {
-			ItemMeta meta = item.getItemMeta();
-			PersistentDataContainer pdc = meta.getPersistentDataContainer();
-			NamespacedKey keyContent = new NamespacedKey(Bookshelf.plugin, "BookshelfContent");
-			NamespacedKey keyTitle = new NamespacedKey(Bookshelf.plugin, "BookshelfTitle");
-			if (pdc.has(keyContent, PersistentDataType.STRING) && pdc.has(keyTitle, PersistentDataType.STRING)) {
-				String hash = pdc.get(keyContent, PersistentDataType.STRING);
-				String title = pdc.get(keyTitle, PersistentDataType.STRING);
-				try {
-					Bookshelf.addBookshelfToMapping(loc, BookshelfUtils.fromBase64(hash, title));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}		
-				BookshelfManager.setTitle(loc, title);
-				BookshelfUtils.saveBookShelf(loc);
-				return;
-			}
-		}
+		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), Bookshelf.title);
 		
-		if (Bookshelf.keyToContentMapping.containsKey(loc)) {
-			return;
-		}
-		if (BookshelfManager.contains(loc)) {
+		ItemStack item = event.getItemInHand();
+		if (NBTUtils.contains(item, "BookshelfContent") && NBTUtils.contains(item, "BookshelfTitle")) {
+			String title = NBTUtils.getString(item, "BookshelfTitle");
+			if (!item.getItemMeta().getDisplayName().equals("")) {
+				title = item.getItemMeta().getDisplayName();
+			}
+			String hash = NBTUtils.getString(item, "BookshelfContent");
+			try {
+				bookshelf.setInventory(BookshelfUtils.fromBase64(hash, title, bookshelf));
+				bookshelf.setTitle(title);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			return;
 		}
 		
@@ -199,9 +156,12 @@ public class BookshelfEvents implements Listener {
 				}
 			}
 		}
-		Bookshelf.addBookshelfToMapping(loc, Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
-		BookshelfManager.setTitle(loc, bsTitle);
-		BookshelfUtils.saveBookShelf(loc);
+		try {
+			bookshelf.setInventory(BookshelfUtils.fromBase64(BookshelfUtils.toBase64(bookshelf.getInventory()), bsTitle, bookshelf));
+			bookshelf.setTitle(bsTitle);
+		} catch (IllegalStateException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@EventHandler(priority=EventPriority.HIGHEST)
@@ -213,62 +173,78 @@ public class BookshelfEvents implements Listener {
 			return;
 		}
 		
-		String loc = BookshelfUtils.locKey(event.getBlock().getLocation());
-		if (!Bookshelf.keyToContentMapping.containsKey(loc)) {
-			if (!BookshelfManager.contains(loc)) {
-				return;
-			}
-			BookshelfUtils.loadBookShelf(loc);
-		}
-		Inventory inv = Bookshelf.keyToContentMapping.get(loc);
+		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), Bookshelf.title);
+		Inventory inv = bookshelf.getInventory();
 		for (ItemStack item : inv.getContents()) {
 			if (item != null && !item.getType().equals(Material.AIR)) {
 				event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item);
 			}
 		}
-		BookshelfUtils.safeRemoveBookself(loc);
+		manager.remove(bookshelf.getPosition());
 	}
 	
 	@EventHandler(priority=EventPriority.HIGHEST)
-	public void onExplode(EntityExplodeEvent event) {
+	public void onEntityExplode(EntityExplodeEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
 		
-		List<Block> bookshelves = new ArrayList<Block>();
+		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getLocation().getWorld());
+		Map<Block, BookshelfHolder> position = new LinkedHashMap<>();
+		List<Block> order = new ArrayList<>();
 		for (Block block : event.blockList()) {
 			if (block.getType().equals(Material.BOOKSHELF)) {
-				String key = BookshelfUtils.locKey(block.getLocation());
-				if (!Bookshelf.keyToContentMapping.containsKey(key)) {
-					if (BookshelfManager.contains(key)) {
-						BookshelfUtils.loadBookShelf(key);
-						bookshelves.add(block);
-					}
-				} else {
-					bookshelves.add(block);
-				}
+				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), Bookshelf.title));
+				order.add(block);
 			}
 		}
 		
-		if (bookshelves.isEmpty()) {
+		if (order.isEmpty()) {
 			return;
 		}
 		
-		for (Block bookshelf : bookshelves) {
-			String loc = BookshelfUtils.locKey(bookshelf.getLocation());
-			if (!Bookshelf.keyToContentMapping.containsKey(loc)) {
-				if (!BookshelfManager.contains(loc)) {
-					return;
-				}
-				BookshelfUtils.loadBookShelf(loc);
-			}
-			Inventory inv = Bookshelf.keyToContentMapping.get(loc);
+		for (Block block : order) {
+			BookshelfHolder bookshelf = position.get(block);
+			Inventory inv = bookshelf.getInventory();
 			for (ItemStack item : inv.getContents()) {
 				if (item != null && !item.getType().equals(Material.AIR)) {
-					bookshelf.getWorld().dropItemNaturally(bookshelf.getLocation(), item);
+					block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 				}
 			}
-			BookshelfUtils.safeRemoveBookself(loc);
+			manager.remove(bookshelf.getPosition());
+		}
+	}
+	
+	@EventHandler(priority=EventPriority.HIGHEST)
+	public void onBlockExplode(BlockExplodeEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+		
+		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		Map<Block, BookshelfHolder> position = new LinkedHashMap<>();
+		List<Block> order = new ArrayList<>();
+		for (Block block : event.blockList()) {
+			if (block.getType().equals(Material.BOOKSHELF)) {
+				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), Bookshelf.title));
+				order.add(block);
+			}
+		}
+		
+		if (order.isEmpty()) {
+			return;
+		}
+		
+		for (Block block : order) {
+			BookshelfHolder bookshelf = position.get(block);
+			Inventory inv = bookshelf.getInventory();
+			for (ItemStack item : inv.getContents()) {
+				if (item != null && !item.getType().equals(Material.AIR)) {
+					block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
+				}
+			}
+			manager.remove(bookshelf.getPosition());
 		}
 	}
 	
@@ -299,13 +275,13 @@ public class BookshelfEvents implements Listener {
 		
 		Player player = (Player) event.getWhoClicked();
 		
+		InventoryHolder holder = event.getView().getTopInventory().getHolder();
+		boolean isBookshelf = holder != null && holder instanceof BookshelfHolder;
+		
 		if (Bookshelf.isDonationView.contains(player.getUniqueId())) {
-			Inventory clicked = event.getClickedInventory();
-			if (Bookshelf.contentToKeyMapping.containsKey(clicked)) {
-				if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getAction().equals(InventoryAction.PICKUP_SOME) || event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.PICKUP_ONE) || event.getAction().equals(InventoryAction.PICKUP_HALF)) {
-					event.setCancelled(true);
-					return;
-				}
+			if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getAction().equals(InventoryAction.PICKUP_SOME) || event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.PICKUP_ONE) || event.getAction().equals(InventoryAction.PICKUP_HALF)) {
+				event.setCancelled(true);
+				return;
 			}
 		}
 		
@@ -317,7 +293,7 @@ public class BookshelfEvents implements Listener {
         }
 		
 		if (event.getAction().equals(InventoryAction.HOTBAR_MOVE_AND_READD) || event.getAction().equals(InventoryAction.HOTBAR_SWAP)) {
-			if (!Bookshelf.contentToKeyMapping.containsKey(event.getView().getTopInventory())) {
+			if (!isBookshelf) {
 				return;
 			}
 			int slot = event.getRawSlot();
@@ -333,10 +309,7 @@ public class BookshelfEvents implements Listener {
 			return;
 		}
 		
-		Inventory inv = event.getView().getTopInventory();
-		String key = Bookshelf.contentToKeyMapping.get(inv);
-		if (key != null) {
-			Bookshelf.bookshelfSavePending.add(key);
+		if (isBookshelf) {
 			if (event.getClick().isShiftClick()) {
 				ItemStack clickedOn = event.getCurrentItem();
 
@@ -372,7 +345,7 @@ public class BookshelfEvents implements Listener {
 			putting = true;
 		}
 		if (event.getAction().equals(InventoryAction.HOTBAR_MOVE_AND_READD) || event.getAction().equals(InventoryAction.HOTBAR_SWAP)) {
-			if (!Bookshelf.contentToKeyMapping.containsKey(event.getView().getTopInventory())) {
+			if (!isBookshelf) {
 				return;
 			}
 			int slot = event.getRawSlot();
@@ -386,24 +359,19 @@ public class BookshelfEvents implements Listener {
 			return;
 		}
 		
-		for (Entry<String, Inventory> entry : Bookshelf.keyToContentMapping.entrySet()) {
-			if (entry.getValue().equals(event.getView().getTopInventory())) {
-				Location loc = BookshelfUtils.keyLoc(entry.getKey());
-				double random = Math.floor(Math.random() * 3) + 1;
-				if (Bookshelf.version.isOld()) {
-					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 3, 1);
-        		} else if (Bookshelf.version.isOlderOrEqualTo(MCVersion.V1_13_1)) {
-					event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
-				} else {
-					if (random == 1) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 3, 1);
-					} else if (random == 2) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
-					} else if (random == 3) {
-						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PAGE_TURN"), 3, 1);
-					}
-				}
-				break;
+		Location loc = ((BookshelfHolder) holder).getPosition().getLocation();
+		double random = Math.floor(Math.random() * 3) + 1;
+		if (Bookshelf.version.isOld()) {
+			event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 3, 1);
+		} else if (Bookshelf.version.isOlderOrEqualTo(MCVersion.V1_13_1)) {
+			event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
+		} else {
+			if (random == 1) {
+				event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PUT"), 3, 1);
+			} else if (random == 2) {
+				event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_ARMOR_EQUIP_LEATHER"), 3, 1);
+			} else if (random == 3) {
+				event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("ITEM_BOOK_PAGE_TURN"), 3, 1);
 			}
 		}
 	}
@@ -423,8 +391,8 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		Inventory inv = event.getView().getTopInventory();
-		String key = Bookshelf.contentToKeyMapping.get(inv);
-		if (key != null) {
+		InventoryHolder holder = inv.getHolder();
+		if (holder != null && holder instanceof BookshelfHolder) {
 			ItemStack dragged = event.getOldCursor(); // This is the item that is being dragged
 
 		    if (!Bookshelf.whitelist.contains(dragged.getType().toString().toUpperCase())) {
@@ -442,7 +410,7 @@ public class BookshelfEvents implements Listener {
 
 	        for (int i : event.getRawSlots()) {
 	        	if (i < inventorySize) {
-	        		Location loc = BookshelfUtils.keyLoc(key);
+	        		Location loc = ((BookshelfHolder) holder).getPosition().getLocation();
 					double random = Math.floor(Math.random() * 3) + 1;
 					if (Bookshelf.version.isOld()) {
 						event.getWhoClicked().getWorld().playSound(loc.add(0.5, 0.5, 0.5), Sound.valueOf("HORSE_ARMOR"), 3, 1);
@@ -512,51 +480,37 @@ public class BookshelfEvents implements Listener {
 			cancelled = true;
 		}
 		
-		String loc = BookshelfUtils.locKey(event.getClickedBlock().getLocation());
-		if (!Bookshelf.keyToContentMapping.containsKey(loc)) {
-			if (!BookshelfManager.contains(loc)) {
-				String bsTitle = Bookshelf.title;
-				Bookshelf.addBookshelfToMapping(loc , Bukkit.createInventory(null, (int) (Bookshelf.bookShelfRows * 9), bsTitle));
-				BookshelfManager.setTitle(loc, bsTitle);
-				BookshelfUtils.saveBookShelf(loc);
-			} else {
-				BookshelfUtils.loadBookShelf(loc);
-			}
-		}
+		BookshelfManager manager = BookshelfManager.getBookshelfManager(player.getWorld());
+		
+		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getClickedBlock()), Bookshelf.title);
 		if (Bookshelf.lwcHook) {
-			Location blockLoc = BookshelfUtils.keyLoc(loc);
+			Location blockLoc = bookshelf.getPosition().getLocation();
 			Protection protection = LWC.getInstance().getPlugin().getLWC().findProtection(blockLoc.getBlock());
 			if (protection != null) {
 				if (!protection.isOwner(player)) {
-					Bookshelf.requestOpen.put(player, new LWCRequestOpenData(loc, event.getBlockFace(), cancelled));
+					Bookshelf.requestOpen.put(player, new LWCRequestOpenData(bookshelf, event.getBlockFace(), cancelled));
 					return;
 				}
 			}
 		}		
 		
-		PlayerOpenBookshelfEvent pobe = new PlayerOpenBookshelfEvent(player, loc, event.getBlockFace(), cancelled);
+		PlayerOpenBookshelfEvent pobe = new PlayerOpenBookshelfEvent(player, bookshelf, event.getBlockFace(), cancelled);
 		Bukkit.getPluginManager().callEvent(pobe);
 		
 		if (pobe.isCancelled()) {
 			return;
 		}
 		
-		Inventory inv = Bookshelf.keyToContentMapping.get(loc);
-		Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(inv));
-		if (!Bookshelf.bookshelfSavePending.contains(loc)) {
-			Bookshelf.bookshelfSavePending.add(loc);
-		}
+		Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(bookshelf.getInventory()));
 	}
 	
 	@EventHandler
 	public void onClose(InventoryCloseEvent event) {
 		Inventory inv = event.getView().getTopInventory();
-		String key = Bookshelf.contentToKeyMapping.get(inv);
-		if (key != null) {
-			PlayerCloseBookshelfEvent pcbe = new PlayerCloseBookshelfEvent((Player) event.getPlayer(), key);
+		InventoryHolder holder = inv.getHolder();
+		if (holder != null && holder instanceof BookshelfHolder) {
+			PlayerCloseBookshelfEvent pcbe = new PlayerCloseBookshelfEvent((Player) event.getPlayer(), (BookshelfHolder) holder);
 			Bukkit.getPluginManager().callEvent(pcbe);
-			
-			Bookshelf.bookshelfSavePending.add(key);
 		}
 		Bookshelf.isDonationView.remove(event.getPlayer().getUniqueId());
 	}	

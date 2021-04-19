@@ -1,7 +1,9 @@
 package com.loohp.bookshelf.listeners;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,11 +14,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.inventory.Inventory;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.utils.CustomListUtils;
 
 public class PistonEvents implements Listener {
@@ -26,41 +27,24 @@ public class PistonEvents implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
-		List<Block> bookshelves = new ArrayList<Block>();
+		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		Map<Block, BlockPosition> position = new LinkedHashMap<>();
+		List<Block> order = new ArrayList<>();
 		for (Block block : event.getBlocks()) {
 			if (block.getType().equals(Material.BOOKSHELF)) {
-				String key = BookshelfUtils.locKey(block.getLocation());
-				if (!Bookshelf.keyToContentMapping.containsKey(key)) {
-					if (BookshelfManager.contains("BookShelfData." + key)) {
-						BookshelfUtils.loadBookShelf(key);
-						bookshelves.add(block);
-					}
-				} else {
-					bookshelves.add(block);
-				}
+				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), Bookshelf.title).getPosition());
+				order.add(block);
 			}
 		}
 		
-		if (bookshelves.isEmpty()) {
+		if (order.isEmpty()) {
 			return;
 		}
 		
 		BlockFace dir = event.getDirection();
-		for (Block bookshelf : CustomListUtils.reverse(bookshelves)) {
-			String key = BookshelfUtils.locKey(bookshelf.getLocation());
-			Inventory inv = Bookshelf.keyToContentMapping.get(key);
-			Location newLoc = bookshelf.getRelative(dir).getLocation().clone();
-			String newKey = BookshelfUtils.locKey(newLoc);
-			String bsTitle = Bookshelf.title;
-			if (BookshelfManager.getTitle(key) != null) {
-				bsTitle = BookshelfManager.getTitle(key);
-			}
-			BookshelfUtils.safeRemoveBookself(key);
-			
-			Bookshelf.addBookshelfToMapping(newKey, inv);
-			BookshelfManager.setTitle(newKey, bsTitle);
-			
-			BookshelfUtils.saveBookShelf(newKey);
+		for (Block block : CustomListUtils.reverse(order)) {
+			Location newLoc = block.getRelative(dir).getLocation().clone();
+			manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
 		}
 	}
 	
@@ -69,41 +53,24 @@ public class PistonEvents implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
-		List<Block> bookshelves = new ArrayList<Block>();
+		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		Map<Block, BlockPosition> position = new LinkedHashMap<>();
+		List<Block> order = new ArrayList<>();
 		for (Block block : event.getBlocks()) {
 			if (block.getType().equals(Material.BOOKSHELF)) {
-				String key = BookshelfUtils.locKey(block.getLocation());
-				if (!Bookshelf.keyToContentMapping.containsKey(key)) {
-					if (BookshelfManager.contains(key)) {
-						BookshelfUtils.loadBookShelf(key);
-						bookshelves.add(block);
-					}
-				} else {
-					bookshelves.add(block);
-				}
+				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), Bookshelf.title).getPosition());
+				order.add(block);
 			}
 		}
 		
-		if (bookshelves.isEmpty()) {
+		if (order.isEmpty()) {
 			return;
 		}
 		
 		BlockFace dir = event.getDirection();
-		for (Block bookshelf : CustomListUtils.reverse(bookshelves)) {
-			String key = BookshelfUtils.locKey(bookshelf.getLocation());
-			Inventory inv = Bookshelf.keyToContentMapping.get(key);
-			Location newLoc = bookshelf.getRelative(dir).getLocation().clone();
-			String newKey = BookshelfUtils.locKey(newLoc);
-			String bsTitle = Bookshelf.title;
-			if (BookshelfManager.getTitle(key) != null) {
-				bsTitle = BookshelfManager.getTitle(key);
-			}
-			BookshelfUtils.safeRemoveBookself(key);
-			
-			Bookshelf.addBookshelfToMapping(newKey, inv);
-			BookshelfManager.setTitle(newKey, bsTitle);
-			
-			BookshelfUtils.saveBookShelf(newKey);
+		for (Block block : CustomListUtils.reverse(order)) {
+			Location newLoc = block.getRelative(dir).getLocation().clone();
+			manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
 		}
 	}
 

@@ -3,6 +3,7 @@ package com.loohp.bookshelf.hooks;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,8 +38,8 @@ import com.loohp.interactionvisualizer.managers.PacketManager;
 
 public class InteractionVisualizerAnimations implements Listener {
 	
-	private ConcurrentHashMap<Player, Location> playermap = new ConcurrentHashMap<Player, Location>();
-	private ConcurrentHashMap<Player, List<Item>> link = new ConcurrentHashMap<Player, List<Item>>();
+	private Map<Player, Location> playermap = new ConcurrentHashMap<>();
+	private Map<Player, List<Item>> link = new ConcurrentHashMap<>();
 	
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onUseBookshelf(InventoryClickEvent event) {
