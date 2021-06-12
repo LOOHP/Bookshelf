@@ -48,7 +48,7 @@ public class EnchantingEvents implements Listener {
 		
 		Block eTable = event.getEnchantBlock();
 		List<Block> blocks = EnchantmentTableUtils.getBookshelves(eTable);
-		Map<Enchantment, HashMap<String, Object>> enchants = new HashMap<Enchantment, HashMap<String, Object>>();
+		Map<Enchantment, Map<String, Object>> enchants = new HashMap<>();
 		int totalSlots = (int) (Bookshelf.bookShelfRows * 9 * 15);
 		if (blocks.isEmpty()) {
 			return;
@@ -75,7 +75,7 @@ public class EnchantingEvents implements Listener {
 						value.put("Level", lvl);
 						enchants.put(entry.getKey(), value);
 					} else {
-						HashMap<String, Object> value = enchants.get(entry.getKey());
+						Map<String, Object> value = enchants.get(entry.getKey());
 						value.put("Occurrence", (int) value.get("Occurrence") + 1);
 						List<Integer> lvl = (List<Integer>) value.get("Level");
 						lvl.add(entry.getValue());
@@ -88,9 +88,9 @@ public class EnchantingEvents implements Listener {
 		if (enchants.isEmpty()) {
 			return;
 		}
-		HashMap<Enchantment, HashMap<String, Integer>> list = new HashMap<Enchantment, HashMap<String, Integer>>();
+		HashMap<Enchantment, HashMap<String, Integer>> list = new HashMap<>();
 		int totalOccurrence = 0;
-		for (Entry<Enchantment, HashMap<String, Object>> entry : enchants.entrySet()) {
+		for (Entry<Enchantment, Map<String, Object>> entry : enchants.entrySet()) {
 			int occurrence = (int) entry.getValue().get("Occurrence");
 			totalOccurrence = totalOccurrence + occurrence;
 			List<Integer> levels = (List<Integer>) entry.getValue().get("Level");
@@ -107,7 +107,7 @@ public class EnchantingEvents implements Listener {
 		if (list.isEmpty()) {
 			return;
 		}
-		List<Object> pick = new ArrayList<Object>();
+		List<Object> pick = new ArrayList<>();
 		for (Entry<Enchantment, HashMap<String, Integer>> entry : list.entrySet()) {
 			if (entry.getKey().equals(Enchantment.MENDING)) {
 				continue;
@@ -172,11 +172,11 @@ public class EnchantingEvents implements Listener {
 				offer.setEnchantmentLevel(level);
 			}
 		}
-		HashMap<ItemStack, EnchantmentOffer[]> offermap = null;
+		Map<ItemStack, EnchantmentOffer[]> offermap = null;
 		if (EnchantmentOfferMapping.enchantOffers.containsKey(player)) {
 			offermap = EnchantmentOfferMapping.enchantOffers.get(player);
 		} else {
-			offermap = new HashMap<ItemStack, EnchantmentOffer[]>();
+			offermap = new HashMap<>();
 			EnchantmentOfferMapping.enchantOffers.put(player, offermap);
 		}
 		offermap.put(event.getItem(), offers);
@@ -197,7 +197,15 @@ public class EnchantingEvents implements Listener {
 		
 		Player player = event.getEnchanter();
 		if (EnchantmentOfferMapping.enchantOffers.containsKey(player)) {
-			EnchantmentOffer offer = EnchantmentOfferMapping.enchantOffers.get(player).get(event.getItem())[event.whichButton()];
+			Map<ItemStack, EnchantmentOffer[]> playerOffers = EnchantmentOfferMapping.enchantOffers.get(player);
+			if (playerOffers == null) {
+				return;
+			}
+			EnchantmentOffer[] offers = playerOffers.get(event.getItem());
+			if (offers == null || offers.length <= event.whichButton()) {
+				return;
+			}
+			EnchantmentOffer offer = offers[event.whichButton()];
 			Map<Enchantment, Integer> orginal = event.getEnchantsToAdd();
 			List<Enchantment> removelist = new ArrayList<Enchantment>();
 			for (Entry<Enchantment, Integer> entry : orginal.entrySet()) {

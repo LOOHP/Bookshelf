@@ -28,6 +28,9 @@ public class BookshelfHolder implements InventoryHolder {
 		return title;
 	}
 	
+	/**
+	 * <b>Dangerous, non-deterministic behavior if not used correctly</b>
+	 */
 	@Deprecated
 	public void setTitle(String title) {
 		this.title = title;
@@ -38,6 +41,9 @@ public class BookshelfHolder implements InventoryHolder {
 		return inventory;
 	}
 
+	/**
+	 * <b>Dangerous, non-deterministic behavior if not used correctly</b>
+	 */
 	@Deprecated
 	public void setInventory(Inventory inventory) {
 		this.inventory = inventory;
