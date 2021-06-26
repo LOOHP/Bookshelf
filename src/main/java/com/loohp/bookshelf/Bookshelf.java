@@ -14,7 +14,9 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.simpleyaml.configuration.file.FileConfiguration;
 
+import com.loohp.bookshelf.config.Config;
 import com.loohp.bookshelf.debug.Debug;
 import com.loohp.bookshelf.hooks.InteractionVisualizerAnimations;
 import com.loohp.bookshelf.listeners.BookshelfEvents;
@@ -29,6 +31,7 @@ import com.loohp.bookshelf.listeners.hooks.LWCEvents;
 import com.loohp.bookshelf.listeners.hooks.LandEvents;
 import com.loohp.bookshelf.listeners.hooks.PlotSquared4Events;
 import com.loohp.bookshelf.listeners.hooks.PlotSquared5Events;
+import com.loohp.bookshelf.listeners.hooks.PlotSquared6Events;
 import com.loohp.bookshelf.listeners.hooks.RedProtectEvents;
 import com.loohp.bookshelf.listeners.hooks.ResidenceEvents;
 import com.loohp.bookshelf.listeners.hooks.SuperiorSkyblock2Events;
@@ -47,6 +50,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Bookshelf extends JavaPlugin {
 	
 	public static final int BSTATS_PLUGIN_ID = 6748;
+	public static final String CONFIG_ID = "config";
 	
 	public static Bookshelf plugin = null;
 	
@@ -138,9 +142,10 @@ public class Bookshelf extends JavaPlugin {
 	    
 	    getCommand("bookshelf").setExecutor(new Commands());
 		
-	    getConfig().options().header("For information on what each option does. Please refer to https://github.com/LOOHP/Bookshelf/blob/master/src/main/resources/config.yml");
-	    getConfig().options().copyDefaults(true);
-	    saveConfig();
+	    if (!getDataFolder().exists()) {
+	    	getDataFolder().mkdirs();
+	    }
+	    Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
 	    
 	    String SuperVanish = "SuperVanish";
 	    String PremiumVanish = "PremiumVanish";
@@ -247,7 +252,11 @@ public class Bookshelf extends JavaPlugin {
 		String PlotSquared = "PlotSquared";
 		if (getServer().getPluginManager().getPlugin(PlotSquared) != null) {
 			String plotSquaredVersion = getServer().getPluginManager().getPlugin(PlotSquared).getDescription().getVersion();
-			if (plotSquaredVersion.startsWith("5.")) {
+			if (plotSquaredVersion.startsWith("6.")) {
+				hookMessage(PlotSquared + " (v6)");
+				getServer().getPluginManager().registerEvents(new PlotSquared6Events(), this);
+				plotSquaredHook = true;
+			} else if (plotSquaredVersion.startsWith("5.")) {
 				hookMessage(PlotSquared + " (v5)");
 				getServer().getPluginManager().registerEvents(new PlotSquared5Events(), this);
 				plotSquaredHook = true;
@@ -271,12 +280,12 @@ public class Bookshelf extends JavaPlugin {
 	    	getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of minecraft is unsupported!");
 	    }
 		
-		if (plugin.getConfig().contains("Options.EnableHopperDropperSupport")) {
-			boolean setting = plugin.getConfig().getBoolean("Options.EnableHopperDropperSupport");
-			plugin.getConfig().set("Options.EnableHopperSupport", setting);
-			plugin.getConfig().set("Options.EnableDropperSupport", setting);
-			plugin.getConfig().set("Options.EnableHopperDropperSupport", null);
-			plugin.saveConfig();
+		if (getConfiguration().contains("Options.EnableHopperDropperSupport")) {
+			boolean setting = getConfiguration().getBoolean("Options.EnableHopperDropperSupport");
+			getConfiguration().set("Options.EnableHopperSupport", setting);
+			getConfiguration().set("Options.EnableDropperSupport", setting);
+			getConfiguration().set("Options.EnableHopperDropperSupport", null);
+			Config.getConfig(CONFIG_ID).save();
 		}
 	    
 	    loadConfig();
@@ -310,18 +319,25 @@ public class Bookshelf extends JavaPlugin {
 		Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
 	}
 	
-	public static void loadConfig() {	
-		bookShelfRows = plugin.getConfig().getInt("Options.BookShelfRows");
-		useWhitelist = plugin.getConfig().getBoolean("Options.UseWhitelist");
-		whitelist = plugin.getConfig().getStringList("Options.Whitelist").stream().collect(Collectors.toSet());
-		title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Options.Title"));
-		noPermissionToReloadMessage = plugin.getConfig().getString("Options.NoPermissionToReloadMessage");
-		noPermissionToUpdateMessage = plugin.getConfig().getString("Options.NoPermissionToUpdateMessage");
-		particlesEnabled = plugin.getConfig().getBoolean("Options.ParticlesWhenOpened");
-		enableHopperSupport = plugin.getConfig().getBoolean("Options.EnableHopperSupport");
-		enableDropperSupport = plugin.getConfig().getBoolean("Options.EnableDropperSupport");
-		enchantmentTable = plugin.getConfig().getBoolean("Options.EnableEnchantmentTableBoosting");
-		int eTableChance = plugin.getConfig().getInt("Options.EnchantmentTableBoostingMaxPercentage");
+	public static FileConfiguration getConfiguration() {
+		return Config.getConfig(CONFIG_ID).getConfiguration();
+	}
+	
+	public static void loadConfig() {
+		Config config = Config.getConfig(CONFIG_ID);
+		config.reload();
+		
+		bookShelfRows = getConfiguration().getInt("Options.BookShelfRows");
+		useWhitelist = getConfiguration().getBoolean("Options.UseWhitelist");
+		whitelist = getConfiguration().getStringList("Options.Whitelist").stream().collect(Collectors.toSet());
+		title = ChatColor.translateAlternateColorCodes('&', getConfiguration().getString("Options.Title"));
+		noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
+		noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
+		particlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
+		enableHopperSupport = getConfiguration().getBoolean("Options.EnableHopperSupport");
+		enableDropperSupport = getConfiguration().getBoolean("Options.EnableDropperSupport");
+		enchantmentTable = getConfiguration().getBoolean("Options.EnableEnchantmentTableBoosting");
+		int eTableChance = getConfiguration().getInt("Options.EnchantmentTableBoostingMaxPercentage");
 		if (eTableChance > 100) {
 			eTableChance = 100;
 		} else if (eTableChance < 0) {
@@ -347,7 +363,7 @@ public class Bookshelf extends JavaPlugin {
 		if (updaterTaskID >= 0) {
 			Bukkit.getScheduler().cancelTask(updaterTaskID);
 		}
-		updaterEnabled = plugin.getConfig().getBoolean("Options.Updater");
+		updaterEnabled = getConfiguration().getBoolean("Options.Updater");
 		if (updaterEnabled == true) {
 			Bukkit.getPluginManager().registerEvents(new Updater(), Bookshelf.plugin);
 		}

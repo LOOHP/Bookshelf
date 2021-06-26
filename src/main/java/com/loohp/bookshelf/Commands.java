@@ -30,7 +30,6 @@ public class Commands implements CommandExecutor, TabCompleter {
 		
 		if (args[0].equalsIgnoreCase("reload")) {
 			if (sender.hasPermission("bookshelf.reload")) {
-				Bookshelf.plugin.reloadConfig();
 				Bookshelf.loadConfig();
 				sender.sendMessage(ChatColor.GREEN + "[Bookshelf] BookShelf has been reloaded!");
 			} else {
