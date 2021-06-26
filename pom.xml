@@ -146,6 +146,7 @@
 						<version>3.2.0</version>
 						<configuration>
 							<encoding>${project.build.sourceEncoding}</encoding>
+							<javadocVersion>16</javadocVersion>
 						</configuration>
 						<executions>
 							<execution>
