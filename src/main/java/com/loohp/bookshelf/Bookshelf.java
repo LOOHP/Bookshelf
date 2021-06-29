@@ -272,7 +272,9 @@ public class Bookshelf extends JavaPlugin {
 		String InteractionVisualizer = "InteractionVisualizer";
 		if (getServer().getPluginManager().getPlugin(InteractionVisualizer) != null) {
 			hookMessage(InteractionVisualizer);
-			getServer().getPluginManager().registerEvents(new InteractionVisualizerAnimations(), this);
+			InteractionVisualizerAnimations iva = new InteractionVisualizerAnimations();
+			iva.register();
+			getServer().getPluginManager().registerEvents(iva, this);
 			interactionVisualizerHook = true;
 		}
 

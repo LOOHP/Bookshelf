@@ -24,6 +24,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.BookshelfAPI;
 import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
@@ -33,10 +34,14 @@ import com.loohp.bookshelf.utils.VanishUtils;
 import com.loohp.interactionvisualizer.InteractionVisualizer;
 import com.loohp.interactionvisualizer.api.InteractionVisualizerAPI;
 import com.loohp.interactionvisualizer.api.InteractionVisualizerAPI.Modules;
+import com.loohp.interactionvisualizer.api.VisualizerDisplay;
 import com.loohp.interactionvisualizer.entityholders.Item;
 import com.loohp.interactionvisualizer.managers.PacketManager;
+import com.loohp.interactionvisualizer.objectholders.EntryKey;
 
-public class InteractionVisualizerAnimations implements Listener {
+public class InteractionVisualizerAnimations implements Listener, VisualizerDisplay {
+	
+	public static final EntryKey KEY = new EntryKey(Bookshelf.plugin, "bookshelf");
 	
 	private Map<Player, Location> playermap = new ConcurrentHashMap<>();
 	private Map<Player, List<Item>> link = new ConcurrentHashMap<>();
@@ -163,7 +168,7 @@ public class InteractionVisualizerAnimations implements Listener {
 					vector = location.clone().toVector().subtract(player.getEyeLocation().clone().toVector()).multiply(0.15).add(offset);
 					item.setVelocity(vector);
 				}
-				PacketManager.sendItemSpawn(InteractionVisualizerAPI.getPlayerModuleList(Modules.ITEMDROP), item);
+				PacketManager.sendItemSpawn(InteractionVisualizerAPI.getPlayerModuleList(Modules.ITEMDROP, KEY), item);
 				item.setItemStack(itemstack);
 				item.setPickupDelay(32767);
 				item.setGravity(true);
@@ -254,7 +259,7 @@ public class InteractionVisualizerAnimations implements Listener {
 					Vector offset = new Vector(0.0, 0.15, 0.0);
 					Vector vector = location.clone().toVector().subtract(player.getEyeLocation().clone().toVector()).multiply(0.15).add(offset);
 					item.setVelocity(vector);
-					PacketManager.sendItemSpawn(InteractionVisualizerAPI.getPlayerModuleList(Modules.ITEMDROP), item);
+					PacketManager.sendItemSpawn(InteractionVisualizerAPI.getPlayerModuleList(Modules.ITEMDROP, KEY), item);
 					item.setItemStack(itemstack);
 					item.setCustomName(System.currentTimeMillis() + "");
 					item.setPickupDelay(32767);
@@ -320,5 +325,10 @@ public class InteractionVisualizerAnimations implements Listener {
 		Block other = block.getRelative(face);
 		Vector vector = other.getLocation().add(0.5, 0.5, 0.5).toVector().subtract(block.getLocation().toVector()).multiply(0.5 + offset);
 		return block.getLocation().add(vector);
+	}
+
+	@Override
+	public EntryKey key() {
+		return KEY;
 	}
 }
