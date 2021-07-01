@@ -5,7 +5,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>3.0.2.1</version>
+	<version>3.0.3.0</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -55,6 +55,10 @@
 								<relocation>
 									<pattern>org.yaml</pattern>
 									<shadedPattern>com.loohp.bookshelf.libs.org.yaml</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.json.simple</pattern>
+									<shadedPattern>com.loohp.bookshelf.libs.org.json.simple</shadedPattern>
 								</relocation>
 							</relocations>
 						</configuration>
@@ -227,6 +231,12 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>30.0-jre</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -404,7 +414,7 @@
 		<dependency>
 			<groupId>com.loohp</groupId>
 			<artifactId>InteractionVisualizer</artifactId>
-			<version>1.16.0.0</version>
+			<version>1.16.0.5</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

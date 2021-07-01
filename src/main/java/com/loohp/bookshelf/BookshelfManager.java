@@ -9,30 +9,29 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -42,16 +41,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.google.common.collect.Iterables;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
+import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
 import com.loohp.bookshelf.utils.BookshelfUtils;
-import com.loohp.bookshelf.utils.EnchantmentTableUtils;
-import com.loohp.bookshelf.utils.OpenInvUtils;
-import com.loohp.bookshelf.utils.ParticlesUtils;
-import com.loohp.bookshelf.utils.VanishUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -91,12 +89,9 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	private final World world;
 	private final File bookshelfFolder;
 	private final Map<ChunkPosition, Map<BlockPosition, BookshelfHolder>> loadedBookshelves;	
-	private final Set<String> isEmittingParticle = new HashSet<>();
-	
+	private final ParticleManager particleManager;
 	private final Object lock;
-	
 	private final int autoSaveTask;
-	private final int particleTaskId;
 	
 	private BookshelfManager(Bookshelf plugin, World world) {
 		this.lock = new Object();
@@ -115,6 +110,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		int spawnchunks = world.getLoadedChunks().length;
 		AtomicInteger done = new AtomicInteger(0);
 		
+		ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Bookshelf Progress Thread").build());
 		CompletableFuture.runAsync(()->{
 			long start = System.currentTimeMillis();
 			long lastDone = 0;
@@ -131,7 +127,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 					TimeUnit.MILLISECONDS.sleep(500);
 				} catch (InterruptedException ignore) {}
 			}
-		});
+		}, executor);
 		
 		for (Chunk chunk : world.getLoadedChunks()) {
 			loadChunk(new ChunkPosition(chunk), true);
@@ -142,6 +138,8 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		
+		particleManager = new ParticleManager(plugin);
+		
 		autoSaveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
 			for (ChunkPosition chunk : loadedBookshelves.keySet()) {
 				saveChunk(chunk, false);
@@ -150,78 +148,6 @@ public class BookshelfManager implements Listener, AutoCloseable {
 				}
 			}
 		}, 6000, 6000).getTaskId();
-		
-		particleTaskId = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-			if (Bookshelf.particlesEnabled && !Bookshelf.version.isLegacy()) {
-				isEmittingParticle.clear();
-				for (Player player : Bukkit.getOnlinePlayers()) {
-					if (OpenInvUtils.isSlientChest(player)) {
-						continue;
-					}
-					if (VanishUtils.isVanished(player)) {
-						continue;
-					}
-					if (player.getOpenInventory() != null) {
-						for (Map<BlockPosition, BookshelfHolder> mapping : loadedBookshelves.values()) {
-							for (BookshelfHolder bookshelf : mapping.values()) {
-								String key = BookshelfUtils.posKey(bookshelf.getPosition());
-								if (!isEmittingParticle.contains(key)) {
-									if (bookshelf.getInventory().equals(player.getOpenInventory().getTopInventory())) {
-										Location loc = bookshelf.getPosition().getLocation();
-										Location loc2 = loc.clone().add(1,1,1);
-										DustOptions purple = new DustOptions(Color.fromRGB(153, 51, 255), 1);
-										DustOptions yellow = new DustOptions(Color.fromRGB(255, 255, 0), 1);
-										for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
-											double random = Math.random() * 100;
-											if (random > 95) {
-												double ranColor = Math.floor(Math.random() * 2) + 1;
-												if (ranColor == 1) {
-													loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, yellow);
-												} else if (ranColor == 2) {
-													loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, purple);
-												}
-											}
-										}
-										isEmittingParticle.add(key);
-									}
-								}
-							}
-						}
-						if (Bookshelf.enchantmentTable) {
-							if (player.getOpenInventory().getTopInventory().getType().equals(InventoryType.ENCHANTING)) {
-								for (Block block : EnchantmentTableUtils.getBookshelves(player.getOpenInventory().getTopInventory().getLocation().getBlock())) {
-									String key = BookshelfUtils.locKey(block.getLocation());
-									if (!isEmittingParticle.contains(key)) {
-										Location loc = block.getLocation().clone();
-										Location loc2 = loc.clone().add(1,1,1);
-										DustOptions purple = new DustOptions(Color.fromRGB(204, 0, 204), 1);
-										DustOptions blue = new DustOptions(Color.fromRGB(51, 51, 255), 1);
-										for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
-											double random = Math.random() * 100;
-											if (random > 95) {
-												double ranColor = Math.floor(Math.random() * 2) + 1;
-												if (ranColor == 1) {
-													loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, blue);
-												} else if (ranColor == 2) {
-													loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, purple);
-												}
-											}
-										}
-										isEmittingParticle.add(key);
-									}
-								}
-								String key = BookshelfUtils.locKey(player.getOpenInventory().getTopInventory().getLocation());
-								if (!isEmittingParticle.contains(key)) {
-									Location pos = player.getOpenInventory().getTopInventory().getLocation().clone().add(0.5, 0.5, 0.5);
-									pos.getWorld().spawnParticle(Particle.PORTAL, pos, 75);
-									isEmittingParticle.add(key);
-								}
-							}
-						}
-					}
-				}
-			}
-		}, 0, 5).getTaskId();
 	}
 	
 	public World getWorld() {
@@ -407,7 +333,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	@Override
 	public void close() {
 		Bukkit.getScheduler().cancelTask(autoSaveTask);
-		Bukkit.getScheduler().cancelTask(particleTaskId);
+		particleManager.close();
 		BOOKSHELF_MANAGER.remove(world);
 		synchronized (lock) {
 			Bukkit.getConsoleSender().sendMessage("[Bookshelf] Saving bookshelves for world " + world.getName());
@@ -415,6 +341,46 @@ public class BookshelfManager implements Listener, AutoCloseable {
 				saveChunk(chunk, true);
 			}
 			Bukkit.getConsoleSender().sendMessage("[Bookshelf] (" + world.getName() + "): All bookshelves are saved");
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onBookshelfOpen(PlayerOpenBookshelfEvent event) {
+		particleManager.openBookshelf(event.getBlock());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onBookshelfClose(PlayerCloseBookshelfEvent event) {
+		particleManager.closeBookshelf(event.getBlock());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onEnchantmentTableOpen(InventoryOpenEvent event) {
+		Inventory inventory = event.getInventory();
+		if (inventory.getType().equals(InventoryType.ENCHANTING)) {
+			Location location = inventory.getLocation();
+			if (location != null) {
+				particleManager.openEnchant(location.getBlock());
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onEnchantmentTableClose(InventoryCloseEvent event) {
+		Inventory inventory = event.getInventory();
+		if (inventory.getType().equals(InventoryType.ENCHANTING)) {
+			Location location = inventory.getLocation();
+			if (location != null) {
+				particleManager.closeEnchant(location.getBlock());
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onBlockBreak(BlockBreakEvent event) {
+		Block block = event.getBlock();
+		if (block.getType().equals(Material.BOOKSHELF)) {
+			particleManager.removeEnchantBookshelf(block);
 		}
 	}
 	
