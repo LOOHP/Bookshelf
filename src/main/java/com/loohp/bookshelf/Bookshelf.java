@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -89,7 +88,7 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean useWhitelist = true;
 	public static String title = "Bookshelf";
 	public static Set<String> whitelist = new HashSet<>();
-	public static boolean particlesEnabled = true;
+	public static boolean bookshelfParticlesEnabled = true;
 	
 	public static String noPermissionToReloadMessage = "&cYou do not have permission use this command!";
 	public static String noPermissionToUpdateMessage = "&cYou do not have permission use this command!";
@@ -97,18 +96,14 @@ public class Bookshelf extends JavaPlugin {
 	public static Set<UUID> lwcCancelOpen = ConcurrentHashMap.newKeySet();
 	public static Set<UUID> isDonationView = ConcurrentHashMap.newKeySet();
 	
-	public static Set<String> isEmittingParticle = new HashSet<>();
-	
-	public static ConcurrentHashMap<Long, Location> tempRedstone = new ConcurrentHashMap<>();
-	
 	public static ConcurrentHashMap<Player, Long> enchantSeed = new ConcurrentHashMap<>();
 	
 	public static long lastHopperTime = 0;
 	public static long lastHoppercartTime = 0;
 	
 	public static boolean enchantmentTable = true;
-	
 	public static int eTableMulti = 1;
+	public static int enchantingParticlesCount = 75;
 	
 	public static boolean updaterEnabled = true;
 	public static int updaterTaskID = -1;
@@ -335,7 +330,7 @@ public class Bookshelf extends JavaPlugin {
 		title = ChatColor.translateAlternateColorCodes('&', getConfiguration().getString("Options.Title"));
 		noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
 		noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
-		particlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
+		bookshelfParticlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
 		enableHopperSupport = getConfiguration().getBoolean("Options.EnableHopperSupport");
 		enableDropperSupport = getConfiguration().getBoolean("Options.EnableDropperSupport");
 		enchantmentTable = getConfiguration().getBoolean("Options.EnableEnchantmentTableBoosting");
@@ -346,6 +341,7 @@ public class Bookshelf extends JavaPlugin {
 			eTableChance = 0;
 		}
 		eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
+		enchantingParticlesCount = getConfiguration().getInt("Options.EnchantingParticlesCount");
 		
 		lastHopperTime = 0;
 		lastHoppercartTime = 0;
