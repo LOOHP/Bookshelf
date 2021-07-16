@@ -8,34 +8,30 @@ import org.bukkit.event.Listener;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 
+import me.angeschossen.lands.api.flags.Flags;
 import me.angeschossen.lands.api.integration.LandsIntegration;
 import me.angeschossen.lands.api.land.Area;
-import me.angeschossen.lands.api.role.enums.RoleSetting;
 
 public class LandEvents implements Listener {
 	
-	private static LandsIntegration landsAddon;
-	
-	public static void setup() {
-		landsAddon = (landsAddon == null || !(landsAddon instanceof LandsIntegration)) ? new LandsIntegration(Bookshelf.plugin) : landsAddon;
-	}
+	private static LandsIntegration landsApi = new LandsIntegration(Bookshelf.plugin);
 
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onLandCheck(PlayerOpenBookshelfEvent event) {
 		
-		if (!Bookshelf.landHook) {
+		if (!Bookshelf.landsHook) {
 			return;
 		}
 		
 		Player player = event.getPlayer();
 		
-		Area area = landsAddon.getAreaByLoc(event.getLocation());
+		Area area = landsApi.getAreaByLoc(event.getLocation());
 		
 		if (area == null) {
 			return;
 		}
 		
-		if (!area.canSetting(player, RoleSetting.INTERACT_CONTAINER, true)) {
+		if (!area.hasFlag(player, Flags.INTERACT_CONTAINER, true)) {
 			event.setCancelled(true);
 		}
 

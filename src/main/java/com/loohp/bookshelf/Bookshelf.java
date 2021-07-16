@@ -69,7 +69,7 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean residenceHook = false;
 	public static boolean townyHook = false;
 	public static boolean superiorSkyblock2Hook = false;
-	public static boolean landHook = false;
+	public static boolean landsHook = false;
 	public static boolean plotSquaredHook = false;
 	public static boolean interactionVisualizerHook = false;
 	
@@ -240,8 +240,7 @@ public class Bookshelf extends JavaPlugin {
 		if (getServer().getPluginManager().getPlugin(Lands) != null) {
 			hookMessage(Lands);
 			getServer().getPluginManager().registerEvents(new LandEvents(), this);
-			LandEvents.setup();
-			landHook = true;
+			landsHook = true;
 		}
 		
 		String PlotSquared = "PlotSquared";
