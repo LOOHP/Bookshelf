@@ -1,5 +1,6 @@
 package com.loohp.bookshelf.listeners.hooks;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -10,8 +11,9 @@ import org.bukkit.event.Listener;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
-import com.plotsquared.bukkit.util.BukkitUtil;
 import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.configuration.adventure.text.minimessage.Template;
+import com.plotsquared.core.configuration.caption.Caption;
 import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.permissions.Permission;
@@ -24,11 +26,19 @@ import com.plotsquared.core.plot.flag.types.BlockTypeWrapper;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockType;
 
-import net.kyori.adventure.text.minimessage.Template;
-
 public class PlotSquared6Events implements Listener {
 	
 	private static final BlockType ADAPTED_BOOKSHELF_TYPE = BukkitAdapter.asBlockType(Material.BOOKSHELF);
+	
+	private static Method plotPlayerSendMessageMethod;
+	
+	static {
+		try {
+			plotPlayerSendMessageMethod = PlotPlayer.class.getMethod("sendMessage", Caption.class, Template.class);
+		} catch (NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	@EventHandler(priority=EventPriority.LOWEST)
@@ -90,7 +100,7 @@ public class PlotSquared6Events implements Listener {
 		}
 		
 		try {
-			BukkitUtil.adapt(event.getPlayer()).sendMessage(
+			plotPlayerSendMessageMethod.invoke(player, 
 				TranslatableCaption.of("permission.no_permission_event"),
 				Template.of("node", String.valueOf(Permission.PERMISSION_ADMIN_BUILD_OTHER))
             );
