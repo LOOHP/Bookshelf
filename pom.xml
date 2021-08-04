@@ -5,7 +5,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>3.0.4.2</version>
+	<version>3.0.4.4</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -404,6 +404,13 @@
 			<scope>system</scope>
 			<version>1.0</version>
 			<systemPath>${basedir}/lib/Towny-0.96.1.0.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>griefdefenderapi-2.0.0-SNAPSHOT</groupId>
+			<artifactId>griefdefenderapi-2.0.0-SNAPSHOT</artifactId>
+			<scope>system</scope>
+			<version>1.0</version>
+			<systemPath>${basedir}/lib/griefdefenderapi-2.0.0-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.loohp</groupId>

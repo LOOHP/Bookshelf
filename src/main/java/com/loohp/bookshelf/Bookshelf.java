@@ -25,6 +25,7 @@ import com.loohp.bookshelf.listeners.EnchantingEvents;
 import com.loohp.bookshelf.listeners.PistonEvents;
 import com.loohp.bookshelf.listeners.hooks.ASkyBlockEvents;
 import com.loohp.bookshelf.listeners.hooks.BentoBoxEvents;
+import com.loohp.bookshelf.listeners.hooks.GriefDefenderEvents;
 import com.loohp.bookshelf.listeners.hooks.GriefPreventionEvents;
 import com.loohp.bookshelf.listeners.hooks.LWCEvents;
 import com.loohp.bookshelf.listeners.hooks.LandEvents;
@@ -71,6 +72,7 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean superiorSkyblock2Hook = false;
 	public static boolean landsHook = false;
 	public static boolean plotSquaredHook = false;
+	public static boolean griefDefenderHook = false;
 	public static boolean interactionVisualizerHook = false;
 	
 	public static boolean enableHopperSupport = true;
@@ -261,6 +263,13 @@ public class Bookshelf extends JavaPlugin {
 			} else {
 				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of PlotSquared is not supported, only v4 and v5 is supported so far.");
 			}
+		}
+		
+		String GriefDefender = "GriefDefender";
+		if (getServer().getPluginManager().getPlugin(GriefDefender) != null) {
+			hookMessage(GriefDefender);
+			getServer().getPluginManager().registerEvents(new GriefDefenderEvents(), this);
+			griefDefenderHook = true;
 		}
 		
 		String InteractionVisualizer = "InteractionVisualizer";

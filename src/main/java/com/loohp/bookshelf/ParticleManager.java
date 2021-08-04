@@ -33,18 +33,18 @@ public class ParticleManager implements AutoCloseable {
 		this.enchantingBookshelves = new ConcurrentHashMap<>();
 		this.random = new Random();
 		
-		DustOptions purple0 = new DustOptions(Color.fromRGB(153, 51, 255), 1);
-		DustOptions yellow = new DustOptions(Color.fromRGB(255, 255, 0), 1);
-		
-		DustOptions purple1 = new DustOptions(Color.fromRGB(204, 0, 204), 1);
-		DustOptions blue = new DustOptions(Color.fromRGB(51, 51, 255), 1);
-		
 		if (!Bookshelf.version.isLegacy()) {
+			DustOptions purple0 = new DustOptions(Color.fromRGB(153, 51, 255), 1);
+			DustOptions yellow = new DustOptions(Color.fromRGB(255, 255, 0), 1);
+			
+			DustOptions purple1 = new DustOptions(Color.fromRGB(204, 0, 204), 1);
+			DustOptions blue = new DustOptions(Color.fromRGB(51, 51, 255), 1);
+			
 			this.particleTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
 				if (Bookshelf.bookshelfParticlesEnabled) {
 					for (Block block : openedBookshelves) {
 						Location loc = block.getLocation();
-						Location loc2 = loc.clone().add(1,1,1);
+						Location loc2 = loc.clone().add(1, 1, 1);
 						for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
 							double randomNum = random.nextDouble();
 							if (randomNum > 0.95) {
