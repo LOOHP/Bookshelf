@@ -19,6 +19,9 @@ public class BookshelfHolder implements InventoryHolder {
 		return position;
 	}
 
+	/**
+	 * <b>Dangerous, non-deterministic behavior if not used correctly</b>
+	 */
 	@Deprecated
 	public void setPosition(BlockPosition position) {
 		this.position = position;

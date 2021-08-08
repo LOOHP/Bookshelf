@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,10 +26,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -92,9 +95,13 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	private final ParticleManager particleManager;
 	private final Object lock;
 	private final int autoSaveTask;
+	private final ExecutorService asyncExecutor;
 	
 	private BookshelfManager(Bookshelf plugin, World world) {
 		this.lock = new Object();
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d (" + world.getName() + ")").build();
+		this.asyncExecutor = Executors.newFixedThreadPool(8, factory);
+		
 		this.plugin = plugin;
 		this.world = world;
 		if (world.getEnvironment().equals(Environment.NETHER)) {
@@ -110,8 +117,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		int spawnchunks = world.getLoadedChunks().length;
 		AtomicInteger done = new AtomicInteger(0);
 		
-		ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Bookshelf Progress Thread").build());
-		CompletableFuture.runAsync(()->{
+		executeAsyncTask(() -> {
 			long start = System.currentTimeMillis();
 			long lastDone = 0;
 			while (done.get() < spawnchunks) {
@@ -127,7 +133,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 					TimeUnit.MILLISECONDS.sleep(500);
 				} catch (InterruptedException ignore) {}
 			}
-		}, executor);
+		});
 		
 		for (Chunk chunk : world.getLoadedChunks()) {
 			loadChunk(new ChunkPosition(chunk), true);
@@ -150,6 +156,16 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		}, 6000, 6000).getTaskId();
 	}
 	
+	private void executeAsyncTask(Runnable task) {
+		asyncExecutor.execute(task);
+	}
+	
+	private void executeAsyncTaskLater(Runnable task, long delay) {
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			asyncExecutor.execute(task);
+		}, delay);
+	}
+	
 	public World getWorld() {
 		return world;
 	}
@@ -167,7 +183,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		if (!event.getWorld().equals(world)) {
 			return;
 		}
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+		executeAsyncTask(() -> {
 			loadChunk(new ChunkPosition(event.getChunk()), true);
 		});
 	}
@@ -177,14 +193,14 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		if (!event.getWorld().equals(world)) {
 			return;
 		}
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+		executeAsyncTask(() -> {
 			saveChunk(new ChunkPosition(event.getChunk()), true);
 		});
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onWorldUnload(WorldUnloadEvent event) {
-		Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+		executeAsyncTaskLater(() -> {
 			close();
 		}, 10);
 	}
@@ -246,6 +262,11 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		BookshelfHolder bookshelf = chunkEntry.get(position);
 		if (bookshelf == null) {
 			return;
+		}
+		Inventory inv = bookshelf.getInventory();
+		List<HumanEntity> viewers = inv.getViewers();
+		for (HumanEntity player : viewers.toArray(new HumanEntity[viewers.size()])) {
+			player.closeInventory();
 		}
 		chunkEntry.remove(position);
 	}
@@ -342,6 +363,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 			}
 			Bukkit.getConsoleSender().sendMessage("[Bookshelf] (" + world.getName() + "): All bookshelves are saved");
 		}
+		asyncExecutor.shutdown();
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -381,6 +403,28 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		Block block = event.getBlock();
 		if (block.getType().equals(Material.BOOKSHELF)) {
 			particleManager.removeEnchantBookshelf(block);
+		}
+	}
+	
+	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onEntityExplode(EntityExplodeEvent event) {
+		for (Block block : event.blockList()) {
+			if (block.getType().equals(Material.BOOKSHELF)) {
+				particleManager.removeEnchantBookshelf(block);
+			}
+		}
+	}
+	
+	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onBlockExplode(BlockExplodeEvent event) {
+		Block origin = event.getBlock();
+		if (origin.getType().equals(Material.BOOKSHELF)) {
+			particleManager.removeEnchantBookshelf(origin);
+		}
+		for (Block block : event.blockList()) {
+			if (block.getType().equals(Material.BOOKSHELF)) {
+				particleManager.removeEnchantBookshelf(block);
+			}
 		}
 	}
 	
