@@ -1,4 +1,4 @@
-[![Build Status](https://ci.loohpjames.com/job/Bookshelf/1/badge/icon)](https://ci.loohpjames.com/job/Bookshelf/1/)
+[![Build Status](https://ci.loohpjames.com/job/Bookshelf/badge/icon)](https://ci.loohpjames.com/job/Bookshelf/)
 # Bookshelf
 
 https://www.spigotmc.org/resources/75804/
