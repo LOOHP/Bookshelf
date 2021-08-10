@@ -7,8 +7,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,9 +57,16 @@ import com.loohp.bookshelf.objectholders.ChunkPosition;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TranslatableComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 public class BookshelfManager implements Listener, AutoCloseable {
 
+	public static final String DEFAULT_BOOKSHELF_NAME_PLACEHOLDER = "\0\0\0DEFAULT\0\0\0";
+	public static final String DEFAULT_BOOKSHELF_NAME_JSON = ComponentSerializer.toString(new TranslatableComponent(Bookshelf.version.isLegacy() ? "tile.bookshelf.name" : "block.minecraft.bookshelf"));
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+	public static final int DATA_VERSION = 0;
+	
 	private static final Map<World, BookshelfManager> BOOKSHELF_MANAGER = Collections.synchronizedMap(new LinkedHashMap<>());
 	
 	public static BookshelfManager getBookshelfManager(World world) {
@@ -91,12 +100,14 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	private final Bookshelf plugin;
 	private final World world;
 	private final File bookshelfFolder;
+	private final File dataFile;
 	private final Map<ChunkPosition, Map<BlockPosition, BookshelfHolder>> loadedBookshelves;	
 	private final ParticleManager particleManager;
 	private final Object lock;
 	private final int autoSaveTask;
 	private final ExecutorService asyncExecutor;
 	
+	@SuppressWarnings("unchecked")
 	private BookshelfManager(Bookshelf plugin, World world) {
 		this.lock = new Object();
 		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d (" + world.getName() + ")").build();
@@ -113,6 +124,51 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		}
 		this.bookshelfFolder.mkdirs();
 		this.loadedBookshelves = new ConcurrentHashMap<>();
+		
+		this.dataFile = new File(bookshelfFolder, "data.json");
+		JSONObject dataJson = null;
+		if (!dataFile.exists()) {
+			dataJson = new JSONObject();
+			dataJson.put("DataVersion", DATA_VERSION);
+			dataJson.put("MCVersionID", Bookshelf.version.getNumber());
+			dataJson.put("MinecraftVersion", Bookshelf.exactMinecraftVersion);
+			dataJson.put("DateCreated", DATE_FORMAT.format(new Date()));
+		} else {
+			try (InputStreamReader reader = new InputStreamReader(new FileInputStream(dataFile), StandardCharsets.UTF_8)) {
+				dataJson = (JSONObject) new JSONParser().parse(reader);
+				if (dataJson.containsKey("MCVersionID") && Bookshelf.version.getNumber() < (long) dataJson.get("MCVersionID")) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
+				}
+				if (dataJson.containsKey("DataVersion") && DATA_VERSION < (long) dataJson.get("DataVersion")) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
+				}
+				dataJson.put("DataVersion", DATA_VERSION);
+				dataJson.put("MCVersionID", Bookshelf.version.getNumber());
+				dataJson.put("MinecraftVersion", Bookshelf.exactMinecraftVersion);
+			} catch (Throwable e) {
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] Unable to read data file at " + dataFile.getPath());
+				e.printStackTrace();
+			}
+		}
+		if (dataJson != null) {
+			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(dataFile), StandardCharsets.UTF_8))) {
+				Gson g = new GsonBuilder().setPrettyPrinting().create();
+	            String prettyJsonString = g.toJson(dataJson);
+	            pw.println(prettyJsonString);
+	            pw.flush();
+			} catch (Throwable e) {
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] Unable to save data file at " + dataFile.getPath());
+				e.printStackTrace();
+			}
+		}
 		
 		int spawnchunks = world.getLoadedChunks().length;
 		AtomicInteger done = new AtomicInteger(0);
@@ -225,7 +281,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		BookshelfHolder bookshelf = chunkEntry.get(position);
 		if (bookshelf == null) {
 			bookshelf = new BookshelfHolder(position, title, null);
-			Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title);
+			Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title);
 			bookshelf.setInventory(inventory);
 			chunkEntry.put(position, bookshelf);
 		}
@@ -293,9 +349,9 @@ public class BookshelfManager implements Listener, AutoCloseable {
 						BlockPosition position = BookshelfUtils.keyPos(world, key);
 						if (!checkPresence || position.getBlock().getType().equals(Material.BOOKSHELF)) {
 							JSONObject entry = (JSONObject) json.get(key);
-							String title = entry.get("Title").toString();
+							String title = entry.containsKey("Title") ? entry.get("Title").toString() : null;
 							BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
-							Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title, bookshelf);
+							Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title, bookshelf);
 							bookshelf.setInventory(inventory);
 							chunkEntry.put(position, bookshelf);
 						}
@@ -327,7 +383,9 @@ public class BookshelfManager implements Listener, AutoCloseable {
 					for (BookshelfHolder bookshelf : chunkEntry.values()) {
 						String key = BookshelfUtils.posKey(bookshelf.getPosition());
 						JSONObject entry = new JSONObject();
-						entry.put("Title", bookshelf.getTitle());
+						if (bookshelf.getTitle() != null) {
+							entry.put("Title", bookshelf.getTitle());
+						}
 						entry.put("Inventory", BookshelfUtils.toBase64(bookshelf.getInventory()));
 						toSave.put(key, entry);
 					}

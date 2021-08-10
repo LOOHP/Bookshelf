@@ -60,7 +60,7 @@ public class HopperUtils {
 						}							
 
 						Inventory inventory = hoppercart.getInventory();
-						Inventory bookshelfInv = BookshelfManager.getBookshelfManager(world).getOrCreateBookself(new BlockPosition(bookshelfBlock), Bookshelf.title).getInventory();	           
+						Inventory bookshelfInv = BookshelfManager.getBookshelfManager(world).getOrCreateBookself(new BlockPosition(bookshelfBlock), null).getInventory();	           
 			            for (int i = 0; i < bookshelfInv.getSize(); i++) {
 			            	ItemStack item = bookshelfInv.getItem(i);
 			            	if (item == null) {

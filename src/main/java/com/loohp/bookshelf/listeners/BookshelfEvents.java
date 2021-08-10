@@ -130,17 +130,17 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
-		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), Bookshelf.title);
+		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), null);
 		
 		ItemStack item = event.getItemInHand();
-		if (NBTUtils.contains(item, "BookshelfContent") && NBTUtils.contains(item, "BookshelfTitle")) {
+		if (NBTUtils.contains(item, "BookshelfContent")) {
 			String title = NBTUtils.getString(item, "BookshelfTitle");
-			if (!item.getItemMeta().getDisplayName().equals("")) {
+			if (title != null && !item.getItemMeta().getDisplayName().equals("")) {
 				title = item.getItemMeta().getDisplayName();
 			}
 			String hash = NBTUtils.getString(item, "BookshelfContent");
 			try {
-				bookshelf.setInventory(BookshelfUtils.fromBase64(hash, title, bookshelf));
+				bookshelf.setInventory(BookshelfUtils.fromBase64(hash, title == null ? BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title, bookshelf));
 				bookshelf.setTitle(title);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -148,7 +148,7 @@ public class BookshelfEvents implements Listener {
 			return;
 		}
 		
-		String bsTitle = Bookshelf.title;
+		String bsTitle = null;
 		if (event.getItemInHand().hasItemMeta()) {
 			if (event.getItemInHand().getItemMeta().hasDisplayName()) {
 				if (!event.getItemInHand().getItemMeta().getDisplayName().equals("")) {
@@ -157,7 +157,7 @@ public class BookshelfEvents implements Listener {
 			}
 		}
 		try {
-			bookshelf.setInventory(BookshelfUtils.fromBase64(BookshelfUtils.toBase64(bookshelf.getInventory()), bsTitle, bookshelf));
+			bookshelf.setInventory(BookshelfUtils.fromBase64(BookshelfUtils.toBase64(bookshelf.getInventory()), bsTitle == null ? BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : bsTitle, bookshelf));
 			bookshelf.setTitle(bsTitle);
 		} catch (IllegalStateException | IOException e) {
 			e.printStackTrace();
@@ -174,7 +174,7 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
-		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), Bookshelf.title);
+		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), null);
 		Inventory inv = bookshelf.getInventory();
 		for (ItemStack item : inv.getContents()) {
 			if (item != null && !item.getType().equals(Material.AIR)) {
@@ -195,7 +195,7 @@ public class BookshelfEvents implements Listener {
 		List<Block> order = new ArrayList<>();
 		for (Block block : event.blockList()) {
 			if (block.getType().equals(Material.BOOKSHELF)) {
-				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), Bookshelf.title));
+				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null));
 				order.add(block);
 			}
 		}
@@ -227,7 +227,7 @@ public class BookshelfEvents implements Listener {
 		List<Block> order = new ArrayList<>();
 		for (Block block : event.blockList()) {
 			if (block.getType().equals(Material.BOOKSHELF)) {
-				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), Bookshelf.title));
+				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null));
 				order.add(block);
 			}
 		}
@@ -479,7 +479,7 @@ public class BookshelfEvents implements Listener {
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(player.getWorld());
 		
-		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getClickedBlock()), Bookshelf.title);
+		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getClickedBlock()), null);
 		if (Bookshelf.lwcHook) {
 			Location blockLoc = bookshelf.getPosition().getLocation();
 			Protection protection = LWC.getInstance().getPlugin().getLWC().findProtection(blockLoc.getBlock());

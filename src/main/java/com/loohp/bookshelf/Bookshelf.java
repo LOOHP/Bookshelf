@@ -22,6 +22,7 @@ import com.loohp.bookshelf.listeners.BookshelfEvents;
 import com.loohp.bookshelf.listeners.CreativeEvents;
 import com.loohp.bookshelf.listeners.DispenserEvents;
 import com.loohp.bookshelf.listeners.EnchantingEvents;
+import com.loohp.bookshelf.listeners.PacketListenerEvents;
 import com.loohp.bookshelf.listeners.PistonEvents;
 import com.loohp.bookshelf.listeners.hooks.ASkyBlockEvents;
 import com.loohp.bookshelf.listeners.hooks.BentoBoxEvents;
@@ -54,6 +55,7 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static Bookshelf plugin = null;
 	
+	public static String exactMinecraftVersion;
 	public static MCVersion version;
 	
 	public static boolean vanishHook = false;
@@ -88,7 +90,6 @@ public class Bookshelf extends JavaPlugin {
 	
 	public static int bookShelfRows = 2;
 	public static boolean useWhitelist = true;
-	public static String title = "Bookshelf";
 	public static Set<String> whitelist = new HashSet<>();
 	public static boolean bookshelfParticlesEnabled = true;
 	
@@ -119,6 +120,7 @@ public class Bookshelf extends JavaPlugin {
 
 		Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID);
 		
+		exactMinecraftVersion = Bukkit.getVersion().substring(Bukkit.getVersion().indexOf("(") + 5, Bukkit.getVersion().indexOf(")"));
 		version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 		
 		//Rename old folder
@@ -136,6 +138,7 @@ public class Bookshelf extends JavaPlugin {
 	    getServer().getPluginManager().registerEvents(new DispenserEvents(), this);
 	    getServer().getPluginManager().registerEvents(new EnchantingEvents(), this);
 	    getServer().getPluginManager().registerEvents(new PistonEvents(), this);
+	    getServer().getPluginManager().registerEvents(new PacketListenerEvents(), this);
 	    
 	    getCommand("bookshelf").setExecutor(new Commands());
 		
@@ -335,7 +338,6 @@ public class Bookshelf extends JavaPlugin {
 		bookShelfRows = getConfiguration().getInt("Options.BookShelfRows");
 		useWhitelist = getConfiguration().getBoolean("Options.UseWhitelist");
 		whitelist = getConfiguration().getStringList("Options.Whitelist").stream().collect(Collectors.toSet());
-		title = ChatColor.translateAlternateColorCodes('&', getConfiguration().getString("Options.Title"));
 		noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
 		noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
 		bookshelfParticlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");

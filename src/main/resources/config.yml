@@ -14,9 +14,6 @@ Options:
    - ENCHANTED_BOOK
    - KNOWLEDGE_BOOK
 
-  #The default inventory name for an unnamed bookshelf
-  Title: "Bookshelf"
-
   NoPermissionToReloadMessage: "&cYou do not have permission use this command!"
   NoPermissionToUpdateMessage: "&cYou do not have permission use this command!"
 
