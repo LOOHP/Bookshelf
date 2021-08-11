@@ -34,7 +34,7 @@ public class PlotSquared6Events implements Listener {
 	
 	static {
 		try {
-			plotPlayerSendMessageMethod = PlotPlayer.class.getMethod("sendMessage", Caption.class, Template.class);
+			plotPlayerSendMessageMethod = PlotPlayer.class.getMethod("sendMessage", Caption.class, Template[].class);
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
