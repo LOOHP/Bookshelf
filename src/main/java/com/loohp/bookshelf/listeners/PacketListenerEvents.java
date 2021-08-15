@@ -89,7 +89,9 @@ public class PacketListenerEvents implements Listener {
 		try {
 			Channel channel = (Channel) channelField.get(networkManagerField.get(playerConnectionField.get(craftPlayerGetHandleMethod.invoke(craftPlayerClass.cast(event.getPlayer())))));
 			Future<?> future = channel.eventLoop().submit(() -> {
-				channel.pipeline().remove(CHANNEL_NAME);
+				try {
+					channel.pipeline().remove(CHANNEL_NAME);
+				} catch (Throwable e) {}
 	        });
 			Bukkit.getScheduler().runTaskAsynchronously(Bookshelf.plugin, () -> {
 				try {
@@ -127,7 +129,9 @@ public class PacketListenerEvents implements Listener {
 		try {
 			Channel channel = (Channel) channelField.get(networkManagerField.get(playerConnectionField.get(craftPlayerGetHandleMethod.invoke(craftPlayerClass.cast(event.getPlayer())))));
 			channel.eventLoop().submit(() -> {
-				channel.pipeline().remove(CHANNEL_NAME);
+				try {
+					channel.pipeline().remove(CHANNEL_NAME);
+				} catch (Throwable e) {}
 	        });
 		} catch (Throwable e) {
 			e.printStackTrace();
