@@ -111,7 +111,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	private BookshelfManager(Bookshelf plugin, World world) {
 		this.lock = new Object();
 		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d (" + world.getName() + ")").build();
-		this.asyncExecutor = Executors.newFixedThreadPool(8, factory);
+		this.asyncExecutor = new ThreadPoolExecutor(8, 16, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), factory);
 		
 		this.plugin = plugin;
 		this.world = world;
