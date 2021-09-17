@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.Bukkit;
@@ -33,6 +33,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -108,10 +109,12 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	private final Object lock;
 	private final int autoSaveTask;
 	private final ExecutorService asyncExecutor;
+	private final AtomicBoolean isClosed;
 	
 	@SuppressWarnings("unchecked")
 	private BookshelfManager(Bookshelf plugin, World world) {
 		this.lock = new Object();
+		this.isClosed = new AtomicBoolean(false);
 		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d (" + world.getName() + ")").build();
 		this.asyncExecutor = new ThreadPoolExecutor(8, 16, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), factory);
 		
@@ -215,12 +218,16 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	}
 	
 	private void executeAsyncTask(Runnable task) {
-		asyncExecutor.execute(task);
+		if (!isClosed.get()) {
+			asyncExecutor.execute(task);
+		}
 	}
 	
 	private void executeAsyncTaskLater(Runnable task, long delay) {
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			asyncExecutor.execute(task);
+			if (!isClosed.get()) {
+				asyncExecutor.execute(task);
+			}
 		}, delay);
 	}
 	
@@ -414,6 +421,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	@Override
 	public void close() {
 		Bukkit.getScheduler().cancelTask(autoSaveTask);
+		HandlerList.unregisterAll(this);
 		particleManager.close();
 		BOOKSHELF_MANAGER.remove(world);
 		synchronized (lock) {
@@ -423,6 +431,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 			}
 			Bukkit.getConsoleSender().sendMessage("[Bookshelf] (" + world.getName() + "): All bookshelves are saved");
 		}
+		isClosed.set(true);
 		asyncExecutor.shutdown();
 	}
 	
