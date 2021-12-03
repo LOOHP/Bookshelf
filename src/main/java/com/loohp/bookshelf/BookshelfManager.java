@@ -142,18 +142,18 @@ public class BookshelfManager implements Listener, AutoCloseable {
 			try (InputStreamReader reader = new InputStreamReader(new FileInputStream(dataFile), StandardCharsets.UTF_8)) {
 				dataJson = (JSONObject) new JSONParser().parse(reader);
 				if (dataJson.containsKey("MCVersionID") && Bookshelf.version.getNumber() < (long) dataJson.get("MCVersionID")) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Minecraft version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Minecraft version downgrade is not supported!");
 				}
 				if (dataJson.containsKey("DataVersion") && DATA_VERSION < (long) dataJson.get("DataVersion")) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WWARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Plugin version downgrade is not supported!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Plugin version downgrade is not supported!");
 				}
 				dataJson.put("DataVersion", DATA_VERSION);
 				dataJson.put("MCVersionID", Bookshelf.version.getNumber());
@@ -265,9 +265,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onWorldUnload(WorldUnloadEvent event) {
-		executeAsyncTaskLater(() -> {
-			close();
-		}, 10);
+		executeAsyncTaskLater(() -> close(), 10);
 	}
 	
 	public Iterable<BookshelfHolder> getLoadedBookshelves() {
@@ -302,18 +300,28 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		if (!position.getWorld().equals(world)) {
 			throw new IllegalArgumentException("Position not in world");
 		}
-		Map<BlockPosition, BookshelfHolder> chunkEntry = loadedBookshelves.get(position.getChunkPosition());
-		if (chunkEntry == null) {
-			chunkEntry = loadChunk(position.getChunkPosition(), false);
+		ChunkPosition originalChunkPosition = position.getChunkPosition();
+		Map<BlockPosition, BookshelfHolder> originalChunkEntry = loadedBookshelves.get(originalChunkPosition);
+		if (originalChunkEntry == null) {
+			originalChunkEntry = loadChunk(originalChunkPosition, false);
 		}
-		BookshelfHolder bookshelf = chunkEntry.get(position);
+		BookshelfHolder bookshelf = originalChunkEntry.get(position);
 		if (bookshelf == null) {
 			return;
 		}
-		chunkEntry.remove(position);
+		originalChunkEntry.remove(position);
 		BlockPosition newPos = new BlockPosition(world, x, y, z);
+		ChunkPosition newChunkPosition = newPos.getChunkPosition();
 		bookshelf.setPosition(newPos);
-		chunkEntry.put(newPos, bookshelf);
+		if (newChunkPosition.equals(originalChunkPosition)) {
+			originalChunkEntry.put(newPos, bookshelf);
+		} else {
+			Map<BlockPosition, BookshelfHolder> newChunkEntry = loadedBookshelves.get(newChunkPosition);
+			if (newChunkEntry == null) {
+				newChunkEntry = loadChunk(newChunkPosition, false);
+			}
+			newChunkEntry.put(newPos, bookshelf);
+		}
 	}
 	
 	public void remove(BlockPosition position) {

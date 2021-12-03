@@ -46,8 +46,9 @@ import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.MCVersion;
-import com.loohp.bookshelf.utils.NBTUtils;
 import com.loohp.bookshelf.utils.legacy.LegacyConfigConverter;
+
+import io.github.bananapuncher714.nbteditor.NBTEditor;
 
 public class BookshelfEvents implements Listener {
 
@@ -133,12 +134,12 @@ public class BookshelfEvents implements Listener {
 		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), null);
 		
 		ItemStack item = event.getItemInHand();
-		if (NBTUtils.contains(item, "BookshelfContent")) {
-			String title = NBTUtils.getString(item, "BookshelfTitle");
+		if (NBTEditor.contains(item, "BookshelfContent")) {
+			String title = NBTEditor.getString(item, "BookshelfTitle");
 			if (title != null && !item.getItemMeta().getDisplayName().equals("")) {
 				title = item.getItemMeta().getDisplayName();
 			}
-			String hash = NBTUtils.getString(item, "BookshelfContent");
+			String hash = NBTEditor.getString(item, "BookshelfContent");
 			try {
 				bookshelf.setInventory(BookshelfUtils.fromBase64(hash, title == null ? BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title, bookshelf));
 				bookshelf.setTitle(title);

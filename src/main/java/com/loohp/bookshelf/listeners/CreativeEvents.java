@@ -19,7 +19,8 @@ import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.MaterialUtils;
-import com.loohp.bookshelf.utils.NBTUtils;
+
+import io.github.bananapuncher714.nbteditor.NBTEditor;
 
 public class CreativeEvents implements Listener {
 	
@@ -42,8 +43,8 @@ public class CreativeEvents implements Listener {
 					BookshelfHolder bookshelf = BookshelfManager.getBookshelfManager(player.getWorld()).getOrCreateBookself(new BlockPosition(block), null);
 					String hash = BookshelfUtils.toBase64(bookshelf.getInventory());
 					String title = bookshelf.getTitle();
-					item = NBTUtils.set(item, hash, "BookshelfContent");
-					item = NBTUtils.set(item, title, "BookshelfTitle");
+					item = NBTEditor.set(item, hash, "BookshelfContent");
+					item = NBTEditor.set(item, title, "BookshelfTitle");
 					event.setCursor(item);
 				}
 			}
