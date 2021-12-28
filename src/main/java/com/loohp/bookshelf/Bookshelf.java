@@ -1,6 +1,7 @@
 package com.loohp.bookshelf;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.simpleyaml.configuration.file.FileConfiguration;
+import org.simpleyaml.exceptions.InvalidConfigurationException;
 
 import com.loohp.bookshelf.config.Config;
 import com.loohp.bookshelf.debug.Debug;
@@ -145,7 +147,13 @@ public class Bookshelf extends JavaPlugin {
 	    if (!getDataFolder().exists()) {
 	    	getDataFolder().mkdirs();
 	    }
-	    Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
+	    try {
+			Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
+		} catch (IOException | InvalidConfigurationException e) {
+			e.printStackTrace();
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 	    
 	    String SuperVanish = "SuperVanish";
 	    String PremiumVanish = "PremiumVanish";
