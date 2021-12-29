@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -98,10 +99,13 @@ public class BookshelfEvents implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onWorldLoad(WorldLoadEvent event) {
-		BookshelfManager manager = BookshelfManager.loadWorld(Bookshelf.plugin, event.getWorld());
-		File legacyData = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/bookshelfdata.json");
-		if (legacyData.exists()) {
-			LegacyConfigConverter.mergeLegacy(legacyData, manager);
+		World world = event.getWorld();
+		if (!Bookshelf.disabledWorlds.contains(world.getName())) {
+			BookshelfManager manager = BookshelfManager.loadWorld(Bookshelf.plugin, world);
+			File legacyData = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/bookshelfdata.json");
+			if (legacyData.exists()) {
+				LegacyConfigConverter.mergeLegacy(legacyData, manager);
+			}
 		}
 	}
 	
@@ -131,6 +135,9 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		if (manager == null) {
+			return;
+		}
 		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), null);
 		
 		ItemStack item = event.getItemInHand();
@@ -175,6 +182,9 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		if (manager == null) {
+			return;
+		}
 		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), null);
 		Inventory inv = bookshelf.getInventory();
 		for (ItemStack item : inv.getContents()) {
@@ -192,6 +202,9 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getLocation().getWorld());
+		if (manager == null) {
+			return;
+		}
 		Map<Block, BookshelfHolder> position = new LinkedHashMap<>();
 		List<Block> order = new ArrayList<>();
 		for (Block block : event.blockList()) {
@@ -224,6 +237,9 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		if (manager == null) {
+			return;
+		}
 		Map<Block, BookshelfHolder> position = new LinkedHashMap<>();
 		List<Block> order = new ArrayList<>();
 		for (Block block : event.blockList()) {
@@ -474,7 +490,9 @@ public class BookshelfEvents implements Listener {
 		}
 		
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(player.getWorld());
-		
+		if (manager == null) {
+			return;
+		}
 		BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getClickedBlock()), null);
 		if (Bookshelf.lwcHook) {
 			Location blockLoc = bookshelf.getPosition().getLocation();

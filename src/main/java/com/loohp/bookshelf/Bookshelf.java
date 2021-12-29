@@ -2,7 +2,9 @@ package com.loohp.bookshelf;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -109,6 +111,8 @@ public class Bookshelf extends JavaPlugin {
 	public static boolean enchantmentTable = true;
 	public static int eTableMulti = 1;
 	public static int enchantingParticlesCount = 75;
+	
+	public static List<String> disabledWorlds = new ArrayList<>();
 	
 	public static boolean updaterEnabled = true;
 	public static int updaterTaskID = -1;
@@ -309,9 +313,11 @@ public class Bookshelf extends JavaPlugin {
 	    File legacyData = new File(Bookshelf.plugin.getDataFolder().getAbsolutePath() + "/bookshelfdata.json");
 	    
 	    for (World world : getServer().getWorlds()) {
-	    	BookshelfManager manager = BookshelfManager.loadWorld(this, world);
-	    	if (legacyData.exists()) {
-	    		LegacyConfigConverter.mergeLegacy(legacyData, manager);
+	    	if (!disabledWorlds.contains(world.getName())) {
+		    	BookshelfManager manager = BookshelfManager.loadWorld(this, world);
+		    	if (legacyData.exists()) {
+		    		LegacyConfigConverter.mergeLegacy(legacyData, manager);
+		    	}
 	    	}
 	    }
 	    
@@ -324,7 +330,7 @@ public class Bookshelf extends JavaPlugin {
 	public void onDisable() {
 		getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Saving bookshelves..");
 		long start = System.currentTimeMillis();
-		for (World world : BookshelfManager.getWorlds()) {
+		for (World world : new ArrayList<>(BookshelfManager.getWorlds())) {
 			BookshelfManager.getBookshelfManager(world).close();
 		}
 		getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Bookshelves saved! (" + (System.currentTimeMillis() - start) + "ms)");
@@ -375,6 +381,8 @@ public class Bookshelf extends JavaPlugin {
 			HopperUtils.hopperCheck();
 			HopperUtils.hopperMinecartCheck();
 		}
+		
+		disabledWorlds = getConfiguration().getStringList("Options.DisabledWorlds");
 		
 		if (updaterTaskID >= 0) {
 			Bukkit.getScheduler().cancelTask(updaterTaskID);

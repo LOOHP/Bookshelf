@@ -40,7 +40,11 @@ public class CreativeEvents implements Listener {
 					block = player.getTargetBlock(MaterialUtils.getNonSolidSet(), 10);
 				}
 				if (block.getType().equals(Material.BOOKSHELF)) {
-					BookshelfHolder bookshelf = BookshelfManager.getBookshelfManager(player.getWorld()).getOrCreateBookself(new BlockPosition(block), null);
+					BookshelfManager manager = BookshelfManager.getBookshelfManager(player.getWorld());
+					if (manager == null) {
+						return;
+					}
+					BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(block), null);
 					String hash = BookshelfUtils.toBase64(bookshelf.getInventory());
 					String title = bookshelf.getTitle();
 					item = NBTEditor.set(item, hash, "BookshelfContent");

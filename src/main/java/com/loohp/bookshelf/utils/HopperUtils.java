@@ -44,7 +44,11 @@ public class HopperUtils {
 		Bookshelf.hopperMinecartTaskID = Bukkit.getScheduler().runTaskTimer(Bookshelf.plugin, () -> {
 			long start = System.currentTimeMillis();
 			long startNano = System.nanoTime();
-			for (World world : Bukkit.getWorlds()) {
+			for (World world : BookshelfManager.getWorlds()) {
+				BookshelfManager manager = BookshelfManager.getBookshelfManager(world);
+				if (manager == null) {
+					continue;
+				}
 				for (Entity entity : world.getEntities()) {
 					if (entity.getType().equals(EntityType.MINECART_HOPPER)) {
 						HopperMinecart hoppercart = (HopperMinecart) entity;
@@ -60,7 +64,7 @@ public class HopperUtils {
 						}							
 
 						Inventory inventory = hoppercart.getInventory();
-						Inventory bookshelfInv = BookshelfManager.getBookshelfManager(world).getOrCreateBookself(new BlockPosition(bookshelfBlock), null).getInventory();	           
+						Inventory bookshelfInv = manager.getOrCreateBookself(new BlockPosition(bookshelfBlock), null).getInventory();	           
 			            for (int i = 0; i < bookshelfInv.getSize(); i++) {
 			            	ItemStack item = bookshelfInv.getItem(i);
 			            	if (item == null) {

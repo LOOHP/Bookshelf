@@ -11,7 +11,10 @@ public class Charts {
 		metrics.addCustomChart(new Metrics.SingleLineChart("total_bookshelves_loaded", new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
-                return BookshelfManager.getWorlds().stream().mapToInt(each -> BookshelfManager.getBookshelfManager(each).size()).sum();
+                return BookshelfManager.getWorlds().stream().mapToInt(each -> {
+                	BookshelfManager manager = BookshelfManager.getBookshelfManager(each);
+                	return manager == null ? 0 : manager.size();
+                }).sum();
             }
         }));
 	    

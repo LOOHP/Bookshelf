@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -76,10 +77,8 @@ public class BookshelfManager implements Listener, AutoCloseable {
 		return BOOKSHELF_MANAGER.get(world);
 	}
 	
-	public static List<World> getWorlds() {
-		synchronized (BOOKSHELF_MANAGER) {
-			return new ArrayList<>(BOOKSHELF_MANAGER.keySet());
-		}
+	public static Set<World> getWorlds() {
+		return Collections.unmodifiableSet(BOOKSHELF_MANAGER.keySet());
 	}
 	
 	public static Iterable<BookshelfHolder> getAllLoadedBookshelves() {
@@ -91,6 +90,9 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	}
 	
 	public synchronized static BookshelfManager loadWorld(Bookshelf plugin, World world) {
+		if (!Bukkit.isPrimaryThread()) {
+			throw new IllegalAccessError("Loading BookshelfManager in async is not allowed!");
+		}
 		BookshelfManager manager = BOOKSHELF_MANAGER.get(world);
 		if (manager != null) {
 			return manager;
@@ -427,7 +429,13 @@ public class BookshelfManager implements Listener, AutoCloseable {
 	}
 	
 	@Override
-	public void close() {
+	public synchronized void close() {
+		if (isClosed.get()) {
+			throw new IllegalAccessError("BookshelfManager already closed!");
+		}
+		if (!Bukkit.isPrimaryThread()) {
+			throw new IllegalAccessError("Closing BookshelfManager in async is not allowed!");
+		}
 		Bukkit.getScheduler().cancelTask(autoSaveTask);
 		HandlerList.unregisterAll(this);
 		particleManager.close();

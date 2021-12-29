@@ -27,6 +27,9 @@ public class PistonEvents implements Listener {
 			return;
 		}
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		if (manager == null) {
+			return;
+		}
 		Map<Block, BlockPosition> position = new LinkedHashMap<>();
 		List<Block> order = new ArrayList<>();
 		for (Block block : event.getBlocks()) {
@@ -53,6 +56,9 @@ public class PistonEvents implements Listener {
 			return;
 		}
 		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+		if (manager == null) {
+			return;
+		}
 		Map<Block, BlockPosition> position = new LinkedHashMap<>();
 		List<Block> order = new ArrayList<>();
 		for (Block block : event.getBlocks()) {
