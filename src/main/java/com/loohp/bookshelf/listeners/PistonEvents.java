@@ -1,10 +1,8 @@
 package com.loohp.bookshelf.listeners;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.objectholders.BlockPosition;
+import com.loohp.bookshelf.utils.CustomListUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,68 +13,69 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 
-import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.objectholders.BlockPosition;
-import com.loohp.bookshelf.utils.CustomListUtils;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PistonEvents implements Listener {
-	
-	@EventHandler(priority=EventPriority.HIGHEST)
-	public void onPistonExtend(BlockPistonExtendEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
-		if (manager == null) {
-			return;
-		}
-		Map<Block, BlockPosition> position = new LinkedHashMap<>();
-		List<Block> order = new ArrayList<>();
-		for (Block block : event.getBlocks()) {
-			if (block.getType().equals(Material.BOOKSHELF)) {
-				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null).getPosition());
-				order.add(block);
-			}
-		}
-		
-		if (order.isEmpty()) {
-			return;
-		}
-		
-		BlockFace dir = event.getDirection();
-		for (Block block : CustomListUtils.reverse(order)) {
-			Location newLoc = block.getRelative(dir).getLocation().clone();
-			manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
-		}
-	}
-	
-	@EventHandler(priority=EventPriority.HIGHEST)
-	public void onPistonRetract(BlockPistonRetractEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-		BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
-		if (manager == null) {
-			return;
-		}
-		Map<Block, BlockPosition> position = new LinkedHashMap<>();
-		List<Block> order = new ArrayList<>();
-		for (Block block : event.getBlocks()) {
-			if (block.getType().equals(Material.BOOKSHELF)) {
-				position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null).getPosition());
-				order.add(block);
-			}
-		}
-		
-		if (order.isEmpty()) {
-			return;
-		}
-		
-		BlockFace dir = event.getDirection();
-		for (Block block : CustomListUtils.reverse(order)) {
-			Location newLoc = block.getRelative(dir).getLocation().clone();
-			manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
-		}
-	}
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+        if (manager == null) {
+            return;
+        }
+        Map<Block, BlockPosition> position = new LinkedHashMap<>();
+        List<Block> order = new ArrayList<>();
+        for (Block block : event.getBlocks()) {
+            if (block.getType().equals(Material.BOOKSHELF)) {
+                position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null).getPosition());
+                order.add(block);
+            }
+        }
+
+        if (order.isEmpty()) {
+            return;
+        }
+
+        BlockFace dir = event.getDirection();
+        for (Block block : CustomListUtils.reverse(order)) {
+            Location newLoc = block.getRelative(dir).getLocation().clone();
+            manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
+        if (manager == null) {
+            return;
+        }
+        Map<Block, BlockPosition> position = new LinkedHashMap<>();
+        List<Block> order = new ArrayList<>();
+        for (Block block : event.getBlocks()) {
+            if (block.getType().equals(Material.BOOKSHELF)) {
+                position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null).getPosition());
+                order.add(block);
+            }
+        }
+
+        if (order.isEmpty()) {
+            return;
+        }
+
+        BlockFace dir = event.getDirection();
+        for (Block block : CustomListUtils.reverse(order)) {
+            Location newLoc = block.getRelative(dir).getLocation().clone();
+            manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
+        }
+    }
 
 }

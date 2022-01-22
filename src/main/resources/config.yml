@@ -8,11 +8,11 @@ Options:
   #Items which is allowed to be placed into a bookshelf
   #See this for item names: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
   Whitelist:
-   - BOOK
-   - WRITABLE_BOOK
-   - WRITTEN_BOOK
-   - ENCHANTED_BOOK
-   - KNOWLEDGE_BOOK
+    - BOOK
+    - WRITABLE_BOOK
+    - WRITTEN_BOOK
+    - ENCHANTED_BOOK
+    - KNOWLEDGE_BOOK
 
   NoPermissionToReloadMessage: "&cYou do not have permission use this command!"
   NoPermissionToUpdateMessage: "&cYou do not have permission use this command!"
@@ -35,7 +35,7 @@ Options:
   EnchantingParticlesCount: 75
 
   #Max percentage of the enchantment table boosting feature
-  #Accepts integer from 0 - 100
+  #Accepts integer from 0 to 100
   EnchantmentTableBoostingMaxPercentage: 80
 
   #Disable bookshelves loading in these worlds
