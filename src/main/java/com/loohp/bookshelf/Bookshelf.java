@@ -27,6 +27,7 @@ import com.loohp.bookshelf.metrics.Charts;
 import com.loohp.bookshelf.metrics.Metrics;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
 import com.loohp.bookshelf.updater.Updater;
+import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.HopperUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.legacy.LegacyConfigConverter;
@@ -39,6 +40,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.simpleyaml.configuration.file.FileConfiguration;
 import org.simpleyaml.exceptions.InvalidConfigurationException;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -94,6 +96,8 @@ public class Bookshelf extends JavaPlugin {
     public static boolean useWhitelist = true;
     public static Set<String> whitelist = new HashSet<>();
     public static boolean bookshelfParticlesEnabled = true;
+    public static Color bookshelfPrimaryColor = ColorUtils.hex2Rgb("#9933FF");
+    public static Color bookshelfSecondaryColor = ColorUtils.hex2Rgb("#FFFF00");
 
     public static String noPermissionToReloadMessage = "&cYou do not have permission use this command!";
     public static String noPermissionToUpdateMessage = "&cYou do not have permission use this command!";
@@ -109,67 +113,13 @@ public class Bookshelf extends JavaPlugin {
     public static boolean enchantmentTable = true;
     public static int eTableMulti = 1;
     public static int enchantingParticlesCount = 75;
+    public static Color boostingPrimaryColor = ColorUtils.hex2Rgb("#CC00CC");
+    public static Color boostingSecondaryColor = ColorUtils.hex2Rgb("#3333FF");
 
     public static List<String> disabledWorlds = new ArrayList<>();
 
     public static boolean updaterEnabled = true;
     public static int updaterTaskID = -1;
-
-    private static void hookMessage(String name) {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
-    }
-
-    public static FileConfiguration getConfiguration() {
-        return Config.getConfig(CONFIG_ID).getConfiguration();
-    }
-
-    public static void loadConfig() {
-        Config config = Config.getConfig(CONFIG_ID);
-        config.reload();
-
-        bookShelfRows = getConfiguration().getInt("Options.BookShelfRows");
-        useWhitelist = getConfiguration().getBoolean("Options.UseWhitelist");
-        whitelist = new HashSet<>(getConfiguration().getStringList("Options.Whitelist"));
-        noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
-        noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
-        bookshelfParticlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
-        enableHopperSupport = getConfiguration().getBoolean("Options.EnableHopperSupport");
-        enableDropperSupport = getConfiguration().getBoolean("Options.EnableDropperSupport");
-        enchantmentTable = getConfiguration().getBoolean("Options.EnableEnchantmentTableBoosting");
-        int eTableChance = getConfiguration().getInt("Options.EnchantmentTableBoostingMaxPercentage");
-        if (eTableChance > 100) {
-            eTableChance = 100;
-        } else if (eTableChance < 0) {
-            eTableChance = 0;
-        }
-        eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
-        enchantingParticlesCount = getConfiguration().getInt("Options.EnchantingParticlesCount");
-
-        lastHopperTime = 0;
-        lastHoppercartTime = 0;
-        if (hopperTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(hopperTaskID);
-        }
-        if (hopperMinecartTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(hopperMinecartTaskID);
-        }
-        if (enableHopperSupport) {
-            hopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
-            hopperAmount = Bukkit.spigot().getConfig().getInt("world-settings.default.hopper-amount");
-            HopperUtils.hopperCheck();
-            HopperUtils.hopperMinecartCheck();
-        }
-
-        disabledWorlds = getConfiguration().getStringList("Options.DisabledWorlds");
-
-        if (updaterTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(updaterTaskID);
-        }
-        updaterEnabled = getConfiguration().getBoolean("Options.Updater");
-        if (updaterEnabled) {
-            Bukkit.getPluginManager().registerEvents(new Updater(), Bookshelf.plugin);
-        }
-    }
 
     @Override
     @SuppressWarnings("deprecation")
@@ -389,5 +339,66 @@ public class Bookshelf extends JavaPlugin {
         }
         getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Bookshelves saved! (" + (System.currentTimeMillis() - start) + "ms)");
         getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] BookShelf has been Disabled!");
+    }
+
+    private static void hookMessage(String name) {
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
+    }
+
+    public static FileConfiguration getConfiguration() {
+        return Config.getConfig(CONFIG_ID).getConfiguration();
+    }
+
+    public static void loadConfig() {
+        Config config = Config.getConfig(CONFIG_ID);
+        config.reload();
+
+        bookShelfRows = getConfiguration().getInt("Options.BookShelfRows");
+        useWhitelist = getConfiguration().getBoolean("Options.UseWhitelist");
+        whitelist = new HashSet<>(getConfiguration().getStringList("Options.Whitelist"));
+        noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
+        noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
+        bookshelfParticlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
+        bookshelfPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Primary"));
+        bookshelfSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Secondary"));
+
+        enableHopperSupport = getConfiguration().getBoolean("Options.EnableHopperSupport");
+        enableDropperSupport = getConfiguration().getBoolean("Options.EnableDropperSupport");
+        enchantmentTable = getConfiguration().getBoolean("Options.EnableEnchantmentTableBoosting");
+        int eTableChance = getConfiguration().getInt("Options.EnchantmentTableBoostingMaxPercentage");
+        if (eTableChance > 100) {
+            eTableChance = 100;
+        } else if (eTableChance < 0) {
+            eTableChance = 0;
+        }
+        eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
+        enchantingParticlesCount = getConfiguration().getInt("Options.EnchantingParticlesCount");
+        boostingPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Primary"));
+        boostingSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Secondary"));
+
+        lastHopperTime = 0;
+        lastHoppercartTime = 0;
+        if (hopperTaskID >= 0) {
+            Bukkit.getScheduler().cancelTask(hopperTaskID);
+        }
+        if (hopperMinecartTaskID >= 0) {
+            Bukkit.getScheduler().cancelTask(hopperMinecartTaskID);
+        }
+        if (enableHopperSupport) {
+            hopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
+            hopperAmount = Bukkit.spigot().getConfig().getInt("world-settings.default.hopper-amount");
+            HopperUtils.hopperCheck();
+            HopperUtils.hopperMinecartCheck();
+        }
+
+        disabledWorlds = getConfiguration().getStringList("Options.DisabledWorlds");
+
+        if (updaterTaskID >= 0) {
+            Bukkit.getScheduler().cancelTask(updaterTaskID);
+        }
+        updaterEnabled = getConfiguration().getBoolean("Options.Updater");
+        if (updaterEnabled) {
+            Bukkit.getPluginManager().registerEvents(new Updater(), Bookshelf.plugin);
+        }
     }
 }

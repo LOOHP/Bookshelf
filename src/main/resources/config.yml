@@ -19,6 +19,9 @@ Options:
 
   #Play particles or not when opening a bookshelf
   ParticlesWhenOpened: true
+  OpenedParticleColors:
+    Primary: "#9933FF"
+    Secondary: "#FFFF00"
 
   #Whether to allow bookshelves to work with hoppers
   #Performace heavy, not recommended
@@ -33,6 +36,9 @@ Options:
   #The count of particles when using an enchantment table that is boosted
   #Defaults to 75
   EnchantingParticlesCount: 75
+  BoostingParticleColors:
+    Primary: "#CC00CC"
+    Secondary: "#3333FF"
 
   #Max percentage of the enchantment table boosting feature
   #Accepts integer from 0 to 100

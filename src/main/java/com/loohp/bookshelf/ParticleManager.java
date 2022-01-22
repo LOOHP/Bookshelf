@@ -1,5 +1,6 @@
 package com.loohp.bookshelf;
 
+import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.utils.ParticlesUtils;
 import org.bukkit.Bukkit;
@@ -9,6 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.Block;
 
+import java.awt.print.Book;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,11 +35,11 @@ public class ParticleManager implements AutoCloseable {
         this.random = new Random();
 
         if (!Bookshelf.version.isLegacy()) {
-            DustOptions purple0 = new DustOptions(Color.fromRGB(153, 51, 255), 1);
-            DustOptions yellow = new DustOptions(Color.fromRGB(255, 255, 0), 1);
+            DustOptions purple0 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.bookshelfPrimaryColor), 1);
+            DustOptions yellow = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.bookshelfSecondaryColor), 1);
 
-            DustOptions purple1 = new DustOptions(Color.fromRGB(204, 0, 204), 1);
-            DustOptions blue = new DustOptions(Color.fromRGB(51, 51, 255), 1);
+            DustOptions purple1 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.boostingPrimaryColor), 1);
+            DustOptions blue = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.boostingSecondaryColor), 1);
 
             this.particleTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
                 if (Bookshelf.bookshelfParticlesEnabled) {
