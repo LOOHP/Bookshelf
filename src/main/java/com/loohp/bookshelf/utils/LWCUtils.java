@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
 public class LWCUtils {
+
     public static boolean checkHopperFlagIn(Entity entity) {
         int hash = 50000 + entity.getUniqueId().hashCode();
         Protection protection = LWC.getInstance().getPlugin().getLWC().findProtection(entity.getWorld(), hash, hash, hash);
@@ -64,4 +65,5 @@ public class LWCUtils {
 
         return protection.getFlag(Type.HOPPER) != null;
     }
+
 }

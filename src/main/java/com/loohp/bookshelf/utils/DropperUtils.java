@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dropper;
 
 public class DropperUtils {
+
     public static Block getDropperRelative(Block block) {
         if (!block.getType().equals(Material.DROPPER)) {
             return null;
@@ -65,4 +66,5 @@ public class DropperUtils {
         }
         return relativeBlock;
     }
+
 }

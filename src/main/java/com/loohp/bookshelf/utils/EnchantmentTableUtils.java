@@ -7,48 +7,39 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class EnchantmentTableUtils {
 
     public static List<Block> getBookshelves(Block enchantmentTableBlock) {
-        List<Block> blocks = new ArrayList<Block>();
-        List<Block> returnlist = new ArrayList<Block>();
+        return getBoostableBlockLocations(enchantmentTableBlock, block -> block.getType().equals(Material.BOOKSHELF));
+    }
+
+    public static List<Block> getBoostableBlockLocations(Block enchantmentTableBlock, Predicate<Block> filter) {
+        List<Block> blocks = new ArrayList<>();
         Location center = enchantmentTableBlock.getLocation();
 
         for (int y = 0; y <= 1; y++) {
             for (int x = -2; x <= 2; x++) {
                 Location loc = new Location(center.getWorld(), center.getBlockX() + x, center.getBlockY() + y, center.getBlockZ() + 2);
-                if (loc.getBlock().getType().equals(Material.BOOKSHELF)) {
-                    blocks.add(loc.getBlock());
-                }
+                blocks.add(loc.getBlock());
             }
             for (int x = -2; x <= 2; x++) {
                 Location loc = new Location(center.getWorld(), center.getBlockX() + x, center.getBlockY() + y, center.getBlockZ() - 2);
-                if (loc.getBlock().getType().equals(Material.BOOKSHELF)) {
-                    blocks.add(loc.getBlock());
-                }
+                blocks.add(loc.getBlock());
             }
             for (int z = -2; z <= 2; z++) {
                 Location loc = new Location(center.getWorld(), center.getBlockX() + 2, center.getBlockY() + y, center.getBlockZ() + z);
-                if (loc.getBlock().getType().equals(Material.BOOKSHELF)) {
-                    blocks.add(loc.getBlock());
-                }
+                blocks.add(loc.getBlock());
             }
             for (int z = -2; z <= 2; z++) {
                 Location loc = new Location(center.getWorld(), center.getBlockX() - 2, center.getBlockY() + y, center.getBlockZ() + z);
-                if (loc.getBlock().getType().equals(Material.BOOKSHELF)) {
-                    blocks.add(loc.getBlock());
-                }
+                blocks.add(loc.getBlock());
             }
         }
 
-        for (Block block : blocks) {
-            if (isAirBetween(block.getLocation().clone().add(0.5, 0.5, 0.5), center.clone().add(0.5, 0.5, 0.5)) == true) {
-                returnlist.add(block);
-            }
-        }
-
-        return returnlist;
+        blocks.removeIf(block -> !isAirBetween(block.getLocation().clone().add(0.5, 0.5, 0.5), center.clone().add(0.5, 0.5, 0.5)) || !filter.test(block));
+        return blocks;
     }
 
     public static boolean isAirBetween(Location loc1, Location loc2) {

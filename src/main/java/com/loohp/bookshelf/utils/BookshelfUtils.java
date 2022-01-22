@@ -84,4 +84,5 @@ public class BookshelfUtils {
             throw new IOException("Unable to decode class type.", e);
         }
     }
+
 }

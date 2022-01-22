@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 public class BlockLockerUtils {
+
     public static boolean checkAccess(Player player, Block block) {
         return BlockLockerAPIv2.isAllowed(player, block, true);
     }
@@ -27,4 +28,5 @@ public class BlockLockerUtils {
         Profile redstoneProfile = plugin.getProfileFactory().fromRedstone();
         return protection.get().isAllowed(redstoneProfile);
     }
+
 }

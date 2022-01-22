@@ -29,6 +29,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -108,11 +109,8 @@ public class BookshelfEvents implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
         if (!event.getPlayer().hasPermission("bookshelf.use")) {
             return;
         }
@@ -170,11 +168,8 @@ public class BookshelfEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
         if (!event.getBlock().getType().equals(Material.BOOKSHELF)) {
             return;
         }
@@ -193,12 +188,8 @@ public class BookshelfEvents implements Listener {
         manager.remove(bookshelf.getPosition());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getLocation().getWorld());
         if (manager == null) {
             return;
@@ -228,12 +219,8 @@ public class BookshelfEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         BookshelfManager manager = BookshelfManager.getBookshelfManager(event.getBlock().getWorld());
         if (manager == null) {
             return;
@@ -263,19 +250,15 @@ public class BookshelfEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBurn(BlockBurnEvent event) {
         if (event.getBlock().getType().equals(Material.BOOKSHELF)) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onUse(InventoryClickEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         if (event.getRawSlot() == -999) {
             return;
         }
@@ -385,12 +368,8 @@ public class BookshelfEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDrag(InventoryDragEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         if (!Bookshelf.useWhitelist) {
             return;
         }
@@ -516,4 +495,5 @@ public class BookshelfEvents implements Listener {
         }
         Bookshelf.isDonationView.remove(event.getPlayer().getUniqueId());
     }
+
 }

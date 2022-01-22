@@ -160,4 +160,5 @@ public class LWCEvents implements Module {
     public void onSendLocale(LWCSendLocaleEvent event) {
         return;
     }
+
 }

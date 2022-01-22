@@ -19,15 +19,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
-import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -70,6 +66,36 @@ public class BookshelfManager implements Listener, AutoCloseable {
     public static final int DATA_VERSION = 0;
 
     private static final Map<World, BookshelfManager> BOOKSHELF_MANAGER = Collections.synchronizedMap(new LinkedHashMap<>());
+
+    public static BookshelfManager getBookshelfManager(World world) {
+        return BOOKSHELF_MANAGER.get(world);
+    }
+
+    public static Set<World> getWorlds() {
+        return Collections.unmodifiableSet(BOOKSHELF_MANAGER.keySet());
+    }
+
+    public static Iterable<BookshelfHolder> getAllLoadedBookshelves() {
+        Iterable<BookshelfHolder> itr = new ArrayList<>();
+        for (BookshelfManager manager : BOOKSHELF_MANAGER.values()) {
+            itr = Iterables.concat(itr, manager.getLoadedBookshelves());
+        }
+        return Iterables.unmodifiableIterable(itr);
+    }
+
+    public synchronized static BookshelfManager loadWorld(Bookshelf plugin, World world) {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalAccessError("Loading BookshelfManager in async is not allowed!");
+        }
+        BookshelfManager manager = BOOKSHELF_MANAGER.get(world);
+        if (manager != null) {
+            return manager;
+        }
+        manager = new BookshelfManager(plugin, world);
+        BOOKSHELF_MANAGER.put(world, manager);
+        return manager;
+    }
+
     private final Bookshelf plugin;
     private final World world;
     private final File bookshelfFolder;
@@ -80,6 +106,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
     private final int autoSaveTask;
     private final ExecutorService asyncExecutor;
     private final AtomicBoolean isClosed;
+
     @SuppressWarnings("unchecked")
     private BookshelfManager(Bookshelf plugin, World world) {
         this.lock = new Object();
@@ -175,7 +202,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
-        particleManager = new ParticleManager(plugin);
+        particleManager = new ParticleManager(plugin, this);
 
         autoSaveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (ChunkPosition chunk : loadedBookshelves.keySet()) {
@@ -185,35 +212,6 @@ public class BookshelfManager implements Listener, AutoCloseable {
                 }
             }
         }, 6000, 6000).getTaskId();
-    }
-
-    public static BookshelfManager getBookshelfManager(World world) {
-        return BOOKSHELF_MANAGER.get(world);
-    }
-
-    public static Set<World> getWorlds() {
-        return Collections.unmodifiableSet(BOOKSHELF_MANAGER.keySet());
-    }
-
-    public static Iterable<BookshelfHolder> getAllLoadedBookshelves() {
-        Iterable<BookshelfHolder> itr = new ArrayList<>();
-        for (BookshelfManager manager : BOOKSHELF_MANAGER.values()) {
-            itr = Iterables.concat(itr, manager.getLoadedBookshelves());
-        }
-        return Iterables.unmodifiableIterable(itr);
-    }
-
-    public synchronized static BookshelfManager loadWorld(Bookshelf plugin, World world) {
-        if (!Bukkit.isPrimaryThread()) {
-            throw new IllegalAccessError("Loading BookshelfManager in async is not allowed!");
-        }
-        BookshelfManager manager = BOOKSHELF_MANAGER.get(world);
-        if (manager != null) {
-            return manager;
-        }
-        manager = new BookshelfManager(plugin, world);
-        BOOKSHELF_MANAGER.put(world, manager);
-        return manager;
     }
 
     private void executeAsyncTask(Runnable task) {
@@ -476,36 +474,6 @@ public class BookshelfManager implements Listener, AutoCloseable {
             Location location = inventory.getLocation();
             if (location != null) {
                 particleManager.closeEnchant(location.getBlock());
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent event) {
-        Block block = event.getBlock();
-        if (block.getType().equals(Material.BOOKSHELF)) {
-            particleManager.removeEnchantBookshelf(block);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityExplode(EntityExplodeEvent event) {
-        for (Block block : event.blockList()) {
-            if (block.getType().equals(Material.BOOKSHELF)) {
-                particleManager.removeEnchantBookshelf(block);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockExplode(BlockExplodeEvent event) {
-        Block origin = event.getBlock();
-        if (origin.getType().equals(Material.BOOKSHELF)) {
-            particleManager.removeEnchantBookshelf(origin);
-        }
-        for (Block block : event.blockList()) {
-            if (block.getType().equals(Material.BOOKSHELF)) {
-                particleManager.removeEnchantBookshelf(block);
             }
         }
     }

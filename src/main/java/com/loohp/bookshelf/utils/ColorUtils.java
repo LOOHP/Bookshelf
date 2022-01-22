@@ -79,4 +79,5 @@ public class ColorUtils {
     public static Color getColor(org.bukkit.Color bukkitColor) {
         return new Color(bukkitColor.asRGB());
     }
+
 }

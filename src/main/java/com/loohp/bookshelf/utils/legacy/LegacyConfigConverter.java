@@ -100,4 +100,5 @@ public class LegacyConfigConverter {
 
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Bookshelf] Upgraded to v3.0.0 done!");
     }
+
 }

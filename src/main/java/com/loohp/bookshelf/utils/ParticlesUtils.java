@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParticlesUtils {
+
     public static List<Location> getHollowCube(Location corner1, Location corner2, double spacing) {
         List<Location> result = new ArrayList<Location>();
         World world = corner1.getWorld();
@@ -43,4 +44,5 @@ public class ParticlesUtils {
 
         return result;
     }
+
 }

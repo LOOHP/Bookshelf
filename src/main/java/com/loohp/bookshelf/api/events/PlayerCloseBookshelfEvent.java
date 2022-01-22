@@ -10,6 +10,11 @@ import org.bukkit.event.HandlerList;
 public class PlayerCloseBookshelfEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     private final Player player;
     private final Block block;
     private final Location location;
@@ -20,10 +25,6 @@ public class PlayerCloseBookshelfEvent extends Event {
         this.location = bookshelf.getPosition().getLocation();
         this.block = location.getBlock();
         this.bookshelf = bookshelf;
-    }
-
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
     }
 
     public Player getPlayer() {

@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class Bookshelf extends JavaPlugin {
 
@@ -120,6 +119,67 @@ public class Bookshelf extends JavaPlugin {
 
     public static boolean updaterEnabled = true;
     public static int updaterTaskID = -1;
+
+    private static void hookMessage(String name) {
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
+    }
+
+    public static FileConfiguration getConfiguration() {
+        return Config.getConfig(CONFIG_ID).getConfiguration();
+    }
+
+    public static void loadConfig() {
+        Config config = Config.getConfig(CONFIG_ID);
+        config.reload();
+
+        bookShelfRows = getConfiguration().getInt("Options.BookShelfRows");
+        useWhitelist = getConfiguration().getBoolean("Options.UseWhitelist");
+        whitelist = new HashSet<>(getConfiguration().getStringList("Options.Whitelist"));
+        noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
+        noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
+        bookshelfParticlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
+        bookshelfPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Primary"));
+        bookshelfSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Secondary"));
+
+        enableHopperSupport = getConfiguration().getBoolean("Options.EnableHopperSupport");
+        enableDropperSupport = getConfiguration().getBoolean("Options.EnableDropperSupport");
+        enchantmentTable = getConfiguration().getBoolean("Options.EnableEnchantmentTableBoosting");
+        int eTableChance = getConfiguration().getInt("Options.EnchantmentTableBoostingMaxPercentage");
+        if (eTableChance > 100) {
+            eTableChance = 100;
+        } else if (eTableChance < 0) {
+            eTableChance = 0;
+        }
+        eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
+        enchantingParticlesCount = getConfiguration().getInt("Options.EnchantingParticlesCount");
+        boostingPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Primary"));
+        boostingSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Secondary"));
+
+        lastHopperTime = 0;
+        lastHoppercartTime = 0;
+        if (hopperTaskID >= 0) {
+            Bukkit.getScheduler().cancelTask(hopperTaskID);
+        }
+        if (hopperMinecartTaskID >= 0) {
+            Bukkit.getScheduler().cancelTask(hopperMinecartTaskID);
+        }
+        if (enableHopperSupport) {
+            hopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
+            hopperAmount = Bukkit.spigot().getConfig().getInt("world-settings.default.hopper-amount");
+            HopperUtils.hopperCheck();
+            HopperUtils.hopperMinecartCheck();
+        }
+
+        disabledWorlds = getConfiguration().getStringList("Options.DisabledWorlds");
+
+        if (updaterTaskID >= 0) {
+            Bukkit.getScheduler().cancelTask(updaterTaskID);
+        }
+        updaterEnabled = getConfiguration().getBoolean("Options.Updater");
+        if (updaterEnabled) {
+            Bukkit.getPluginManager().registerEvents(new Updater(), Bookshelf.plugin);
+        }
+    }
 
     @Override
     @SuppressWarnings("deprecation")
@@ -341,64 +401,4 @@ public class Bookshelf extends JavaPlugin {
         getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] BookShelf has been Disabled!");
     }
 
-    private static void hookMessage(String name) {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
-    }
-
-    public static FileConfiguration getConfiguration() {
-        return Config.getConfig(CONFIG_ID).getConfiguration();
-    }
-
-    public static void loadConfig() {
-        Config config = Config.getConfig(CONFIG_ID);
-        config.reload();
-
-        bookShelfRows = getConfiguration().getInt("Options.BookShelfRows");
-        useWhitelist = getConfiguration().getBoolean("Options.UseWhitelist");
-        whitelist = new HashSet<>(getConfiguration().getStringList("Options.Whitelist"));
-        noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
-        noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
-        bookshelfParticlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
-        bookshelfPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Primary"));
-        bookshelfSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Secondary"));
-
-        enableHopperSupport = getConfiguration().getBoolean("Options.EnableHopperSupport");
-        enableDropperSupport = getConfiguration().getBoolean("Options.EnableDropperSupport");
-        enchantmentTable = getConfiguration().getBoolean("Options.EnableEnchantmentTableBoosting");
-        int eTableChance = getConfiguration().getInt("Options.EnchantmentTableBoostingMaxPercentage");
-        if (eTableChance > 100) {
-            eTableChance = 100;
-        } else if (eTableChance < 0) {
-            eTableChance = 0;
-        }
-        eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
-        enchantingParticlesCount = getConfiguration().getInt("Options.EnchantingParticlesCount");
-        boostingPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Primary"));
-        boostingSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Secondary"));
-
-        lastHopperTime = 0;
-        lastHoppercartTime = 0;
-        if (hopperTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(hopperTaskID);
-        }
-        if (hopperMinecartTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(hopperMinecartTaskID);
-        }
-        if (enableHopperSupport) {
-            hopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
-            hopperAmount = Bukkit.spigot().getConfig().getInt("world-settings.default.hopper-amount");
-            HopperUtils.hopperCheck();
-            HopperUtils.hopperMinecartCheck();
-        }
-
-        disabledWorlds = getConfiguration().getStringList("Options.DisabledWorlds");
-
-        if (updaterTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(updaterTaskID);
-        }
-        updaterEnabled = getConfiguration().getBoolean("Options.Updater");
-        if (updaterEnabled) {
-            Bukkit.getPluginManager().registerEvents(new Updater(), Bookshelf.plugin);
-        }
-    }
 }

@@ -5,14 +5,15 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class CustomListUtils<T> implements Iterable<T> {
+
+    public static <T> CustomListUtils<T> reverse(List<T> original) {
+        return new CustomListUtils<T>(original);
+    }
+
     private final List<T> original;
 
     public CustomListUtils(List<T> original) {
         this.original = original;
-    }
-
-    public static <T> CustomListUtils<T> reverse(List<T> original) {
-        return new CustomListUtils<T>(original);
     }
 
     public Iterator<T> iterator() {
@@ -32,4 +33,5 @@ public class CustomListUtils<T> implements Iterable<T> {
             }
         };
     }
+
 }

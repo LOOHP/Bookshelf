@@ -12,6 +12,11 @@ import org.bukkit.event.HandlerList;
 public class PlayerOpenBookshelfEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     private final Player player;
     private final Block block;
     private final BlockFace blockface;
@@ -26,10 +31,6 @@ public class PlayerOpenBookshelfEvent extends Event implements Cancellable {
         this.block = location.getBlock();
         this.blockface = blockface;
         this.cancelled = cancelled;
-    }
-
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
     }
 
     public Player getPlayer() {

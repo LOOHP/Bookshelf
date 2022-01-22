@@ -330,4 +330,5 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
     public EntryKey key() {
         return KEY;
     }
+
 }
