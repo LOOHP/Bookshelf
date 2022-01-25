@@ -31,14 +31,13 @@ import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.HopperUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.legacy.LegacyConfigConverter;
+import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.simpleyaml.configuration.file.FileConfiguration;
-import org.simpleyaml.exceptions.InvalidConfigurationException;
 
 import java.awt.Color;
 import java.io.File;
@@ -124,7 +123,7 @@ public class Bookshelf extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
     }
 
-    public static FileConfiguration getConfiguration() {
+    public static YamlConfiguration getConfiguration() {
         return Config.getConfig(CONFIG_ID).getConfiguration();
     }
 
@@ -217,7 +216,7 @@ public class Bookshelf extends JavaPlugin {
         }
         try {
             Config.loadConfig(CONFIG_ID, new File(getDataFolder(), "config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), getClass().getClassLoader().getResourceAsStream("config.yml"), true);
-        } catch (IOException | InvalidConfigurationException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
             return;

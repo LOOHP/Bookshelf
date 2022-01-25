@@ -5,7 +5,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>3.0.7.10</version>
+	<version>3.0.7.11</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -49,12 +49,8 @@
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<relocations>
 								<relocation>
-									<pattern>org.simpleyaml</pattern>
-									<shadedPattern>com.loohp.bookshelf.libs.org.simpleyaml</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>org.yaml</pattern>
-									<shadedPattern>com.loohp.bookshelf.libs.org.yaml</shadedPattern>
+									<pattern>com.loohp.yamlconfiguration</pattern>
+									<shadedPattern>com.loohp.interactivechat.libs.com.loohp.yamlconfiguration</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>org.json.simple</pattern>
@@ -226,9 +222,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.github.LOOHP</groupId>
-			<artifactId>Simple-YAML</artifactId>
-			<version>d68cdc3892</version>
+			<groupId>com.loohp</groupId>
+			<artifactId>YamlConfiguration</artifactId>
+			<version>1.0.0.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
