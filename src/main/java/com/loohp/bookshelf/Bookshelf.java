@@ -1,5 +1,6 @@
 package com.loohp.bookshelf;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.loohp.bookshelf.config.Config;
 import com.loohp.bookshelf.debug.Debug;
 import com.loohp.bookshelf.hooks.InteractionVisualizerAnimations;
@@ -49,6 +50,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Bookshelf extends JavaPlugin {
 
@@ -191,6 +197,9 @@ public class Bookshelf extends JavaPlugin {
 
         exactMinecraftVersion = Bukkit.getVersion().substring(Bukkit.getVersion().indexOf("(") + 5, Bukkit.getVersion().indexOf(")"));
         version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
+
+        ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d").build();
+        BookshelfManager.setAsyncExecutor(new ThreadPoolExecutor(8, 16, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), factory));
 
         //Rename old folder
         File pluginFolder = new File(Bukkit.getWorldContainer(), "plugins");
@@ -397,6 +406,10 @@ public class Bookshelf extends JavaPlugin {
             BookshelfManager.getBookshelfManager(world).close();
         }
         getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[Bookshelf] Bookshelves saved! (" + (System.currentTimeMillis() - start) + "ms)");
+        ExecutorService asyncExecutor = BookshelfManager.getAsyncExecutor();
+        if (asyncExecutor != null) {
+            asyncExecutor.shutdown();
+        }
         getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] BookShelf has been Disabled!");
     }
 

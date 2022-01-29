@@ -1,7 +1,6 @@
 package com.loohp.bookshelf;
 
 import com.google.common.collect.Iterables;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
@@ -51,9 +50,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -66,6 +62,16 @@ public class BookshelfManager implements Listener, AutoCloseable {
     public static final int DATA_VERSION = 0;
 
     private static final Map<World, BookshelfManager> BOOKSHELF_MANAGER = Collections.synchronizedMap(new LinkedHashMap<>());
+
+    private static ExecutorService ASYNC_EXECUTOR;
+
+    protected static ExecutorService getAsyncExecutor() {
+        return ASYNC_EXECUTOR;
+    }
+
+    protected static void setAsyncExecutor(ExecutorService asyncExecutor) {
+        ASYNC_EXECUTOR = asyncExecutor;
+    }
 
     public static BookshelfManager getBookshelfManager(World world) {
         return BOOKSHELF_MANAGER.get(world);
@@ -104,15 +110,12 @@ public class BookshelfManager implements Listener, AutoCloseable {
     private final ParticleManager particleManager;
     private final Object lock;
     private final int autoSaveTask;
-    private final ExecutorService asyncExecutor;
     private final AtomicBoolean isClosed;
 
     @SuppressWarnings("unchecked")
     private BookshelfManager(Bookshelf plugin, World world) {
         this.lock = new Object();
         this.isClosed = new AtomicBoolean(false);
-        ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d (" + world.getName() + ")").build();
-        this.asyncExecutor = new ThreadPoolExecutor(8, 16, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), factory);
 
         this.plugin = plugin;
         this.world = world;
@@ -216,14 +219,14 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
     private void executeAsyncTask(Runnable task) {
         if (!isClosed.get()) {
-            asyncExecutor.execute(task);
+            ASYNC_EXECUTOR.execute(task);
         }
     }
 
     private void executeAsyncTaskLater(Runnable task, long delay) {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!isClosed.get()) {
-                asyncExecutor.execute(task);
+                ASYNC_EXECUTOR.execute(task);
             }
         }, delay);
     }
@@ -443,7 +446,6 @@ public class BookshelfManager implements Listener, AutoCloseable {
             Bukkit.getConsoleSender().sendMessage("[Bookshelf] (" + world.getName() + "): All bookshelves are saved");
         }
         isClosed.set(true);
-        asyncExecutor.shutdown();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
