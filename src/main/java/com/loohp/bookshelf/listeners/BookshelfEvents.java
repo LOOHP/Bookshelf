@@ -29,7 +29,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -134,7 +133,7 @@ public class BookshelfEvents implements Listener {
         if (manager == null) {
             return;
         }
-        BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), null);
+        BookshelfHolder bookshelf = manager.getOrCreateBookshelf(new BlockPosition(event.getBlock()), null);
 
         ItemStack item = event.getItemInHand();
         if (NBTEditor.contains(item, "BookshelfContent")) {
@@ -178,7 +177,7 @@ public class BookshelfEvents implements Listener {
         if (manager == null) {
             return;
         }
-        BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getBlock()), null);
+        BookshelfHolder bookshelf = manager.getOrCreateBookshelf(new BlockPosition(event.getBlock()), null);
         Inventory inv = bookshelf.getInventory();
         for (ItemStack item : inv.getContents()) {
             if (item != null && !item.getType().equals(Material.AIR)) {
@@ -198,7 +197,7 @@ public class BookshelfEvents implements Listener {
         List<Block> order = new ArrayList<>();
         for (Block block : event.blockList()) {
             if (block.getType().equals(Material.BOOKSHELF)) {
-                position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null));
+                position.put(block, manager.getOrCreateBookshelf(new BlockPosition(block), null));
                 order.add(block);
             }
         }
@@ -229,7 +228,7 @@ public class BookshelfEvents implements Listener {
         List<Block> order = new ArrayList<>();
         for (Block block : event.blockList()) {
             if (block.getType().equals(Material.BOOKSHELF)) {
-                position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null));
+                position.put(block, manager.getOrCreateBookshelf(new BlockPosition(block), null));
                 order.add(block);
             }
         }
@@ -463,7 +462,7 @@ public class BookshelfEvents implements Listener {
         if (manager == null) {
             return;
         }
-        BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(event.getClickedBlock()), null);
+        BookshelfHolder bookshelf = manager.getOrCreateBookshelf(new BlockPosition(event.getClickedBlock()), null);
         if (Bookshelf.lwcHook) {
             Location blockLoc = bookshelf.getPosition().getLocation();
             Protection protection = LWC.getInstance().getPlugin().getLWC().findProtection(blockLoc.getBlock());

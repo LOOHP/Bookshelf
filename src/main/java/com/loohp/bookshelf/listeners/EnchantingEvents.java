@@ -57,7 +57,7 @@ public class EnchantingEvents implements Listener {
             return;
         }
         for (Block block : blocks) {
-            BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(block), null);
+            BookshelfHolder bookshelf = manager.getOrCreateBookshelf(new BlockPosition(block), null);
             Inventory inv = bookshelf.getInventory();
             for (int i = 0; i < inv.getSize(); i++) {
                 ItemStack item = inv.getItem(i);

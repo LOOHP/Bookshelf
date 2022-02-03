@@ -277,7 +277,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
     }
 
     @SuppressWarnings("deprecation")
-    public BookshelfHolder getOrCreateBookself(BlockPosition position, String title) {
+    public BookshelfHolder getOrCreateBookshelf(BlockPosition position, String title) {
         if (!position.getWorld().equals(world)) {
             return null;
         }

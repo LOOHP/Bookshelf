@@ -33,7 +33,7 @@ public class PistonEvents implements Listener {
         List<Block> order = new ArrayList<>();
         for (Block block : event.getBlocks()) {
             if (block.getType().equals(Material.BOOKSHELF)) {
-                position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null).getPosition());
+                position.put(block, manager.getOrCreateBookshelf(new BlockPosition(block), null).getPosition());
                 order.add(block);
             }
         }
@@ -62,7 +62,7 @@ public class PistonEvents implements Listener {
         List<Block> order = new ArrayList<>();
         for (Block block : event.getBlocks()) {
             if (block.getType().equals(Material.BOOKSHELF)) {
-                position.put(block, manager.getOrCreateBookself(new BlockPosition(block), null).getPosition());
+                position.put(block, manager.getOrCreateBookshelf(new BlockPosition(block), null).getPosition());
                 order.add(block);
             }
         }

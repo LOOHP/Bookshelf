@@ -45,7 +45,7 @@ public class DispenserEvents implements Listener {
         if (manager == null) {
             return;
         }
-        BookshelfHolder bookshelf = manager.getOrCreateBookself(new BlockPosition(relative), null);
+        BookshelfHolder bookshelf = manager.getOrCreateBookshelf(new BlockPosition(relative), null);
         if (Bookshelf.lwcHook) {
             if (!LWCUtils.checkHopperFlagIn(relative)) {
                 event.setCancelled(true);
