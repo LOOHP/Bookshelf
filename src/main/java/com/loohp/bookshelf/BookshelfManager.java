@@ -289,7 +289,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         if (bookshelf == null) {
             bookshelf = new BookshelfHolder(position, title, null);
             Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title);
-            bookshelf.setInventory(inventory);
+            bookshelf.getUnsafe().setInventory(inventory);
             chunkEntry.put(position, bookshelf);
         }
         return bookshelf;
@@ -312,7 +312,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         originalChunkEntry.remove(position);
         BlockPosition newPos = new BlockPosition(world, x, y, z);
         ChunkPosition newChunkPosition = newPos.getChunkPosition();
-        bookshelf.setPosition(newPos);
+        bookshelf.getUnsafe().setPosition(newPos);
         if (newChunkPosition.equals(originalChunkPosition)) {
             originalChunkEntry.put(newPos, bookshelf);
         } else {
@@ -369,7 +369,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
                             String title = entry.containsKey("Title") ? entry.get("Title").toString() : null;
                             BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
                             Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title, bookshelf);
-                            bookshelf.setInventory(inventory);
+                            bookshelf.getUnsafe().setInventory(inventory);
                             chunkEntry.put(position, bookshelf);
                         }
                     }

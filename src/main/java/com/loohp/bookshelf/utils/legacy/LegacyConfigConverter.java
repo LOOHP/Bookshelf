@@ -60,7 +60,7 @@ public class LegacyConfigConverter {
                     String title = entry.get("Title").toString();
                     BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
                     Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title, bookshelf);
-                    bookshelf.setInventory(inventory);
+                    bookshelf.getUnsafe().setInventory(inventory);
                     chunkEntry.put(position, bookshelf);
                     itr.remove();
                 } catch (Throwable e) {

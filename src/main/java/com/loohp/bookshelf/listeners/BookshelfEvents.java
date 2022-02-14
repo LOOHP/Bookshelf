@@ -143,8 +143,8 @@ public class BookshelfEvents implements Listener {
             }
             String hash = NBTEditor.getString(item, "BookshelfContent");
             try {
-                bookshelf.setInventory(BookshelfUtils.fromBase64(hash, title == null ? BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title, bookshelf));
-                bookshelf.setTitle(title);
+                bookshelf.getUnsafe().setInventory(BookshelfUtils.fromBase64(hash, title == null ? BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title, bookshelf));
+                bookshelf.getUnsafe().setTitle(title);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -160,8 +160,8 @@ public class BookshelfEvents implements Listener {
             }
         }
         try {
-            bookshelf.setInventory(BookshelfUtils.fromBase64(BookshelfUtils.toBase64(bookshelf.getInventory()), bsTitle == null ? BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : bsTitle, bookshelf));
-            bookshelf.setTitle(bsTitle);
+            bookshelf.getUnsafe().setInventory(BookshelfUtils.fromBase64(BookshelfUtils.toBase64(bookshelf.getInventory()), bsTitle == null ? BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : bsTitle, bookshelf));
+            bookshelf.getUnsafe().setTitle(bsTitle);
         } catch (IllegalStateException | IOException e) {
             e.printStackTrace();
         }

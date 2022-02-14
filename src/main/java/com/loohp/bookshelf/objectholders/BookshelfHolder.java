@@ -9,34 +9,21 @@ public class BookshelfHolder implements InventoryHolder {
     private String title;
     private Inventory inventory;
 
+    private Unsafe unsafe;
+
     public BookshelfHolder(BlockPosition position, String title, Inventory inventory) {
         this.position = position;
         this.title = title;
         this.inventory = inventory;
+        this.unsafe = null;
     }
 
     public BlockPosition getPosition() {
         return position;
     }
 
-    /**
-     * <b>Dangerous, non-deterministic behavior if not used correctly</b>
-     */
-    @Deprecated
-    public void setPosition(BlockPosition position) {
-        this.position = position;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    /**
-     * <b>Dangerous, non-deterministic behavior if not used correctly</b>
-     */
-    @Deprecated
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     @Override
@@ -44,12 +31,53 @@ public class BookshelfHolder implements InventoryHolder {
         return inventory;
     }
 
-    /**
-     * <b>Dangerous, non-deterministic behavior if not used correctly</b>
-     */
+    @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"})
     @Deprecated
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
+    public Unsafe getUnsafe() {
+        if (unsafe != null) {
+            return unsafe;
+        }
+        BookshelfHolder thisRef = this;
+        return unsafe = new Unsafe() {
+            @Deprecated
+            public void setPosition(BlockPosition position) {
+                thisRef.position = position;
+            }
+
+            @Deprecated
+            public void setTitle(String title) {
+                thisRef.title = title;
+            }
+
+            @Deprecated
+            public void setInventory(Inventory inventory) {
+                thisRef.inventory = inventory;
+            }
+        };
+    }
+
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated
+    public interface Unsafe {
+
+        /**
+         * <b>Dangerous, non-deterministic behavior if not used correctly</b>
+         */
+        @Deprecated
+        void setPosition(BlockPosition position);
+
+        /**
+         * <b>Dangerous, non-deterministic behavior if not used correctly</b>
+         */
+        @Deprecated
+        void setTitle(String title);
+
+        /**
+         * <b>Dangerous, non-deterministic behavior if not used correctly</b>
+         */
+        @Deprecated
+        void setInventory(Inventory inventory);
+
     }
 
 }
