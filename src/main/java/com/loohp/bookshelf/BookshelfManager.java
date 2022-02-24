@@ -358,7 +358,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         }
         Inventory inv = bookshelf.getInventory();
         List<HumanEntity> viewers = inv.getViewers();
-        for (HumanEntity player : viewers.toArray(new HumanEntity[viewers.size()])) {
+        for (HumanEntity player : viewers.toArray(new HumanEntity[0])) {
             player.closeInventory();
         }
         chunkEntry.remove(position);
