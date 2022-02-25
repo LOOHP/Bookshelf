@@ -269,7 +269,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
             return;
         }
         executeAsyncTask(() -> {
-            loadChunk(new ChunkPosition(event.getChunk()), true);
+            loadChunk(new ChunkPosition(event.getChunk()), false);
         });
     }
 
@@ -294,6 +294,21 @@ public class BookshelfManager implements Listener, AutoCloseable {
             itr = Iterables.concat(itr, map.values());
         }
         return Iterables.unmodifiableIterable(itr);
+    }
+
+    public BookshelfHolder createOrReplaceBookshelf(BlockPosition position, String title) {
+        if (!position.getWorld().equals(world)) {
+            return null;
+        }
+        Map<BlockPosition, BookshelfHolder> chunkEntry = loadedBookshelves.get(position.getChunkPosition());
+        if (chunkEntry == null) {
+            chunkEntry = loadChunk(position.getChunkPosition(), false);
+        }
+        BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
+        Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title);
+        bookshelf.getUnsafe().setInventory(inventory);
+        chunkEntry.put(position, bookshelf);
+        return bookshelf;
     }
 
     @SuppressWarnings("deprecation")
@@ -384,7 +399,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
                     for (Object obj : json.keySet()) {
                         String key = obj.toString();
                         BlockPosition position = BookshelfUtils.keyPos(world, key);
-                        if (!checkPresence || position.getBlock().getType().equals(Material.BOOKSHELF)) {
+                        if (!checkPresence || checkIfLocationIsBookshelf(position)) {
                             JSONObject entry = (JSONObject) json.get(key);
                             String title = entry.containsKey("Title") ? entry.get("Title").toString() : null;
                             BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
@@ -399,6 +414,14 @@ public class BookshelfManager implements Listener, AutoCloseable {
             }
             return chunkEntry;
         }
+    }
+
+    private boolean checkIfLocationIsBookshelf(BlockPosition position) {
+        if (!Bukkit.isPrimaryThread()) {
+            new RuntimeException("Async block type check! Assuming True!").printStackTrace();
+            return true;
+        }
+        return position.getBlock().getType().equals(Material.BOOKSHELF);
     }
 
     @SuppressWarnings("unchecked")

@@ -153,7 +153,7 @@ public class BookshelfEvents implements Listener {
         if (manager == null) {
             return;
         }
-        BookshelfHolder bookshelf = manager.getOrCreateBookshelf(new BlockPosition(event.getBlock()), null);
+        BookshelfHolder bookshelf = manager.createOrReplaceBookshelf(new BlockPosition(event.getBlock()), null);
 
         ItemStack item = event.getItemInHand();
         if (NBTEditor.contains(item, "BookshelfContent")) {
