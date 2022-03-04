@@ -65,21 +65,23 @@ public class PacketListenerEvents implements Listener {
         try {
             craftPlayerClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftPlayer");
             craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
-            try {
-                playerConnectionField = craftPlayerGetHandleMethod.getReturnType().getField("playerConnection");
-            } catch (NoSuchFieldException e) {
-                playerConnectionField = craftPlayerGetHandleMethod.getReturnType().getField("b");
-            }
-            try {
-                networkManagerField = playerConnectionField.getType().getField("networkManager");
-            } catch (NoSuchFieldException e) {
-                networkManagerField = playerConnectionField.getType().getField("a");
-            }
-            try {
-                channelField = networkManagerField.getType().getField("channel");
-            } catch (NoSuchFieldException e) {
-                channelField = networkManagerField.getType().getField("k");
-            }
+            playerConnectionField = NMSUtils.reflectiveLookup(Field.class, () -> {
+                return craftPlayerGetHandleMethod.getReturnType().getField("playerConnection");
+            }, () -> {
+                return craftPlayerGetHandleMethod.getReturnType().getField("b");
+            });
+            networkManagerField = NMSUtils.reflectiveLookup(Field.class, () -> {
+                return playerConnectionField.getType().getField("networkManager");
+            }, () -> {
+                return playerConnectionField.getType().getField("a");
+            });
+            channelField = NMSUtils.reflectiveLookup(Field.class, () -> {
+                return networkManagerField.getType().getField("channel");
+            }, () -> {
+                return networkManagerField.getType().getField("k");
+            }, () -> {
+                return networkManagerField.getType().getField("m");
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }

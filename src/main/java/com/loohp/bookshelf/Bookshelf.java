@@ -58,6 +58,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.awt.Color;
@@ -151,6 +152,11 @@ public class Bookshelf extends JavaPlugin {
 
     public static YamlConfiguration getConfiguration() {
         return Config.getConfig(CONFIG_ID).getConfiguration();
+    }
+
+    public static boolean isPluginEnabled(String name) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
+        return plugin != null && plugin.isEnabled();
     }
 
     public static void loadConfig() {
@@ -253,107 +259,107 @@ public class Bookshelf extends JavaPlugin {
 
         String SuperVanish = "SuperVanish";
         String PremiumVanish = "PremiumVanish";
-        if (getServer().getPluginManager().getPlugin(SuperVanish) != null || getServer().getPluginManager().getPlugin(PremiumVanish) != null) {
+        if (isPluginEnabled(SuperVanish) || isPluginEnabled(PremiumVanish)) {
             hookMessage(SuperVanish + "/" + PremiumVanish);
             vanishHook = true;
         }
 
         String CMI = "CMI";
-        if (getServer().getPluginManager().getPlugin(CMI) != null) {
+        if (isPluginEnabled(CMI)) {
             hookMessage(CMI);
             cmiHook = true;
         }
 
         String Essentials = "Essentials";
-        if (getServer().getPluginManager().getPlugin(Essentials) != null) {
+        if (isPluginEnabled(Essentials)) {
             hookMessage(Essentials);
             essentialsHook = true;
         }
 
         String OpenInv = "OpenInv";
-        if (getServer().getPluginManager().getPlugin(OpenInv) != null) {
+        if (isPluginEnabled(OpenInv)) {
             hookMessage(OpenInv);
             openInvHook = true;
         }
 
         String GriefPrevention = "GriefPrevention";
-        if (getServer().getPluginManager().getPlugin("GriefPrevention") != null) {
+        if (isPluginEnabled("GriefPrevention")) {
             hookMessage(GriefPrevention);
             getServer().getPluginManager().registerEvents(new GriefPreventionEvents(), this);
             griefPreventionHook = true;
         }
 
         String LWC = "LWC";
-        if (getServer().getPluginManager().getPlugin(LWC) != null) {
+        if (isPluginEnabled(LWC)) {
             hookMessage(LWC);
             LWCEvents.hookLWC();
             lwcHook = true;
         }
 
         String BlockLocker = "BlockLocker";
-        if (getServer().getPluginManager().getPlugin(BlockLocker) != null) {
+        if (isPluginEnabled(BlockLocker)) {
             hookMessage(BlockLocker);
             blockLockerHook = true;
         }
 
         String WorldGuard = "WorldGuard";
-        if (getServer().getPluginManager().getPlugin(WorldGuard) != null) {
+        if (isPluginEnabled(WorldGuard)) {
             hookMessage(WorldGuard);
             getServer().getPluginManager().registerEvents(new WorldGuardEvents(), this);
             worldGuardHook = true;
         }
 
         String RedProtect = "RedProtect";
-        if (getServer().getPluginManager().getPlugin(RedProtect) != null) {
+        if (isPluginEnabled(RedProtect)) {
             hookMessage(RedProtect);
             getServer().getPluginManager().registerEvents(new RedProtectEvents(), this);
             redProtectHook = true;
         }
 
         String BentoBox = "BentoBox";
-        if (getServer().getPluginManager().getPlugin(BentoBox) != null) {
+        if (isPluginEnabled(BentoBox)) {
             hookMessage(BentoBox);
             getServer().getPluginManager().registerEvents(new BentoBoxEvents(), this);
             bentoBoxHook = true;
         }
 
         String ASkyBlock = "ASkyBlock";
-        if (getServer().getPluginManager().getPlugin(ASkyBlock) != null) {
+        if (isPluginEnabled(ASkyBlock)) {
             hookMessage(ASkyBlock);
             getServer().getPluginManager().registerEvents(new ASkyBlockEvents(), this);
             aSkyBlockHook = true;
         }
 
         String Residence = "Residence";
-        if (getServer().getPluginManager().getPlugin(Residence) != null) {
+        if (isPluginEnabled(Residence)) {
             hookMessage(Residence);
             getServer().getPluginManager().registerEvents(new ResidenceEvents(), this);
             residenceHook = true;
         }
 
         String Towny = "Towny";
-        if (getServer().getPluginManager().getPlugin(Towny) != null) {
+        if (isPluginEnabled(Towny)) {
             hookMessage(Towny);
             getServer().getPluginManager().registerEvents(new TownyEvents(), this);
             townyHook = true;
         }
 
         String SuperiorSkyblock2 = "SuperiorSkyblock2";
-        if (getServer().getPluginManager().getPlugin(SuperiorSkyblock2) != null) {
+        if (isPluginEnabled(SuperiorSkyblock2)) {
             hookMessage(SuperiorSkyblock2);
             getServer().getPluginManager().registerEvents(new SuperiorSkyblock2Events(), this);
             superiorSkyblock2Hook = true;
         }
 
         String Lands = "Lands";
-        if (getServer().getPluginManager().getPlugin(Lands) != null) {
+        if (isPluginEnabled(Lands)) {
             hookMessage(Lands);
             getServer().getPluginManager().registerEvents(new LandEvents(), this);
             landsHook = true;
         }
 
         String PlotSquared = "PlotSquared";
-        if (getServer().getPluginManager().getPlugin(PlotSquared) != null) {
+        if (isPluginEnabled(PlotSquared)) {
             String plotSquaredVersion = getServer().getPluginManager().getPlugin(PlotSquared).getDescription().getVersion();
             if (plotSquaredVersion.startsWith("6.")) {
                 hookMessage(PlotSquared + " (v6)");
@@ -373,14 +379,14 @@ public class Bookshelf extends JavaPlugin {
         }
 
         String GriefDefender = "GriefDefender";
-        if (getServer().getPluginManager().getPlugin(GriefDefender) != null) {
+        if (isPluginEnabled(GriefDefender)) {
             hookMessage(GriefDefender);
             getServer().getPluginManager().registerEvents(new GriefDefenderEvents(), this);
             griefDefenderHook = true;
         }
 
         String InteractionVisualizer = "InteractionVisualizer";
-        if (getServer().getPluginManager().getPlugin(InteractionVisualizer) != null) {
+        if (isPluginEnabled(InteractionVisualizer)) {
             hookMessage(InteractionVisualizer);
             InteractionVisualizerAnimations iva = new InteractionVisualizerAnimations();
             iva.register();
