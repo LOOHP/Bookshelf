@@ -24,6 +24,7 @@ import com.griefdefender.api.ClanPlayer;
 import com.griefdefender.api.GriefDefender;
 import com.griefdefender.api.claim.Claim;
 import com.griefdefender.api.claim.TrustTypes;
+import com.griefdefender.api.provider.ClanProvider;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import org.bukkit.entity.Player;
@@ -43,7 +44,11 @@ public class GriefDefenderEvents implements Listener {
         Player player = event.getPlayer();
 
         Claim claim = GriefDefender.getCore().getClaimAt(event.getLocation());
-        ClanPlayer clanPlayer = GriefDefender.getCore().getClanProvider().getClanPlayer(player.getUniqueId());
+        ClanProvider clanProvider = GriefDefender.getCore().getClanProvider();
+        ClanPlayer clanPlayer = null;
+        if (clanProvider != null) {
+            clanPlayer = clanProvider.getClanPlayer(player.getUniqueId());
+        }
 
         if (claim == null) {
             return;
