@@ -50,7 +50,7 @@ public class GriefDefenderEvents implements Listener {
             clanPlayer = clanProvider.getClanPlayer(player.getUniqueId());
         }
 
-        if (claim == null) {
+        if (claim == null || claim.isWilderness()) {
             return;
         }
 
