@@ -68,6 +68,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -143,6 +144,8 @@ public class Bookshelf extends JavaPlugin {
 
     public static List<String> disabledWorlds = new ArrayList<>();
 
+    public static Optional<String> bookshelfDefaultName = Optional.empty();
+
     public static boolean updaterEnabled = true;
     public static int updaterTaskID = -1;
 
@@ -202,6 +205,8 @@ public class Bookshelf extends JavaPlugin {
         }
 
         disabledWorlds = getConfiguration().getStringList("Options.DisabledWorlds");
+
+        bookshelfDefaultName = getConfiguration().contains("Options.BookshelfDefaultName") ? Optional.of(getConfiguration().getString("Options.BookshelfDefaultName")) : Optional.empty();
 
         if (updaterTaskID >= 0) {
             Bukkit.getScheduler().cancelTask(updaterTaskID);

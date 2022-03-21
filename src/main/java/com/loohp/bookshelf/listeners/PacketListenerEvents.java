@@ -111,7 +111,7 @@ public class PacketListenerEvents implements Listener {
             Future<?> future = channel.eventLoop().submit(() -> {
                 try {
                     channel.pipeline().remove(CHANNEL_NAME);
-                } catch (Throwable e) {
+                } catch (Throwable ignored) {
                 }
             });
             Bukkit.getScheduler().runTaskAsynchronously(Bookshelf.plugin, () -> {
@@ -126,7 +126,7 @@ public class PacketListenerEvents implements Listener {
                             if (packet != null) {
                                 if (nmsPacketPlayOutOpenWindowClass.isInstance(packet)) {
                                     nmsPacketPlayOutOpenWindowTitleField.setAccessible(true);
-                                    if (ChatColor.stripColor(craftChatMessageFromComponentMethod.invoke(null, nmsPacketPlayOutOpenWindowTitleField.get(packet)).toString()).equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_PLACEHOLDER)) {
+                                    if (ChatColor.stripColor(craftChatMessageFromComponentMethod.invoke(null, nmsPacketPlayOutOpenWindowTitleField.get(packet)).toString()).equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
                                         nmsPacketPlayOutOpenWindowTitleField.set(packet, nmsChatSerializerFromJSONMethod.invoke(null, BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
                                     }
                                 }
@@ -153,7 +153,7 @@ public class PacketListenerEvents implements Listener {
             channel.eventLoop().submit(() -> {
                 try {
                     channel.pipeline().remove(CHANNEL_NAME);
-                } catch (Throwable e) {
+                } catch (Throwable ignored) {
                 }
             });
         } catch (Throwable e) {

@@ -76,7 +76,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BookshelfManager implements Listener, AutoCloseable {
 
-    public static final String DEFAULT_BOOKSHELF_NAME_PLACEHOLDER = "\0\0\0DEFAULT\0\0\0";
+    public static final String DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER = "\0\0\0DEFAULT\0\0\0";
     public static final String DEFAULT_BOOKSHELF_NAME_JSON = ComponentSerializer.toString(new TranslatableComponent(Bookshelf.version.isLegacy() ? "tile.bookshelf.name" : "block.minecraft.bookshelf"));
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     public static final int DATA_VERSION = 0;
@@ -95,6 +95,10 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
     public static BookshelfManager getBookshelfManager(World world) {
         return BOOKSHELF_MANAGER.get(world);
+    }
+
+    public static String getBookshelfDefaultName() {
+        return Bookshelf.bookshelfDefaultName.orElse(DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER);
     }
 
     public static Set<World> getWorlds() {
@@ -194,14 +198,14 @@ public class BookshelfManager implements Listener, AutoCloseable {
             }
         }
 
-        int spawnchunks = world.getLoadedChunks().length;
+        int spawnChunks = world.getLoadedChunks().length;
         AtomicInteger done = new AtomicInteger(0);
 
         executeAsyncTask(() -> {
             long start = System.currentTimeMillis();
             long lastDone = 0;
-            while (done.get() < spawnchunks) {
-                Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks in " + world.getName() + ": " + Math.round(((double) done.get() / (double) spawnchunks) * 100) + "%");
+            while (done.get() < spawnChunks) {
+                Bukkit.getConsoleSender().sendMessage("[Bookshelf] Preparing bookshelves in spawn chunks in " + world.getName() + ": " + Math.round(((double) done.get() / (double) spawnChunks) * 100) + "%");
                 if ((System.currentTimeMillis() - start) > 30000) {
                     return;
                 }
@@ -305,7 +309,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
             chunkEntry = loadChunk(position.getChunkPosition(), false);
         }
         BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
-        Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title);
+        Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? getBookshelfDefaultName() : title);
         bookshelf.getUnsafe().setInventory(inventory);
         chunkEntry.put(position, bookshelf);
         return bookshelf;
@@ -323,7 +327,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         BookshelfHolder bookshelf = chunkEntry.get(position);
         if (bookshelf == null) {
             bookshelf = new BookshelfHolder(position, title, null);
-            Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title);
+            Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? getBookshelfDefaultName() : title);
             bookshelf.getUnsafe().setInventory(inventory);
             chunkEntry.put(position, bookshelf);
         }
@@ -403,7 +407,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
                             JSONObject entry = (JSONObject) json.get(key);
                             String title = entry.containsKey("Title") ? entry.get("Title").toString() : null;
                             BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
-                            Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title == null ? DEFAULT_BOOKSHELF_NAME_PLACEHOLDER : title, bookshelf);
+                            Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title == null ? getBookshelfDefaultName() : title, bookshelf);
                             bookshelf.getUnsafe().setInventory(inventory);
                             chunkEntry.put(position, bookshelf);
                         }
