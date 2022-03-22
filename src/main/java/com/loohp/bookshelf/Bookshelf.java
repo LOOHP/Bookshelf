@@ -206,7 +206,7 @@ public class Bookshelf extends JavaPlugin {
 
         disabledWorlds = getConfiguration().getStringList("Options.DisabledWorlds");
 
-        bookshelfDefaultName = getConfiguration().contains("Options.BookshelfDefaultName") ? Optional.of(getConfiguration().getString("Options.BookshelfDefaultName")) : Optional.empty();
+        bookshelfDefaultName = getConfiguration().contains("Options.BookshelfDefaultName") ? Optional.of(ChatColor.translateAlternateColorCodes('&', getConfiguration().getString("Options.BookshelfDefaultName"))) : Optional.empty();
 
         if (updaterTaskID >= 0) {
             Bukkit.getScheduler().cancelTask(updaterTaskID);
