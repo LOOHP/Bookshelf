@@ -29,6 +29,7 @@ import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
 import com.loohp.bookshelf.utils.BookshelfUtils;
+import com.loohp.bookshelf.utils.WorldUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -143,12 +144,21 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
         this.plugin = plugin;
         this.world = world;
-        if (world.getEnvironment().equals(Environment.NETHER)) {
-            this.bookshelfFolder = new File(world.getWorldFolder(), "DIM-1/bookshelf");
-        } else if (world.getEnvironment().equals(Environment.THE_END)) {
-            this.bookshelfFolder = new File(world.getWorldFolder(), "DIM1/bookshelf");
-        } else {
+
+        Environment environment = world.getEnvironment();
+        if (environment.equals(Environment.NORMAL)) {
             this.bookshelfFolder = new File(world.getWorldFolder(), "bookshelf");
+        } else if (environment.equals(Environment.NETHER)) {
+            this.bookshelfFolder = new File(world.getWorldFolder(), "DIM-1/bookshelf");
+        } else if (environment.equals(Environment.THE_END)) {
+            this.bookshelfFolder = new File(world.getWorldFolder(), "DIM1/bookshelf");
+        } else if (environment.equals(Environment.CUSTOM)) {
+            String namespacedKey = WorldUtils.getNamespacedKey(world);
+            @SuppressWarnings("ConstantConditions")
+            String key = namespacedKey.substring(namespacedKey.indexOf(":") + 1);
+            this.bookshelfFolder = new File(world.getWorldFolder(), key + "/bookshelf");
+        } else {
+            throw new UnsupportedOperationException("Dimension type " + environment + " not supported yet!");
         }
         this.bookshelfFolder.mkdirs();
         this.loadedBookshelves = new ConcurrentHashMap<>();
