@@ -299,7 +299,10 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
-        executeAsyncTaskLater(() -> close(), 10);
+        if (!event.getWorld().equals(world)) {
+            return;
+        }
+        close();
     }
 
     public Iterable<BookshelfHolder> getLoadedBookshelves() {

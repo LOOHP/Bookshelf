@@ -230,7 +230,7 @@ public class Bookshelf extends JavaPlugin {
         version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 
         ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d").build();
-        BookshelfManager.setAsyncExecutor(new ThreadPoolExecutor(0, Integer.MAX_VALUE, 15L, TimeUnit.SECONDS, new SynchronousQueue<>(true), factory));
+        BookshelfManager.setAsyncExecutor(new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(true), factory));
 
         //Rename old folder
         File pluginFolder = new File(Bukkit.getWorldContainer(), "plugins");
