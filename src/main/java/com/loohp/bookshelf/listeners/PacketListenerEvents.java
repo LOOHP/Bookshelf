@@ -156,8 +156,7 @@ public class PacketListenerEvents implements Listener {
                 } catch (Throwable ignored) {
                 }
             });
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Throwable ignored) {
         }
     }
 
