@@ -22,6 +22,7 @@ package com.loohp.bookshelf.utils;
 
 import com.loohp.bookshelf.Bookshelf;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,16 +48,25 @@ public class WorldUtils {
     }
 
     public static String getNamespacedKey(World world) {
-        if (Bookshelf.version.isOlderThan(MCVersion.V1_16)) {
-            throw new RuntimeException("getNamespacedKey(world) can only be called on Minecraft version 1.16 or above");
-        }
-        try {
-            Object craftWorldObject = craftWorldClass.cast(world);
-            Object nmsWorldServerObject = getHandleMethod.invoke(craftWorldObject);
-            Object nmsResourceKeyObject = getWorldTypeKeyMethod.invoke(nmsWorldServerObject);
-            return getMinecraftKeyMethod.invoke(nmsResourceKeyObject).toString();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_16)) {
+            try {
+                Object craftWorldObject = craftWorldClass.cast(world);
+                Object nmsWorldServerObject = getHandleMethod.invoke(craftWorldObject);
+                Object nmsResourceKeyObject = getWorldTypeKeyMethod.invoke(nmsWorldServerObject);
+                return getMinecraftKeyMethod.invoke(nmsResourceKeyObject).toString();
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else {
+            if (world.getEnvironment().equals(Environment.NORMAL)) {
+                return "minecraft:overworld";
+            } else if (world.getEnvironment().equals(Environment.NETHER)) {
+                return "minecraft:the_nether";
+            } else if (world.getEnvironment().equals(Environment.THE_END)) {
+                return "minecraft:the_end";
+            } else {
+                return "minecraft:custom";
+            }
         }
         return null;
     }
