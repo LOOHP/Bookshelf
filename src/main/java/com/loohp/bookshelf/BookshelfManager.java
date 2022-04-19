@@ -152,13 +152,19 @@ public class BookshelfManager implements Listener, AutoCloseable {
             this.bookshelfFolder = new File(world.getWorldFolder(), "DIM-1/bookshelf");
         } else if (environment.equals(Environment.THE_END)) {
             this.bookshelfFolder = new File(world.getWorldFolder(), "DIM1/bookshelf");
-        } else if (environment.equals(Environment.CUSTOM)) {
-            String namespacedKey = WorldUtils.getNamespacedKey(world);
-            @SuppressWarnings("ConstantConditions")
-            String key = namespacedKey.substring(namespacedKey.indexOf(":") + 1);
-            this.bookshelfFolder = new File(world.getWorldFolder(), key + "/bookshelf");
         } else {
-            throw new UnsupportedOperationException("Dimension type " + environment + " not supported yet!");
+            try {
+                if (environment.equals(Environment.CUSTOM)) {
+                    String namespacedKey = WorldUtils.getNamespacedKey(world);
+                    @SuppressWarnings("ConstantConditions")
+                    String key = namespacedKey.substring(namespacedKey.indexOf(":") + 1);
+                    this.bookshelfFolder = new File(world.getWorldFolder(), key + "/bookshelf");
+                } else {
+                    throw new UnsupportedOperationException("Dimension type " + environment + " of world " + world.getName() + " not supported yet!");
+                }
+            } catch (Throwable e) {
+                throw new UnsupportedOperationException("Dimension type " + environment + " of world " + world.getName() + " not supported yet!");
+            }
         }
         this.bookshelfFolder.mkdirs();
         this.loadedBookshelves = new ConcurrentHashMap<>();

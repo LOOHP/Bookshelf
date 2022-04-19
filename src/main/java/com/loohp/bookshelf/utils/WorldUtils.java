@@ -20,20 +20,18 @@
 
 package com.loohp.bookshelf.utils;
 
+import com.loohp.bookshelf.Bookshelf;
 import org.bukkit.World;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class WorldUtils {
 
     private static Class<?> craftWorldClass;
     private static Method getHandleMethod;
     private static Class<?> worldServerClass;
-    private static Class<?> dimensionManagerClass;
-    private static Method getDimensionManagerMethod;
-    private static Class<?> minecraftKeyClass;
+    private static Method getWorldTypeKeyMethod;
     private static Method getMinecraftKeyMethod;
 
     static {
@@ -41,39 +39,22 @@ public class WorldUtils {
             craftWorldClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.CraftWorld");
             getHandleMethod = craftWorldClass.getMethod("getHandle");
             worldServerClass = getHandleMethod.getReturnType();
-            dimensionManagerClass = NMSUtils.getNMSClass("net.minecraft.server.%s.DimensionManager", "net.minecraft.world.level.dimension.DimensionManager");
-            getDimensionManagerMethod = Arrays.stream(worldServerClass.getMethods()).filter(each -> each.getReturnType().equals(dimensionManagerClass)).findFirst().get();
-            minecraftKeyClass = NMSUtils.getNMSClass("net.minecraft.server.%s.MinecraftKey", "net.minecraft.resources.MinecraftKey");
-            getMinecraftKeyMethod = NMSUtils.reflectiveLookup(Method.class, () -> {
-                Method method = dimensionManagerClass.getMethod("a");
-                if (!method.getReturnType().equals(minecraftKeyClass)) {
-                    throw new NoSuchMethodException();
-                }
-                return method;
-            }, () -> {
-                Method method = dimensionManagerClass.getMethod("r");
-                if (!method.getReturnType().equals(minecraftKeyClass)) {
-                    throw new NoSuchMethodException();
-                }
-                return method;
-            }, () -> {
-                Method method = dimensionManagerClass.getMethod("p");
-                if (!method.getReturnType().equals(minecraftKeyClass)) {
-                    throw new NoSuchMethodException();
-                }
-                return method;
-            });
+            getWorldTypeKeyMethod = worldServerClass.getMethod("getTypeKey");
+            getMinecraftKeyMethod = getWorldTypeKeyMethod.getReturnType().getMethod("a");
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
     }
 
     public static String getNamespacedKey(World world) {
+        if (Bookshelf.version.isOlderThan(MCVersion.V1_16)) {
+            throw new RuntimeException("getNamespacedKey(world) can only be called on Minecraft version 1.16 or above");
+        }
         try {
             Object craftWorldObject = craftWorldClass.cast(world);
             Object nmsWorldServerObject = getHandleMethod.invoke(craftWorldObject);
-            Object nmsDimensionManagerObject = getDimensionManagerMethod.invoke(nmsWorldServerObject);
-            return getMinecraftKeyMethod.invoke(nmsDimensionManagerObject).toString();
+            Object nmsResourceKeyObject = getWorldTypeKeyMethod.invoke(nmsWorldServerObject);
+            return getMinecraftKeyMethod.invoke(nmsResourceKeyObject).toString();
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
