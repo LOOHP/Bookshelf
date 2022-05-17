@@ -55,12 +55,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -178,7 +177,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
             dataJson.put("MinecraftVersion", Bookshelf.exactMinecraftVersion);
             dataJson.put("DateCreated", DATE_FORMAT.format(new Date()));
         } else {
-            try (InputStreamReader reader = new InputStreamReader(new FileInputStream(dataFile), StandardCharsets.UTF_8)) {
+            try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(dataFile.toPath()), StandardCharsets.UTF_8)) {
                 dataJson = (JSONObject) new JSONParser().parse(reader);
                 if (dataJson.containsKey("MCVersionID") && Bookshelf.version.getNumber() < (long) dataJson.get("MCVersionID")) {
                     Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] WARNING: Minecraft version downgrade is not supported!");
@@ -203,7 +202,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
             }
         }
         if (dataJson != null) {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(dataFile), StandardCharsets.UTF_8))) {
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(dataFile.toPath()), StandardCharsets.UTF_8))) {
                 Gson g = new GsonBuilder().setPrettyPrinting().create();
                 String prettyJsonString = g.toJson(dataJson);
                 pw.println(prettyJsonString);
@@ -417,7 +416,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
             File regionFolder = new File(bookshelfFolder, "r." + (chunk.getChunkX() >> 5) + "." + (chunk.getChunkZ() >> 5));
             File chunkFile = new File(regionFolder, "c." + chunk.getChunkX() + "." + chunk.getChunkZ() + ".json");
             if (chunkFile.exists()) {
-                try (InputStreamReader reader = new InputStreamReader(new FileInputStream(chunkFile), StandardCharsets.UTF_8)) {
+                try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(chunkFile.toPath()), StandardCharsets.UTF_8)) {
                     JSONObject json = (JSONObject) new JSONParser().parse(reader);
                     for (Object obj : json.keySet()) {
                         String key = obj.toString();
@@ -461,7 +460,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
             if (!chunkEntry.isEmpty()) {
                 regionFolder.mkdirs();
                 File chunkFile = new File(regionFolder, "c." + chunk.getChunkX() + "." + chunk.getChunkZ() + ".json");
-                try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(chunkFile), StandardCharsets.UTF_8))) {
+                try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(chunkFile.toPath()), StandardCharsets.UTF_8))) {
                     JSONObject toSave = new JSONObject();
                     for (BookshelfHolder bookshelf : chunkEntry.values()) {
                         String key = BookshelfUtils.posKey(bookshelf.getPosition());

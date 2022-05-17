@@ -38,10 +38,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Stream;
 
 public class PacketListenerEvents implements Listener {
 
@@ -92,7 +93,7 @@ public class PacketListenerEvents implements Listener {
             nmsChatSerializerClass = NMSUtils.getNMSClass("net.minecraft.server.%s.IChatBaseComponent$ChatSerializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer");
             nmsChatSerializerFromJSONMethod = nmsChatSerializerClass.getMethod("a", String.class);
             nmsPacketPlayOutOpenWindowClass = NMSUtils.getNMSClass("net.minecraft.server.%s.PacketPlayOutOpenWindow", "net.minecraft.network.protocol.game.PacketPlayOutOpenWindow");
-            nmsPacketPlayOutOpenWindowTitleField = Stream.of(nmsPacketPlayOutOpenWindowClass.getDeclaredFields()).filter(each -> each.getType().equals(nmsIChatBaseComponentClass)).findFirst().get();
+            nmsPacketPlayOutOpenWindowTitleField = Arrays.stream(nmsPacketPlayOutOpenWindowClass.getDeclaredFields()).filter(each -> each.getType().equals(nmsIChatBaseComponentClass)).findFirst().get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,6 +107,7 @@ public class PacketListenerEvents implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        UUID uuid = event.getPlayer().getUniqueId();
         try {
             Channel channel = (Channel) channelField.get(networkManagerField.get(playerConnectionField.get(craftPlayerGetHandleMethod.invoke(craftPlayerClass.cast(event.getPlayer())))));
             Future<?> future = channel.eventLoop().submit(() -> {
@@ -120,25 +122,27 @@ public class PacketListenerEvents implements Listener {
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 }
                 Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> {
-                    channel.pipeline().addBefore(HANDLER, CHANNEL_NAME, new ChannelDuplexHandler() {
-                        @Override
-                        public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
-                            if (packet != null) {
-                                if (nmsPacketPlayOutOpenWindowClass.isInstance(packet)) {
-                                    nmsPacketPlayOutOpenWindowTitleField.setAccessible(true);
-                                    if (ChatColor.stripColor(craftChatMessageFromComponentMethod.invoke(null, nmsPacketPlayOutOpenWindowTitleField.get(packet)).toString()).equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
-                                        nmsPacketPlayOutOpenWindowTitleField.set(packet, nmsChatSerializerFromJSONMethod.invoke(null, BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
+                    if (Bukkit.getPlayer(uuid) != null) {
+                        channel.pipeline().addBefore(HANDLER, CHANNEL_NAME, new ChannelDuplexHandler() {
+                            @Override
+                            public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
+                                if (packet != null) {
+                                    if (nmsPacketPlayOutOpenWindowClass.isInstance(packet)) {
+                                        nmsPacketPlayOutOpenWindowTitleField.setAccessible(true);
+                                        if (ChatColor.stripColor(craftChatMessageFromComponentMethod.invoke(null, nmsPacketPlayOutOpenWindowTitleField.get(packet)).toString()).equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
+                                            nmsPacketPlayOutOpenWindowTitleField.set(packet, nmsChatSerializerFromJSONMethod.invoke(null, BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
+                                        }
                                     }
                                 }
+                                super.write(context, packet, promise);
                             }
-                            super.write(context, packet, promise);
-                        }
 
-                        @Override
-                        public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-                            super.channelRead(ctx, packet);
-                        }
-                    });
+                            @Override
+                            public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+                                super.channelRead(ctx, packet);
+                            }
+                        });
+                    }
                 });
             });
         } catch (Throwable e) {

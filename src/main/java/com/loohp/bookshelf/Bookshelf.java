@@ -73,10 +73,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class Bookshelf extends JavaPlugin {
 
@@ -230,7 +228,7 @@ public class Bookshelf extends JavaPlugin {
         version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
 
         ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d").build();
-        BookshelfManager.setAsyncExecutor(new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(true), factory));
+        BookshelfManager.setAsyncExecutor(Executors.newFixedThreadPool(8, factory));
 
         //Rename old folder
         File pluginFolder = new File(Bukkit.getWorldContainer(), "plugins");
