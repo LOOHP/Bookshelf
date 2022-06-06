@@ -42,7 +42,7 @@ public class Charts {
             @Override
             public String call() throws Exception {
                 String string = "Disabled";
-                if (Bookshelf.enableHopperSupport == true) {
+                if (Bookshelf.enableHopperSupport) {
                     string = "Enabled";
                 }
                 return string;
@@ -53,7 +53,7 @@ public class Charts {
             @Override
             public String call() throws Exception {
                 String string = "Disabled";
-                if (Bookshelf.enableDropperSupport == true) {
+                if (Bookshelf.enableDropperSupport) {
                     string = "Enabled";
                 }
                 return string;
@@ -64,7 +64,7 @@ public class Charts {
             @Override
             public String call() throws Exception {
                 String string = "Disabled";
-                if (Bookshelf.enchantmentTable == true) {
+                if (Bookshelf.enchantmentTable) {
                     string = "Enabled";
                 }
                 return string;

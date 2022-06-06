@@ -295,7 +295,7 @@ public class Bookshelf extends JavaPlugin {
         String LWC = "LWC";
         if (isPluginEnabled(LWC)) {
             hookMessage(LWC);
-            LWCEvents.hookLWC();
+            new LWCEvents().registerLWCModule();
             lwcHook = true;
         }
 

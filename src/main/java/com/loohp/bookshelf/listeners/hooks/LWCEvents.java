@@ -38,7 +38,7 @@ import org.bukkit.entity.Player;
 
 public class LWCEvents extends JavaModule {
 
-    public static void hookLWC() {
+    public void registerLWCModule() {
         LWC.getInstance().getModuleLoader().registerModule(Bookshelf.plugin, new LWCEvents());
     }
 
@@ -55,15 +55,15 @@ public class LWCEvents extends JavaModule {
             LWCRequestOpenData data = Bookshelf.requestOpen.get(player);
             BookshelfHolder bookshelf = data.getBookshelf();
             Protection protection = event.getProtection();
-            if (LWC.getInstance().getPlugin().getLWC().canAccessProtection(player, protection) == true || !event.getAccess().equals(Access.NONE)) {
+            if (LWC.getInstance().getPlugin().getLWC().canAccessProtection(player, protection) || !event.getAccess().equals(Access.NONE)) {
                 if (event.getProtection().getType().equals(Type.DONATION)) {
                     Bookshelf.isDonationView.add(player.getUniqueId());
                 }
 
-                PlayerOpenBookshelfEvent pobe = new PlayerOpenBookshelfEvent(player, bookshelf, data.getBlockFace(), data.isCancelled());
-                Bukkit.getPluginManager().callEvent(pobe);
+                PlayerOpenBookshelfEvent playerOpenBookshelfEvent = new PlayerOpenBookshelfEvent(player, bookshelf, data.getBlockFace(), data.isCancelled());
+                Bukkit.getPluginManager().callEvent(playerOpenBookshelfEvent);
 
-                if (!pobe.isCancelled()) {
+                if (!playerOpenBookshelfEvent.isCancelled()) {
                     Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(bookshelf.getInventory()));
                 }
             }

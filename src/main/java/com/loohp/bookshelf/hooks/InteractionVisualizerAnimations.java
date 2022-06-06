@@ -175,7 +175,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
             }
         }
 
-        if (isMove == true) {
+        if (isMove) {
             PacketManager.sendHandMovement(InteractionVisualizerAPI.getPlayers(), player);
             if (itemstack != null) {
                 Item item = new Item(location.clone());
