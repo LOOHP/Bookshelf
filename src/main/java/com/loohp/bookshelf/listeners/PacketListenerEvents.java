@@ -22,6 +22,7 @@ package com.loohp.bookshelf.listeners;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.NMSUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -74,7 +75,11 @@ public class PacketListenerEvents implements Listener {
             networkManagerField = NMSUtils.reflectiveLookup(Field.class, () -> {
                 return playerConnectionField.getType().getField("networkManager");
             }, () -> {
-                return playerConnectionField.getType().getField("a");
+                if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_19)) {
+                    return playerConnectionField.getType().getField("b");
+                } else {
+                    return playerConnectionField.getType().getField("a");
+                }
             });
             channelField = NMSUtils.reflectiveLookup(Field.class, () -> {
                 return networkManagerField.getType().getField("channel");
@@ -119,7 +124,7 @@ public class PacketListenerEvents implements Listener {
             Bukkit.getScheduler().runTaskAsynchronously(Bookshelf.plugin, () -> {
                 try {
                     future.get(5000, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                 }
                 Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> {
                     if (Bukkit.getPlayer(uuid) != null) {
