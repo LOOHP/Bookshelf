@@ -24,32 +24,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class CustomListUtils<T> implements Iterable<T> {
+public class CustomListUtils {
 
-    public static <T> CustomListUtils<T> reverse(List<T> original) {
-        return new CustomListUtils<T>(original);
-    }
+    public static <T> Iterable<T> reverseIterable(List<T> original) {
+        return () -> new Iterator<T>() {
+            private final ListIterator<T> itr = original.listIterator(original.size());
 
-    private final List<T> original;
-
-    public CustomListUtils(List<T> original) {
-        this.original = original;
-    }
-
-    public Iterator<T> iterator() {
-        final ListIterator<T> i = original.listIterator(original.size());
-
-        return new Iterator<T>() {
+            @Override
             public boolean hasNext() {
-                return i.hasPrevious();
+                return itr.hasPrevious();
             }
 
+            @Override
             public T next() {
-                return i.previous();
+                return itr.previous();
             }
 
+            @Override
             public void remove() {
-                i.remove();
+                itr.remove();
             }
         };
     }

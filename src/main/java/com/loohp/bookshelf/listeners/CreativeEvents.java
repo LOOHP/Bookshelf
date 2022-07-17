@@ -28,6 +28,7 @@ import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.MaterialUtils;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -39,6 +40,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CreativeEvents implements Listener {
 
@@ -67,6 +73,17 @@ public class CreativeEvents implements Listener {
                     String title = bookshelf.getTitle();
                     item = NBTEditor.set(item, hash, "BookshelfContent");
                     item = NBTEditor.set(item, title, "BookshelfTitle");
+                    ItemMeta meta = item.getItemMeta();
+                    if (meta != null) {
+                        if (meta.hasLore()) {
+                            List<String> lore = new ArrayList<>(meta.getLore());
+                            lore.add(ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + "(+NBT)");
+                            meta.setLore(lore);
+                        } else {
+                            meta.setLore(Collections.singletonList(ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + "(+NBT)"));
+                        }
+                        item.setItemMeta(meta);
+                    }
                     event.setCursor(item);
                 }
             }

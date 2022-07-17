@@ -63,7 +63,7 @@ public class PistonEvents implements Listener {
         }
 
         BlockFace dir = event.getDirection();
-        for (Block block : CustomListUtils.reverse(order)) {
+        for (Block block : CustomListUtils.reverseIterable(order)) {
             Location newLoc = block.getRelative(dir).getLocation().clone();
             manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
         }
@@ -92,7 +92,7 @@ public class PistonEvents implements Listener {
         }
 
         BlockFace dir = event.getDirection();
-        for (Block block : CustomListUtils.reverse(order)) {
+        for (Block block : CustomListUtils.reverseIterable(order)) {
             Location newLoc = block.getRelative(dir).getLocation().clone();
             manager.move(position.get(block), newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
         }
