@@ -54,3 +54,14 @@ Replace `VERSION` with the version number.
 - [PremiumVanish](https://www.spigotmc.org/resources/premiumvanish-stay-hidden-bungee-support.14404/)
 - [InteractionVisualizer](https://www.spigotmc.org/resources/interactionvisualizer-visualize-function-blocks-like-crafting-tables-with-animations-client-side.77050/)
 
+## Partnerships
+
+### Server Hosting
+**Use the link or click the banner** below to **get a 25% discount off** your first month when buying any of their gaming servers!<br>
+It also **supports my development**, take it as an alternative way to donate while getting your very own Minecraft server as well!
+
+*P.S. Using the link or clicking the banner rather than the code supports me more! (Costs you no extra!)*
+
+**https://www.bisecthosting.com/loohp**
+
+![https://www.bisecthosting.com/loohp](https://www.bisecthosting.com/partners/custom-banners/c5357014-3610-418b-9600-88baaa75431e.png)
