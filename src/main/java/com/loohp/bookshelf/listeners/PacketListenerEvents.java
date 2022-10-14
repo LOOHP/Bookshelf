@@ -40,6 +40,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -127,26 +128,29 @@ public class PacketListenerEvents implements Listener {
                 } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                 }
                 Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> {
-                    if (Bukkit.getPlayer(uuid) != null) {
-                        channel.pipeline().addBefore(HANDLER, CHANNEL_NAME, new ChannelDuplexHandler() {
-                            @Override
-                            public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
-                                if (packet != null) {
-                                    if (nmsPacketPlayOutOpenWindowClass.isInstance(packet)) {
-                                        nmsPacketPlayOutOpenWindowTitleField.setAccessible(true);
-                                        if (ChatColor.stripColor(craftChatMessageFromComponentMethod.invoke(null, nmsPacketPlayOutOpenWindowTitleField.get(packet)).toString()).equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
-                                            nmsPacketPlayOutOpenWindowTitleField.set(packet, nmsChatSerializerFromJSONMethod.invoke(null, BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
+                    try {
+                        if (Bukkit.getPlayer(uuid) != null) {
+                            channel.pipeline().addBefore(HANDLER, CHANNEL_NAME, new ChannelDuplexHandler() {
+                                @Override
+                                public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
+                                    if (packet != null) {
+                                        if (nmsPacketPlayOutOpenWindowClass.isInstance(packet)) {
+                                            nmsPacketPlayOutOpenWindowTitleField.setAccessible(true);
+                                            if (ChatColor.stripColor(craftChatMessageFromComponentMethod.invoke(null, nmsPacketPlayOutOpenWindowTitleField.get(packet)).toString()).equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
+                                                nmsPacketPlayOutOpenWindowTitleField.set(packet, nmsChatSerializerFromJSONMethod.invoke(null, BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
+                                            }
                                         }
                                     }
+                                    super.write(context, packet, promise);
                                 }
-                                super.write(context, packet, promise);
-                            }
 
-                            @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-                                super.channelRead(ctx, packet);
-                            }
-                        });
+                                @Override
+                                public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+                                    super.channelRead(ctx, packet);
+                                }
+                            });
+                        }
+                    } catch (NoSuchElementException ignore) {
                     }
                 });
             });
