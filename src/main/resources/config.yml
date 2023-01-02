@@ -20,6 +20,7 @@ Options:
   #Play particles or not when opening a bookshelf
   ParticlesWhenOpened: true
   OpenedParticleColors:
+    Frequency: 5
     Primary: "#9933FF"
     Secondary: "#FFFF00"
 
@@ -37,6 +38,8 @@ Options:
   #Defaults to 75
   EnchantingParticlesCount: 75
   BoostingParticleColors:
+    # This is the frequency of particles on the bookshelves
+    Frequency: 5
     Primary: "#CC00CC"
     Secondary: "#3333FF"
 

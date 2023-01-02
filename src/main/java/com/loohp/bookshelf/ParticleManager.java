@@ -31,7 +31,6 @@ import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.awt.print.Book;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,6 +38,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParticleManager implements AutoCloseable {
 
@@ -58,56 +58,63 @@ public class ParticleManager implements AutoCloseable {
         this.random = new Random();
 
         if (!Bookshelf.version.isLegacy()) {
-            this.particleTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
-                DustOptions bookshelfColor1 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.bookshelfPrimaryColor), 1);
-                DustOptions bookshelfColor2 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.bookshelfSecondaryColor), 1);
-                DustOptions boostColor1 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.boostingPrimaryColor), 1);
-                DustOptions boostColor2 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.boostingSecondaryColor), 1);
+            DustOptions bookshelfColor1 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.bookshelfPrimaryColor), 1);
+            DustOptions bookshelfColor2 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.bookshelfSecondaryColor), 1);
+            DustOptions boostColor1 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.boostingPrimaryColor), 1);
+            DustOptions boostColor2 = new DustOptions(ColorUtils.toBukkitColor(Bookshelf.boostingSecondaryColor), 1);
 
+            AtomicInteger counter = new AtomicInteger(0);
+
+            this.particleTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
+                int currentTick = counter.getAndIncrement();
                 if (Bookshelf.bookshelfParticlesEnabled) {
-                    for (Block block : openedBookshelves) {
-                        Location loc = block.getLocation();
-                        Location loc2 = loc.clone().add(1, 1, 1);
-                        for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
-                            if (random.nextInt(100) >= 95) {
-                                int ranColor = random.nextInt(2) + 1;
-                                if (ranColor == 1) {
-                                    loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, bookshelfColor2);
-                                } else {
-                                    loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, bookshelfColor1);
+                    if (currentTick % Bookshelf.bookshelfParticlesFrequency == 0) {
+                        for (Block block : openedBookshelves) {
+                            Location loc = block.getLocation();
+                            Location loc2 = loc.clone().add(1, 1, 1);
+                            for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
+                                if (random.nextInt(100) >= 95) {
+                                    int ranColor = random.nextInt(2) + 1;
+                                    if (ranColor == 1) {
+                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, bookshelfColor2);
+                                    } else {
+                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, bookshelfColor1);
+                                    }
                                 }
                             }
                         }
                     }
                 }
                 if (Bookshelf.enchantingParticlesCount > 0) {
-                    Set<Block> enchantEmitted = new HashSet<>();
-                    for (Entry<Block, Set<Block>> entry : enchantingBoostingBlocks.entrySet()) {
-                        Set<Block> blocks = entry.getValue();
-                        if (!blocks.isEmpty()) {
-                            Location tablePos = entry.getKey().getLocation().add(0.5, 0.5, 0.5);
-                            tablePos.getWorld().spawnParticle(Particle.PORTAL, tablePos, Bookshelf.enchantingParticlesCount);
-                            for (Block block : blocks) {
-                                if (block.getType().equals(Material.BOOKSHELF) && !enchantEmitted.contains(block)) {
-                                    Location loc = block.getLocation().clone();
-                                    Location loc2 = loc.clone().add(1, 1, 1);
-                                    for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
-                                        if (random.nextInt(100) >= 98) {
-                                            int ranColor = random.nextInt(2) + 1;
-                                            if (ranColor == 1) {
-                                                loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor2);
-                                            } else {
-                                                loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor1);
+                    if (currentTick % Bookshelf.bookshelfEnchantingParticlesFrequency == 0) {
+                        Set<Block> enchantEmitted = new HashSet<>();
+                        for (Entry<Block, Set<Block>> entry : enchantingBoostingBlocks.entrySet()) {
+                            Set<Block> blocks = entry.getValue();
+                            if (!blocks.isEmpty()) {
+                                Location tablePos = entry.getKey().getLocation().add(0.5, 0.5, 0.5);
+                                tablePos.getWorld().spawnParticle(Particle.PORTAL, tablePos, Bookshelf.enchantingParticlesCount);
+                                for (Block block : blocks) {
+                                    if (block.getType().equals(Material.BOOKSHELF) && !enchantEmitted.contains(block)) {
+                                        Location loc = block.getLocation().clone();
+                                        Location loc2 = loc.clone().add(1, 1, 1);
+                                        for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
+                                            if (random.nextInt(100) >= 98) {
+                                                int ranColor = random.nextInt(2) + 1;
+                                                if (ranColor == 1) {
+                                                    loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor2);
+                                                } else {
+                                                    loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor1);
+                                                }
                                             }
                                         }
+                                        enchantEmitted.add(block);
                                     }
-                                    enchantEmitted.add(block);
                                 }
                             }
                         }
                     }
                 }
-            }, 0, 5).getTaskId();
+            }, 0, 1).getTaskId();
         } else {
             this.particleTaskId = -1;
         }

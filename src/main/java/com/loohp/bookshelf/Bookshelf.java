@@ -52,7 +52,6 @@ import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.HopperUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.legacy.LegacyConfigConverter;
-import com.loohp.yamlconfiguration.YamlConfiguration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -60,6 +59,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.simpleyaml.configuration.file.YamlFile;
 
 import java.awt.Color;
 import java.io.File;
@@ -120,6 +120,7 @@ public class Bookshelf extends JavaPlugin {
     public static boolean useWhitelist = true;
     public static Set<String> whitelist = new HashSet<>();
     public static boolean bookshelfParticlesEnabled = true;
+    public static int bookshelfParticlesFrequency = 5;
     public static Color bookshelfPrimaryColor = ColorUtils.hex2Rgb("#9933FF");
     public static Color bookshelfSecondaryColor = ColorUtils.hex2Rgb("#FFFF00");
 
@@ -137,6 +138,7 @@ public class Bookshelf extends JavaPlugin {
     public static boolean enchantmentTable = true;
     public static int eTableMulti = 1;
     public static int enchantingParticlesCount = 75;
+    public static int bookshelfEnchantingParticlesFrequency = 5;
     public static Color boostingPrimaryColor = ColorUtils.hex2Rgb("#CC00CC");
     public static Color boostingSecondaryColor = ColorUtils.hex2Rgb("#3333FF");
 
@@ -151,7 +153,7 @@ public class Bookshelf extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
     }
 
-    public static YamlConfiguration getConfiguration() {
+    public static YamlFile getConfiguration() {
         return Config.getConfig(CONFIG_ID).getConfiguration();
     }
 
@@ -170,6 +172,7 @@ public class Bookshelf extends JavaPlugin {
         noPermissionToReloadMessage = getConfiguration().getString("Options.NoPermissionToReloadMessage");
         noPermissionToUpdateMessage = getConfiguration().getString("Options.NoPermissionToUpdateMessage");
         bookshelfParticlesEnabled = getConfiguration().getBoolean("Options.ParticlesWhenOpened");
+        bookshelfParticlesFrequency = getConfiguration().getInt("Options.OpenedParticleColors.Frequency");
         bookshelfPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Primary"));
         bookshelfSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.OpenedParticleColors.Secondary"));
 
@@ -184,6 +187,7 @@ public class Bookshelf extends JavaPlugin {
         }
         eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
         enchantingParticlesCount = getConfiguration().getInt("Options.EnchantingParticlesCount");
+        bookshelfEnchantingParticlesFrequency = getConfiguration().getInt("Options.BoostingParticleColors.Frequency");
         boostingPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Primary"));
         boostingSecondaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Secondary"));
 

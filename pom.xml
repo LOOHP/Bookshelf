@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>3.1.1.0</version>
+	<version>3.1.1.1</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -69,8 +69,12 @@
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<relocations>
 								<relocation>
-									<pattern>com.loohp.yamlconfiguration</pattern>
-									<shadedPattern>com.loohp.bookshelf.libs.com.loohp.yamlconfiguration</shadedPattern>
+									<pattern>org.simpleyaml</pattern>
+									<shadedPattern>com.loohp.bookshelf.libs.org.simpleyaml</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.yaml.snakeyaml</pattern>
+									<shadedPattern>com.loohp.bookshelf.libs.org.yaml.snakeyaml</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>org.json.simple</pattern>
@@ -242,15 +246,15 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.loohp</groupId>
-			<artifactId>YamlConfiguration</artifactId>
-			<version>1.0.1.4</version>
+			<groupId>me.carleslc.Simple-YAML</groupId>
+			<artifactId>Simple-Yaml</artifactId>
+			<version>1.8.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.github.bananapuncher714</groupId>
 			<artifactId>nbteditor</artifactId>
-			<version>7.18.3</version>
+			<version>7.18.4</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -418,7 +422,7 @@
 		<dependency>
 			<groupId>com.loohp</groupId>
 			<artifactId>InteractionVisualizer</artifactId>
-			<version>1.17.2.5</version>
+			<version>1.17.2.8</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
