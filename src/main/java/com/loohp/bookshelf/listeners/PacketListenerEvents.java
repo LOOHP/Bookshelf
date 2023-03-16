@@ -76,7 +76,9 @@ public class PacketListenerEvents implements Listener {
             networkManagerField = NMSUtils.reflectiveLookup(Field.class, () -> {
                 return playerConnectionField.getType().getField("networkManager");
             }, () -> {
-                if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_19)) {
+                if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_19_4)) {
+                    return playerConnectionField.getType().getDeclaredField("h");
+                } else if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_19)) {
                     return playerConnectionField.getType().getField("b");
                 } else {
                     return playerConnectionField.getType().getField("a");
@@ -115,6 +117,7 @@ public class PacketListenerEvents implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         try {
+            networkManagerField.setAccessible(true);
             Channel channel = (Channel) channelField.get(networkManagerField.get(playerConnectionField.get(craftPlayerGetHandleMethod.invoke(craftPlayerClass.cast(event.getPlayer())))));
             Future<?> future = channel.eventLoop().submit(() -> {
                 try {
@@ -162,6 +165,7 @@ public class PacketListenerEvents implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         try {
+            networkManagerField.setAccessible(true);
             Channel channel = (Channel) channelField.get(networkManagerField.get(playerConnectionField.get(craftPlayerGetHandleMethod.invoke(craftPlayerClass.cast(event.getPlayer())))));
             channel.eventLoop().submit(() -> {
                 try {

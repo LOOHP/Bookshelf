@@ -42,5 +42,5 @@ permissions:
     description: Allows you to shift-middle-click to copy bookshelf with items inside in creative
     default: op
   bookshelf.update:
-    description: Allows you receive update messages
+    description: Allows you to receive update messages
     default: op

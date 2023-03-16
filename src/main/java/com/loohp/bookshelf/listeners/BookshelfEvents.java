@@ -28,6 +28,7 @@ import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
+import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.MCVersion;
@@ -298,7 +299,11 @@ public class BookshelfEvents implements Listener {
             return;
         }
 
-        if (Bookshelf.isDonationView.contains(player.getUniqueId())) {
+        BookshelfViewType viewType = Bookshelf.isDonationView.getOrDefault(player.getUniqueId(), BookshelfViewType.DEFAULT);
+        if (viewType.equals(BookshelfViewType.DISPLAY)) {
+            event.setCancelled(true);
+            return;
+        } else if (viewType.equals(BookshelfViewType.DONATION)) {
             if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getAction().equals(InventoryAction.PICKUP_SOME) || event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.PICKUP_ONE) || event.getAction().equals(InventoryAction.PICKUP_HALF)) {
                 event.setCancelled(true);
                 return;

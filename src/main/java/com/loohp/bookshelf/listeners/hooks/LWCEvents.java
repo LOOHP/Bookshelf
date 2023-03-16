@@ -32,6 +32,7 @@ import com.griefcraft.scripting.event.LWCProtectionRemovePostEvent;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
+import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -56,8 +57,11 @@ public class LWCEvents extends JavaModule {
             BookshelfHolder bookshelf = data.getBookshelf();
             Protection protection = event.getProtection();
             if (LWC.getInstance().getPlugin().getLWC().canAccessProtection(player, protection) || !event.getAccess().equals(Access.NONE)) {
-                if (event.getProtection().getType().equals(Type.DONATION)) {
-                    Bookshelf.isDonationView.add(player.getUniqueId());
+                Type type = event.getProtection().getType();
+                if (type.equals(Type.DONATION)) {
+                    Bookshelf.isDonationView.put(player.getUniqueId(), BookshelfViewType.DONATION);
+                } else if (type.equals(Type.DISPLAY)) {
+                    Bookshelf.isDonationView.put(player.getUniqueId(), BookshelfViewType.DISPLAY);
                 }
 
                 PlayerOpenBookshelfEvent playerOpenBookshelfEvent = new PlayerOpenBookshelfEvent(player, bookshelf, data.getBlockFace(), data.isCancelled());

@@ -46,6 +46,7 @@ import com.loohp.bookshelf.listeners.hooks.TownyEvents;
 import com.loohp.bookshelf.listeners.hooks.WorldGuardEvents;
 import com.loohp.bookshelf.metrics.Charts;
 import com.loohp.bookshelf.metrics.Metrics;
+import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
 import com.loohp.bookshelf.updater.Updater;
 import com.loohp.bookshelf.utils.ColorUtils;
@@ -128,7 +129,7 @@ public class Bookshelf extends JavaPlugin {
     public static String noPermissionToUpdateMessage = "&cYou do not have permission use this command!";
 
     public static Set<UUID> lwcCancelOpen = ConcurrentHashMap.newKeySet();
-    public static Set<UUID> isDonationView = ConcurrentHashMap.newKeySet();
+    public static Map<UUID, BookshelfViewType> isDonationView = new ConcurrentHashMap<>();
 
     public static ConcurrentHashMap<Player, Long> enchantSeed = new ConcurrentHashMap<>();
 
