@@ -48,6 +48,7 @@ import com.loohp.bookshelf.metrics.Charts;
 import com.loohp.bookshelf.metrics.Metrics;
 import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.updater.Updater;
 import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.HopperUtils;
@@ -108,8 +109,8 @@ public class Bookshelf extends JavaPlugin {
 
     public static boolean enableHopperSupport = true;
     public static boolean enableDropperSupport = true;
-    public static int hopperTaskID = -1;
-    public static int hopperMinecartTaskID = -1;
+    public static Scheduler.ScheduledTask hopperTask = null;
+    public static Scheduler.ScheduledTask hopperMinecartTask = null;
     public static int hopperTicksPerTransfer = 8;
     public static int hopperAmount = 1;
 
@@ -148,7 +149,7 @@ public class Bookshelf extends JavaPlugin {
     public static Optional<String> bookshelfDefaultName = Optional.empty();
 
     public static boolean updaterEnabled = true;
-    public static int updaterTaskID = -1;
+    public static Scheduler.ScheduledTask updaterTask = null;
 
     private static void hookMessage(String name) {
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
@@ -194,11 +195,11 @@ public class Bookshelf extends JavaPlugin {
 
         lastHopperTime = 0;
         lastHoppercartTime = 0;
-        if (hopperTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(hopperTaskID);
+        if (hopperTask != null) {
+            hopperTask.cancel();
         }
-        if (hopperMinecartTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(hopperMinecartTaskID);
+        if (hopperMinecartTask != null) {
+            hopperMinecartTask.cancel();
         }
         if (enableHopperSupport) {
             hopperTicksPerTransfer = Bukkit.spigot().getConfig().getInt("world-settings.default.ticks-per.hopper-transfer");
@@ -211,8 +212,8 @@ public class Bookshelf extends JavaPlugin {
 
         bookshelfDefaultName = getConfiguration().contains("Options.BookshelfDefaultName") ? Optional.of(ChatColor.translateAlternateColorCodes('&', getConfiguration().getString("Options.BookshelfDefaultName"))) : Optional.empty();
 
-        if (updaterTaskID >= 0) {
-            Bukkit.getScheduler().cancelTask(updaterTaskID);
+        if (updaterTask != null) {
+            updaterTask.cancel();
         }
         updaterEnabled = getConfiguration().getBoolean("Options.Updater");
         if (updaterEnabled) {

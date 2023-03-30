@@ -22,6 +22,7 @@ package com.loohp.bookshelf.listeners;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.NMSUtils;
 import io.netty.channel.Channel;
@@ -125,12 +126,12 @@ public class PacketListenerEvents implements Listener {
                 } catch (Throwable ignored) {
                 }
             });
-            Bukkit.getScheduler().runTaskAsynchronously(Bookshelf.plugin, () -> {
+            Scheduler.runTaskAsynchronously(Bookshelf.plugin, () -> {
                 try {
                     future.get(5000, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                 }
-                Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> {
+                Scheduler.runTask(Bookshelf.plugin, () -> {
                     try {
                         if (Bukkit.getPlayer(uuid) != null) {
                             channel.pipeline().addBefore(HANDLER, CHANNEL_NAME, new ChannelDuplexHandler() {
@@ -155,7 +156,7 @@ public class PacketListenerEvents implements Listener {
                         }
                     } catch (NoSuchElementException ignore) {
                     }
-                });
+                }, event.getPlayer());
             });
         } catch (Throwable e) {
             e.printStackTrace();

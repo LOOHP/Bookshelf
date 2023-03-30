@@ -30,6 +30,7 @@ import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.legacy.LegacyConfigConverter;
@@ -473,9 +474,9 @@ public class BookshelfEvents implements Listener {
         }
 
         Bookshelf.lastBlockFace.put(event.getPlayer(), event.getBlockFace());
-        Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
+        Scheduler.runTaskLater(Bookshelf.plugin, () -> {
             Bookshelf.lastBlockFace.remove(event.getPlayer());
-        }, 2);
+        }, 2, player);
 
         if (event.getBlockFace().equals(BlockFace.UP) || event.getBlockFace().equals(BlockFace.DOWN)) {
             return;
@@ -506,7 +507,7 @@ public class BookshelfEvents implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(bookshelf.getInventory()));
+        Scheduler.runTask(Bookshelf.plugin, () -> player.openInventory(bookshelf.getInventory()), player);
     }
 
     @EventHandler

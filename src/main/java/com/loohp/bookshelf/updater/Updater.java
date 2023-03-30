@@ -21,6 +21,7 @@
 package com.loohp.bookshelf.updater;
 
 import com.loohp.bookshelf.Bookshelf;
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.HTTPRequestUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -98,7 +99,7 @@ public class Updater implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(Bookshelf.plugin, () -> {
+        Scheduler.runTaskLaterAsynchronously(Bookshelf.plugin, () -> {
             if (Bookshelf.updaterEnabled) {
                 Player player = event.getPlayer();
                 if (player.hasPermission("Bookshelf.update")) {

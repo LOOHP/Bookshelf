@@ -20,10 +20,10 @@
 
 package com.loohp.bookshelf;
 
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.utils.ParticlesUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -48,7 +48,7 @@ public class ParticleManager implements AutoCloseable {
     private final Map<Block, Set<Block>> enchantingBoostingBlocks;
     private final Random random;
 
-    private final int particleTaskId;
+    private final Scheduler.ScheduledTask particleTask;
 
     public ParticleManager(Bookshelf plugin, BookshelfManager bookshelfManager) {
         this.plugin = plugin;
@@ -65,7 +65,7 @@ public class ParticleManager implements AutoCloseable {
 
             AtomicInteger counter = new AtomicInteger(0);
 
-            this.particleTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
+            this.particleTask = Scheduler.runTaskTimerAsynchronously(this.plugin, () -> {
                 int currentTick = counter.getAndIncrement();
                 if (Bookshelf.bookshelfParticlesEnabled) {
                     if (currentTick % Bookshelf.bookshelfParticlesFrequency == 0) {
@@ -114,9 +114,9 @@ public class ParticleManager implements AutoCloseable {
                         }
                     }
                 }
-            }, 0, 1).getTaskId();
+            }, 0, 1);
         } else {
-            this.particleTaskId = -1;
+            this.particleTask = null;
         }
     }
 
@@ -148,8 +148,8 @@ public class ParticleManager implements AutoCloseable {
 
     @Override
     public void close() {
-        if (particleTaskId >= 0) {
-            Bukkit.getScheduler().cancelTask(particleTaskId);
+        if (particleTask != null) {
+            particleTask.cancel();
         }
     }
 

@@ -20,6 +20,7 @@
 
 package com.loohp.bookshelf;
 
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.updater.Updater;
 import com.loohp.bookshelf.updater.Updater.UpdaterResponse;
 import net.md_5.bungee.api.ChatColor;
@@ -60,7 +61,7 @@ public class Commands implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("bookshelf.update")) {
                 sender.sendMessage(ChatColor.AQUA + "[Bookshelf] BookShelf written by LOOHP!");
                 sender.sendMessage(ChatColor.GOLD + "[Bookshelf] You are running BookShelf version: " + Bookshelf.plugin.getDescription().getVersion());
-                Bukkit.getScheduler().runTaskAsynchronously(Bookshelf.plugin, () -> {
+                Scheduler.runTaskAsynchronously(Bookshelf.plugin, () -> {
                     UpdaterResponse version = Updater.checkUpdate();
                     if (version.getResult().equals("latest")) {
                         if (version.isDevBuildLatest()) {

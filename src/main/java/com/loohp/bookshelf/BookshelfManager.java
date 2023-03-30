@@ -28,6 +28,7 @@ import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.WorldUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -133,7 +134,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
     private final Map<ChunkPosition, Map<BlockPosition, BookshelfHolder>> loadedBookshelves;
     private final ParticleManager particleManager;
     private final Object lock;
-    private final int autoSaveTask;
+    private final Scheduler.ScheduledTask autoSaveTask;
     private final AtomicBoolean isClosed;
 
     @SuppressWarnings("unchecked")
@@ -246,14 +247,14 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
         particleManager = new ParticleManager(plugin, this);
 
-        autoSaveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        autoSaveTask = Scheduler.runTaskTimerAsynchronously(plugin, () -> {
             for (ChunkPosition chunk : loadedBookshelves.keySet()) {
                 saveChunk(chunk, false);
                 if (!plugin.isEnabled()) {
                     return;
                 }
             }
-        }, 6000, 6000).getTaskId();
+        }, 6000, 6000);
     }
 
     private void executeAsyncTask(Runnable task) {
@@ -263,7 +264,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
     }
 
     private void executeAsyncTaskLater(Runnable task, long delay) {
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Scheduler.runTaskLater(plugin, () -> {
             if (!isClosed.get()) {
                 ASYNC_EXECUTOR.execute(task);
             }
@@ -499,7 +500,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         if (!Bukkit.isPrimaryThread()) {
             throw new IllegalAccessError("Closing BookshelfManager in async is not allowed!");
         }
-        Bukkit.getScheduler().cancelTask(autoSaveTask);
+        autoSaveTask.cancel();
         HandlerList.unregisterAll(this);
         particleManager.close();
         BOOKSHELF_MANAGER.remove(world);

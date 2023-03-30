@@ -34,6 +34,7 @@ import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
+import com.loohp.bookshelf.objectholders.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -48,7 +49,7 @@ public class LWCEvents extends JavaModule {
         if (!event.getPlayer().hasPermission("bookshelf.use")) {
             return;
         }
-        Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> {
+        Scheduler.runTaskLater(Bookshelf.plugin, () -> {
             Player player = event.getPlayer();
             if (!Bookshelf.requestOpen.containsKey(player)) {
                 return;
@@ -68,11 +69,11 @@ public class LWCEvents extends JavaModule {
                 Bukkit.getPluginManager().callEvent(playerOpenBookshelfEvent);
 
                 if (!playerOpenBookshelfEvent.isCancelled()) {
-                    Bukkit.getScheduler().runTask(Bookshelf.plugin, () -> player.openInventory(bookshelf.getInventory()));
+                    Scheduler.runTask(Bookshelf.plugin, () -> player.openInventory(bookshelf.getInventory()), player);
                 }
             }
             Bookshelf.requestOpen.remove(player);
-        }, 1);
+        }, 1, event.getPlayer());
     }
 
     @Override
@@ -82,7 +83,7 @@ public class LWCEvents extends JavaModule {
             return;
         }
         Bookshelf.lwcCancelOpen.add(player.getUniqueId());
-        Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5);
+        Scheduler.runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5, event.getPlayer());
     }
 
     @Override
@@ -95,7 +96,7 @@ public class LWCEvents extends JavaModule {
             return;
         }
         Bookshelf.lwcCancelOpen.add(player.getUniqueId());
-        Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5);
+        Scheduler.runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5, event.getPlayer());
     }
 
     @Override
@@ -105,7 +106,7 @@ public class LWCEvents extends JavaModule {
             return;
         }
         Bookshelf.lwcCancelOpen.add(player.getUniqueId());
-        Bukkit.getScheduler().runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5);
+        Scheduler.runTaskLater(Bookshelf.plugin, () -> Bookshelf.lwcCancelOpen.remove(player.getUniqueId()), 5, event.getPlayer());
     }
 
 }

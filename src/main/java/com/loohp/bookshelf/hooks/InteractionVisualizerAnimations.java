@@ -24,6 +24,7 @@ import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.BookshelfAPI;
 import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.InventoryUtils;
 import com.loohp.bookshelf.utils.OpenInvUtils;
 import com.loohp.bookshelf.utils.VanishUtils;
@@ -198,7 +199,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
                 List<Item> list = link.get(player);
                 list.add(item);
                 boolean finalIsIn = isIn;
-                Bukkit.getScheduler().runTaskLater(InteractionVisualizer.plugin, () -> {
+                Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
                     if (finalIsIn) {
                         item.teleport(location.clone());
                     } else {
@@ -208,7 +209,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
                     item.setGravity(false);
                     PacketManager.updateItem(item);
                 }, 7);
-                Bukkit.getScheduler().runTaskLater(InteractionVisualizer.plugin, () -> {
+                Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
                     PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
                     list.remove(item);
                 }, 20);
@@ -289,13 +290,13 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
                     }
                     List<Item> list = link.get(player);
                     list.add(item);
-                    Bukkit.getScheduler().runTaskLater(InteractionVisualizer.plugin, () -> {
+                    Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
                         item.teleport(location.clone());
                         item.setVelocity(new Vector(0.0, 0.0, 0.0));
                         item.setGravity(false);
                         PacketManager.updateItem(item);
                     }, 7);
-                    Bukkit.getScheduler().runTaskLater(InteractionVisualizer.plugin, () -> {
+                    Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
                         PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
                         list.remove(item);
                     }, 20);
