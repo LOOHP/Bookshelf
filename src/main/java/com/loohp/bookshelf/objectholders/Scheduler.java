@@ -83,7 +83,7 @@ public class Scheduler {
 
     public static ScheduledTask runTaskTimer(Plugin plugin, Runnable task, long delay, long period, Entity entity) {
         if (FOLIA) {
-            return new ScheduledTask(entity.getScheduler().runAtFixedRate(plugin, st -> task.run(), null, delay, period));
+            return new ScheduledTask(entity.getScheduler().runAtFixedRate(plugin, st -> task.run(), null, Math.max(1, delay), period));
         } else {
             return new ScheduledTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
         }
@@ -107,7 +107,7 @@ public class Scheduler {
 
     public static ScheduledTask runTaskTimer(Plugin plugin, Runnable task, long delay, long period, Location location) {
         if (FOLIA) {
-            return new ScheduledTask(Bukkit.getRegionScheduler().runAtFixedRate(plugin, location, st -> task.run(), delay, period));
+            return new ScheduledTask(Bukkit.getRegionScheduler().runAtFixedRate(plugin, location, st -> task.run(), Math.max(1, delay), period));
         } else {
             return new ScheduledTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
         }
