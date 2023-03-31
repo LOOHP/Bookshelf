@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Scheduler {
     
-    private static final boolean FOLIA;
+    public static final boolean FOLIA;
     
     static {
         boolean folia;
