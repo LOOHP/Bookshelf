@@ -165,7 +165,7 @@ public class Scheduler {
 
         private final Object task;
 
-        private ScheduledTask(Object task) {
+        public ScheduledTask(Object task) {
             this.task = task;
         }
 
