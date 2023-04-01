@@ -71,7 +71,7 @@ public class HopperUtils {
                     continue;
                 }
                 for (Entity entity : world.getEntities()) {
-                    Scheduler.execute(Bookshelf.plugin, () -> {
+                    Scheduler.executeOrScheduleSync(Bookshelf.plugin, () -> {
                         if (entity.getType().equals(EntityType.MINECART_HOPPER)) {
                             HopperMinecart hoppercart = (HopperMinecart) entity;
                             if (!hoppercart.isEnabled()) {
@@ -169,7 +169,7 @@ public class HopperUtils {
                 if (!perform.containsKey(loc.getWorld())) {
                     continue;
                 }
-                Scheduler.execute(Bookshelf.plugin, () -> {
+                Scheduler.executeOrScheduleSync(Bookshelf.plugin, () -> {
                     long amount = perform.get(loc.getWorld());
                     Block blockBelow = loc.getBlock().getRelative(BlockFace.DOWN);
                     if (!loc.getBlock().getType().equals(Material.BOOKSHELF)) {

@@ -43,25 +43,35 @@ public class Scheduler {
         FOLIA = folia;
     }
 
-    public static void execute(Plugin plugin, Runnable task, Entity entity) {
+    public static void executeOrScheduleSync(Plugin plugin, Runnable task, Entity entity) {
         if (FOLIA) {
-            entity.getScheduler().run(plugin, st -> task.run(), null);
-        } else {
-            if (!Bukkit.isPrimaryThread()) {
-                throw new RuntimeException("Call not made on main thread");
+            if (Bukkit.isOwnedByCurrentRegion(entity)) {
+                task.run();
+            } else {
+                entity.getScheduler().run(plugin, st -> task.run(), null);
             }
-            task.run();
+        } else {
+            if (Bukkit.isPrimaryThread()) {
+                task.run();
+            } else {
+                Bukkit.getScheduler().runTask(plugin, task);
+            }
         }
     }
 
-    public static void execute(Plugin plugin, Runnable task, Location location) {
+    public static void executeOrScheduleSync(Plugin plugin, Runnable task, Location location) {
         if (FOLIA) {
-            Bukkit.getRegionScheduler().execute(plugin, location, task);
-        } else {
-            if (!Bukkit.isPrimaryThread()) {
-                throw new RuntimeException("Call not made on main thread");
+            if (Bukkit.isOwnedByCurrentRegion(location)) {
+                task.run();
+            } else {
+                Bukkit.getRegionScheduler().execute(plugin, location, task);
             }
-            task.run();
+        } else {
+            if (Bukkit.isPrimaryThread()) {
+                task.run();
+            } else {
+                Bukkit.getScheduler().runTask(plugin, task);
+            }
         }
     }
 
