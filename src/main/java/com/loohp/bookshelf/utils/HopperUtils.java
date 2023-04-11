@@ -112,6 +112,7 @@ public class HopperUtils {
                                     additem.setAmount(1);
                                     ItemStack beforeEvent = additem.clone();
                                     InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
+                                    Bukkit.getPluginManager().callEvent(event);
                                     if (event.isCancelled()) {
                                         break;
                                     }
@@ -196,6 +197,7 @@ public class HopperUtils {
                                             additem.setAmount(num);
                                             ItemStack beforeEvent = additem.clone();
                                             InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
+                                            Bukkit.getPluginManager().callEvent(event);
                                             if (event.isCancelled()) {
                                                 break;
                                             }
@@ -253,6 +255,7 @@ public class HopperUtils {
                                         additem.setAmount(num);
                                         ItemStack beforeEvent = additem.clone();
                                         InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, inventory, false);
+                                        Bukkit.getPluginManager().callEvent(event);
                                         if (event.isCancelled()) {
                                             break;
                                         }
@@ -288,6 +291,7 @@ public class HopperUtils {
                                     additem.setAmount(num);
                                     ItemStack beforeEvent = additem.clone();
                                     InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, inventory, false);
+                                    Bukkit.getPluginManager().callEvent(event);
                                     if (event.isCancelled()) {
                                         break;
                                     }

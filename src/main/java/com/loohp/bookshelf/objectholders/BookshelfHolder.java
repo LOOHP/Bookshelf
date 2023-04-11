@@ -20,10 +20,11 @@
 
 package com.loohp.bookshelf.objectholders;
 
+import org.bukkit.block.Block;
+import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 
-public class BookshelfHolder implements InventoryHolder {
+public class BookshelfHolder implements BlockInventoryHolder {
 
     private BlockPosition position;
     private String title;
@@ -40,6 +41,11 @@ public class BookshelfHolder implements InventoryHolder {
 
     public BlockPosition getPosition() {
         return position;
+    }
+
+    @Override
+    public Block getBlock() {
+        return position.getBlock();
     }
 
     public String getTitle() {

@@ -20,7 +20,6 @@
 
 package com.loohp.bookshelf.listeners.hooks;
 
-import com.google.common.collect.Lists;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -42,6 +41,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WorldGuardEvents implements Listener {
@@ -49,7 +49,6 @@ public class WorldGuardEvents implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onWorldGuardCheck(PlayerOpenBookshelfEvent event) {
-
         if (!Bookshelf.worldGuardHook) {
             return;
         }
@@ -69,84 +68,79 @@ public class WorldGuardEvents implements Listener {
 
         boolean isGlobal = set.size() == 0;
 
-        if (testFlag(query, Flags.CHEST_ACCESS, loc, localPlayer).equals("false")) {
+        if (testFlag(query, Flags.CHEST_ACCESS, loc, localPlayer).equals(TestFlagResult.FALSE)) {
             event.setCancelled(true);
             player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
             player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
             return;
-        } else if (testFlag(query, Flags.CHEST_ACCESS, loc, localPlayer).equals("true")) {
+        }
+        if (testFlag(query, Flags.CHEST_ACCESS, loc, localPlayer).equals(TestFlagResult.TRUE)) {
             return;
-        } else {
-            if (testFlag(query, Flags.BUILD, loc, localPlayer).equals("false")) {
+        }
+        if (testFlag(query, Flags.BUILD, loc, localPlayer).equals(TestFlagResult.FALSE)) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
+            player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
+            return;
+        }
+        if (testFlag(query, Flags.BUILD, loc, localPlayer).equals(TestFlagResult.TRUE)) {
+            return;
+        }
+        if (isGlobal) {
+            List<ProtectedRegion> regions = new ArrayList<>();
+
+            regions.add(WorldGuard.getInstance().getPlatform().getRegionContainer().get(localPlayer.getWorld()).getRegion("__global__"));
+            ApplicableRegionSet setOnlyGlobal = new RegionResultSet(regions, null);
+            if (setTestFlag(setOnlyGlobal, Flags.PASSTHROUGH, localPlayer).equals(TestFlagResult.FALSE)) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
                 player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
-                return;
-            } else if (testFlag(query, Flags.BUILD, loc, localPlayer).equals("true")) {
-                return;
-            } else {
-                if (!isGlobal) {
-                    List<ProtectedRegion> regions = Lists.newArrayList();
-
-                    for (ProtectedRegion reg : set.getRegions()) {
-                        regions.add(reg);
-                    }
-
-                    ApplicableRegionSet setNoGlobal = new RegionResultSet(regions, null);
-
-                    if (setTestFlag(setNoGlobal, Flags.PASSTHROUGH, localPlayer).equals("false")) {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-                        player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
-                        return;
-                    } else if (setTestFlag(setNoGlobal, Flags.PASSTHROUGH, localPlayer).equals("null")) {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-                        player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
-                        return;
-                    } else {
-                        return;
-                    }
-                } else {
-                    List<ProtectedRegion> regions = Lists.newArrayList();
-
-                    regions.add(WorldGuard.getInstance().getPlatform().getRegionContainer().get(localPlayer.getWorld()).getRegion("__global__"));
-                    ApplicableRegionSet setOnlyGlobal = new RegionResultSet(regions, null);
-                    if (setTestFlag(setOnlyGlobal, Flags.PASSTHROUGH, localPlayer).equals("false")) {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
-                        player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
-                        return;
-                    } else {
-                        return;
-                    }
-                }
             }
+            return;
+        }
+        List<ProtectedRegion> regions = new ArrayList<>(set.getRegions());
+
+        ApplicableRegionSet setNoGlobal = new RegionResultSet(regions, null);
+
+        if (setTestFlag(setNoGlobal, Flags.PASSTHROUGH, localPlayer).equals(TestFlagResult.FALSE)) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
+            player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
+        } else if (setTestFlag(setNoGlobal, Flags.PASSTHROUGH, localPlayer).equals(TestFlagResult.NOT_SET)) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't open that here.");
+            player.playEffect(event.getLocation().clone().add(0, 1, 0), Effect.SMOKE, 4);
         }
     }
 
-    public String testFlag(RegionQuery query, StateFlag flag, com.sk89q.worldedit.util.Location loc, LocalPlayer localPlayer) {
+    public TestFlagResult testFlag(RegionQuery query, StateFlag flag, com.sk89q.worldedit.util.Location loc, LocalPlayer localPlayer) {
         if (query.queryState(loc, localPlayer, flag) == null) {
-            return "null";
+            return TestFlagResult.NOT_SET;
         } else {
             if (query.queryState(loc, localPlayer, flag).equals(State.ALLOW)) {
-                return "true";
+                return TestFlagResult.TRUE;
             } else {
-                return "false";
+                return TestFlagResult.FALSE;
             }
         }
     }
 
-    public String setTestFlag(ApplicableRegionSet set, StateFlag flag, LocalPlayer localPlayer) {
+    public TestFlagResult setTestFlag(ApplicableRegionSet set, StateFlag flag, LocalPlayer localPlayer) {
         if (set.queryState(localPlayer, flag) == null) {
-            return "null";
+            return TestFlagResult.NOT_SET;
         } else {
             if (set.queryState(localPlayer, flag).equals(State.ALLOW)) {
-                return "true";
+                return TestFlagResult.TRUE;
             } else {
-                return "false";
+                return TestFlagResult.FALSE;
             }
         }
+    }
+    
+    public enum TestFlagResult {
+        
+        TRUE, FALSE, NOT_SET;
+        
     }
 
 }
