@@ -63,21 +63,20 @@ public class BookshelfHolder implements BlockInventoryHolder {
         if (unsafe != null) {
             return unsafe;
         }
-        BookshelfHolder thisRef = this;
         return unsafe = new Unsafe() {
             @Deprecated
             public void setPosition(BlockPosition position) {
-                thisRef.position = position;
+                BookshelfHolder.this.position = position;
             }
 
             @Deprecated
             public void setTitle(String title) {
-                thisRef.title = title;
+                BookshelfHolder.this.title = title;
             }
 
             @Deprecated
             public void setInventory(Inventory inventory) {
-                thisRef.inventory = inventory;
+                BookshelfHolder.this.inventory = inventory;
             }
         };
     }
