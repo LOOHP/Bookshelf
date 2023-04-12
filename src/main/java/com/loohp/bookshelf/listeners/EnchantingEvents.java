@@ -91,9 +91,9 @@ public class EnchantingEvents implements Listener {
                 Map<Enchantment, Integer> map = meta.getStoredEnchants();
                 for (Entry<Enchantment, Integer> entry : map.entrySet()) {
                     if (!enchants.containsKey(entry.getKey())) {
-                        HashMap<String, Object> value = new HashMap<String, Object>();
+                        Map<String, Object> value = new HashMap<>();
                         value.put("Occurrence", 1);
-                        List<Integer> lvl = new ArrayList<Integer>();
+                        List<Integer> lvl = new ArrayList<>();
                         lvl.add(entry.getValue());
                         value.put("Level", lvl);
                         enchants.put(entry.getKey(), value);
@@ -111,7 +111,7 @@ public class EnchantingEvents implements Listener {
         if (enchants.isEmpty()) {
             return;
         }
-        HashMap<Enchantment, HashMap<String, Integer>> list = new HashMap<>();
+        Map<Enchantment, Map<String, Integer>> list = new HashMap<>();
         int totalOccurrence = 0;
         for (Entry<Enchantment, Map<String, Object>> entry : enchants.entrySet()) {
             int occurrence = (int) entry.getValue().get("Occurrence");
@@ -122,7 +122,7 @@ public class EnchantingEvents implements Listener {
                 sum = sum + each;
             }
             int level = (int) Math.floor((double) sum / (double) levels.size());
-            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            Map<String, Integer> map = new HashMap<>();
             map.put("Occurrence", occurrence);
             map.put("Level", level);
             list.put(entry.getKey(), map);
@@ -131,7 +131,7 @@ public class EnchantingEvents implements Listener {
             return;
         }
         List<Object> pick = new ArrayList<>();
-        for (Entry<Enchantment, HashMap<String, Integer>> entry : list.entrySet()) {
+        for (Entry<Enchantment, Map<String, Integer>> entry : list.entrySet()) {
             if (entry.getKey().equals(Enchantment.MENDING)) {
                 continue;
             }

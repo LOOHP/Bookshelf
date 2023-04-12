@@ -44,12 +44,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HopperUtils {
 
-    private static final HashMap<World, Long> PerWorldHopperTransferCurrentTick = new HashMap<World, Long>();
-    private static final HashMap<World, Long> PerWorldHopperTransferSpeed = new HashMap<World, Long>();
-    private static final HashMap<World, Long> PerWorldHopperTransferAmount = new HashMap<World, Long>();
+    private static final Map<World, Long> PerWorldHopperTransferCurrentTick = new ConcurrentHashMap<>();
+    private static final Map<World, Long> PerWorldHopperTransferSpeed = new ConcurrentHashMap<>();
+    private static final Map<World, Long> PerWorldHopperTransferAmount = new ConcurrentHashMap<>();
 
     public static void hopperMinecartCheck() {
         for (World world : Bukkit.getWorlds()) {
