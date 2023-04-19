@@ -94,6 +94,10 @@ public class BookshelfManager implements Listener, AutoCloseable {
         ASYNC_EXECUTOR = asyncExecutor;
     }
 
+    public static Inventory createBookshelfInventory(BookshelfHolder holder, int rows, String title) {
+        return Bukkit.createInventory(holder, rows * 9, title == null ? getBookshelfDefaultName() : title);
+    }
+
     public static BookshelfManager getBookshelfManager(World world) {
         return BOOKSHELF_MANAGER.get(world);
     }
@@ -279,6 +283,10 @@ public class BookshelfManager implements Listener, AutoCloseable {
         return bookshelfFolder;
     }
 
+    public ParticleManager getParticleManager() {
+        return particleManager;
+    }
+
     public int size() {
         return loadedBookshelves.values().stream().mapToInt(each -> each.size()).sum();
     }
@@ -328,7 +336,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
             chunkEntry = loadChunk(position.getChunkPosition(), false);
         }
         BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
-        Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? getBookshelfDefaultName() : title);
+        Inventory inventory = BookshelfManager.createBookshelfInventory(bookshelf, Bookshelf.bookShelfRows, title);
         bookshelf.getUnsafe().setInventory(inventory);
         chunkEntry.put(position, bookshelf);
         return bookshelf;
@@ -346,7 +354,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         BookshelfHolder bookshelf = chunkEntry.get(position);
         if (bookshelf == null) {
             bookshelf = new BookshelfHolder(position, title, null);
-            Inventory inventory = Bukkit.createInventory(bookshelf, Bookshelf.bookShelfRows * 9, title == null ? getBookshelfDefaultName() : title);
+            Inventory inventory = BookshelfManager.createBookshelfInventory(bookshelf, Bookshelf.bookShelfRows, title);
             bookshelf.getUnsafe().setInventory(inventory);
             chunkEntry.put(position, bookshelf);
         }
@@ -521,7 +529,9 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBookshelfClose(PlayerCloseBookshelfEvent event) {
-        particleManager.closeBookshelf(event.getBlock());
+        if (!event.getBookshelf().isForceOpen() && event.getBookshelf().getInventory().getViewers().isEmpty()) {
+            particleManager.closeBookshelf(event.getBlock());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -538,7 +548,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEnchantmentTableClose(InventoryCloseEvent event) {
         Inventory inventory = event.getInventory();
-        if (inventory.getType().equals(InventoryType.ENCHANTING)) {
+        if (inventory.getType().equals(InventoryType.ENCHANTING) && inventory.getViewers().isEmpty()) {
             Location location = inventory.getLocation();
             if (location != null) {
                 particleManager.closeEnchant(location.getBlock());

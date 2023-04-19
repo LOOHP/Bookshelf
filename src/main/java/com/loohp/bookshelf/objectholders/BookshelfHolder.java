@@ -20,15 +20,19 @@
 
 package com.loohp.bookshelf.objectholders;
 
+import com.loohp.bookshelf.BookshelfManager;
 import org.bukkit.block.Block;
+import org.bukkit.block.Lidded;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 
-public class BookshelfHolder implements BlockInventoryHolder {
+public class BookshelfHolder implements BlockInventoryHolder, Lidded {
 
     private BlockPosition position;
     private String title;
     private Inventory inventory;
+
+    private boolean forceOpen;
 
     private Unsafe unsafe;
 
@@ -36,7 +40,14 @@ public class BookshelfHolder implements BlockInventoryHolder {
         this.position = position;
         this.title = title;
         this.inventory = inventory;
+
+        this.forceOpen = false;
+
         this.unsafe = null;
+    }
+
+    private BookshelfManager getManager() {
+        return BookshelfManager.getBookshelfManager(position.getWorld());
     }
 
     public BlockPosition getPosition() {
@@ -55,6 +66,40 @@ public class BookshelfHolder implements BlockInventoryHolder {
     @Override
     public Inventory getInventory() {
         return inventory;
+    }
+
+    @Override
+    public void open() {
+        forceOpen = true;
+        BookshelfManager manager = getManager();
+        if (manager != null) {
+            manager.getParticleManager().openBookshelf(getBlock());
+        }
+    }
+
+    @Override
+    public void close() {
+        forceOpen = false;
+        BookshelfManager manager = getManager();
+        if (manager != null) {
+            manager.getParticleManager().closeBookshelf(getBlock());
+        }
+    }
+
+    @Override
+    public boolean isOpen() {
+        if (forceOpen) {
+            return true;
+        }
+        BookshelfManager manager = getManager();
+        if (manager != null) {
+            return getManager().getParticleManager().isBookshelfOpen(getBlock());
+        }
+        return false;
+    }
+
+    public boolean isForceOpen() {
+        return forceOpen;
     }
 
     @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"})

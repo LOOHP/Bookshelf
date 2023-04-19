@@ -65,11 +65,15 @@ public class ParticleManager implements AutoCloseable {
 
             AtomicInteger counter = new AtomicInteger(0);
 
-            this.particleTask = Scheduler.runTaskTimerAsynchronously(this.plugin, () -> {
+            this.particleTask = Scheduler.runTaskTimerAsynchronously(plugin, () -> {
                 int currentTick = counter.getAndIncrement();
                 if (Bookshelf.bookshelfParticlesEnabled) {
                     if (currentTick % Bookshelf.bookshelfParticlesFrequency == 0) {
                         for (Block block : openedBookshelves) {
+                            if (!block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
+                                Scheduler.runTask(plugin, () -> closeBookshelf(block));
+                                continue;
+                            }
                             Location loc = block.getLocation();
                             Location loc2 = loc.clone().add(1, 1, 1);
                             for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
@@ -134,6 +138,10 @@ public class ParticleManager implements AutoCloseable {
 
     public void closeBookshelf(Block bookshelf) {
         openedBookshelves.remove(bookshelf);
+    }
+
+    public boolean isBookshelfOpen(Block bookshelf) {
+        return openedBookshelves.contains(bookshelf);
     }
 
     public void openEnchant(Block enchantingTable) {

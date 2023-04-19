@@ -20,12 +20,12 @@
 
 package com.loohp.bookshelf.utils;
 
+import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.objectholders.BlockPosition;
-import org.bukkit.Bukkit;
+import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -82,16 +82,11 @@ public class BookshelfUtils {
         }
     }
 
-    public static Inventory fromBase64(String data, String title, InventoryHolder holder) throws IOException {
+    public static Inventory fromBase64(String data, String title, BookshelfHolder holder) throws IOException {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            Inventory inventory = null;
-            if (title.equals("")) {
-                inventory = Bukkit.getServer().createInventory(holder, dataInput.readInt());
-            } else {
-                inventory = Bukkit.getServer().createInventory(holder, dataInput.readInt(), title);
-            }
+            Inventory inventory = BookshelfManager.createBookshelfInventory(holder, dataInput.readInt(), title == null || title.equals("") ? null : title);
 
             // Read the serialized inventory
             for (int i = 0; i < inventory.getSize(); i++) {
