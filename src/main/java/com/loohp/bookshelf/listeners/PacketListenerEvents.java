@@ -20,162 +20,34 @@
 
 package com.loohp.bookshelf.listeners;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
-import com.loohp.bookshelf.objectholders.Scheduler;
-import com.loohp.bookshelf.utils.MCVersion;
-import com.loohp.bookshelf.utils.NMSUtils;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.util.concurrent.Future;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-public class PacketListenerEvents implements Listener {
-
-    public static final String HANDLER = "packet_handler";
-    public static final String CHANNEL_NAME = "bookshelf_listener";
-
-    private static Class<?> craftPlayerClass;
-    private static Method craftPlayerGetHandleMethod;
-    private static Field playerConnectionField;
-    private static Field networkManagerField;
-    private static Field channelField;
-    private static Class<?> craftChatMessageClass;
-    private static Class<?> nmsIChatBaseComponentClass;
-    private static Method craftChatMessageFromComponentMethod;
-    private static Class<?> nmsChatSerializerClass;
-    private static Method nmsChatSerializerFromJSONMethod;
-    private static Class<?> nmsPacketPlayOutOpenWindowClass;
-    private static Field nmsPacketPlayOutOpenWindowTitleField;
-
-    static {
-        try {
-            craftPlayerClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.entity.CraftPlayer");
-            craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
-            playerConnectionField = NMSUtils.reflectiveLookup(Field.class, () -> {
-                return craftPlayerGetHandleMethod.getReturnType().getField("playerConnection");
-            }, () -> {
-                return craftPlayerGetHandleMethod.getReturnType().getField("b");
-            });
-            networkManagerField = NMSUtils.reflectiveLookup(Field.class, () -> {
-                return playerConnectionField.getType().getField("networkManager");
-            }, () -> {
-                if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_19_4)) {
-                    return playerConnectionField.getType().getDeclaredField("h");
-                } else if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_19)) {
-                    return playerConnectionField.getType().getField("b");
-                } else {
-                    return playerConnectionField.getType().getField("a");
-                }
-            });
-            channelField = NMSUtils.reflectiveLookup(Field.class, () -> {
-                return networkManagerField.getType().getField("channel");
-            }, () -> {
-                return networkManagerField.getType().getField("k");
-            }, () -> {
-                return networkManagerField.getType().getField("m");
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            craftChatMessageClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.util.CraftChatMessage");
-            nmsIChatBaseComponentClass = NMSUtils.getNMSClass("net.minecraft.server.%s.IChatBaseComponent", "net.minecraft.network.chat.IChatBaseComponent");
-            craftChatMessageFromComponentMethod = craftChatMessageClass.getMethod("fromComponent", nmsIChatBaseComponentClass);
-            nmsChatSerializerClass = NMSUtils.getNMSClass("net.minecraft.server.%s.IChatBaseComponent$ChatSerializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer");
-            nmsChatSerializerFromJSONMethod = nmsChatSerializerClass.getMethod("a", String.class);
-            nmsPacketPlayOutOpenWindowClass = NMSUtils.getNMSClass("net.minecraft.server.%s.PacketPlayOutOpenWindow", "net.minecraft.network.protocol.game.PacketPlayOutOpenWindow");
-            nmsPacketPlayOutOpenWindowTitleField = Arrays.stream(nmsPacketPlayOutOpenWindowClass.getDeclaredFields()).filter(each -> each.getType().equals(nmsIChatBaseComponentClass)).findFirst().get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+public class PacketListenerEvents {
 
     public PacketListenerEvents() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            onJoin(new PlayerJoinEvent(player, ""));
-        }
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        UUID uuid = event.getPlayer().getUniqueId();
-        try {
-            networkManagerField.setAccessible(true);
-            Channel channel = (Channel) channelField.get(networkManagerField.get(playerConnectionField.get(craftPlayerGetHandleMethod.invoke(craftPlayerClass.cast(event.getPlayer())))));
-            Future<?> future = channel.eventLoop().submit(() -> {
-                try {
-                    channel.pipeline().remove(CHANNEL_NAME);
-                } catch (Throwable ignored) {
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(Bookshelf.plugin, ListenerPriority.NORMAL, PacketType.Play.Server.OPEN_WINDOW) {
+            @SuppressWarnings("deprecation")
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+                WrappedChatComponent title = packet.getChatComponents().read(0);
+                String plain = ChatColor.stripColor(BaseComponent.toLegacyText(ComponentSerializer.parse(title.getJson())));
+                if (plain.equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
+                    packet.getChatComponents().write(0, WrappedChatComponent.fromJson(BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
                 }
-            });
-            Scheduler.runTaskAsynchronously(Bookshelf.plugin, () -> {
-                try {
-                    future.get(5000, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
-                }
-                Scheduler.runTask(Bookshelf.plugin, () -> {
-                    try {
-                        if (Bukkit.getPlayer(uuid) != null) {
-                            channel.pipeline().addBefore(HANDLER, CHANNEL_NAME, new ChannelDuplexHandler() {
-                                @Override
-                                public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
-                                    if (packet != null) {
-                                        if (nmsPacketPlayOutOpenWindowClass.isInstance(packet)) {
-                                            nmsPacketPlayOutOpenWindowTitleField.setAccessible(true);
-                                            if (ChatColor.stripColor(craftChatMessageFromComponentMethod.invoke(null, nmsPacketPlayOutOpenWindowTitleField.get(packet)).toString()).equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
-                                                nmsPacketPlayOutOpenWindowTitleField.set(packet, nmsChatSerializerFromJSONMethod.invoke(null, BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
-                                            }
-                                        }
-                                    }
-                                    super.write(context, packet, promise);
-                                }
-
-                                @Override
-                                public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-                                    super.channelRead(ctx, packet);
-                                }
-                            });
-                        }
-                    } catch (NoSuchElementException ignore) {
-                    }
-                }, event.getPlayer());
-            });
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        try {
-            networkManagerField.setAccessible(true);
-            Channel channel = (Channel) channelField.get(networkManagerField.get(playerConnectionField.get(craftPlayerGetHandleMethod.invoke(craftPlayerClass.cast(event.getPlayer())))));
-            channel.eventLoop().submit(() -> {
-                try {
-                    channel.pipeline().remove(CHANNEL_NAME);
-                } catch (Throwable ignored) {
-                }
-            });
-        } catch (Throwable ignored) {
-        }
+            }
+        });
     }
 
 }

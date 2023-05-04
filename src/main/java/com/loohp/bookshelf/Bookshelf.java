@@ -251,7 +251,8 @@ public class Bookshelf extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DispenserEvents(), this);
         getServer().getPluginManager().registerEvents(new EnchantingEvents(), this);
         getServer().getPluginManager().registerEvents(new PistonEvents(), this);
-        getServer().getPluginManager().registerEvents(new PacketListenerEvents(), this);
+
+        new PacketListenerEvents();
 
         getCommand("bookshelf").setExecutor(new Commands());
 

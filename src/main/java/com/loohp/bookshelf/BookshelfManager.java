@@ -27,6 +27,7 @@ import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
+import com.loohp.bookshelf.objectholders.BookshelfHolderFactory;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
 import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.BookshelfUtils;
@@ -335,7 +336,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         if (chunkEntry == null) {
             chunkEntry = loadChunk(position.getChunkPosition(), false);
         }
-        BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
+        BookshelfHolder bookshelf = BookshelfHolderFactory.newInstance(position, title, null);
         Inventory inventory = BookshelfManager.createBookshelfInventory(bookshelf, Bookshelf.bookShelfRows, title);
         bookshelf.getUnsafe().setInventory(inventory);
         chunkEntry.put(position, bookshelf);
@@ -353,7 +354,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
         }
         BookshelfHolder bookshelf = chunkEntry.get(position);
         if (bookshelf == null) {
-            bookshelf = new BookshelfHolder(position, title, null);
+            bookshelf = BookshelfHolderFactory.newInstance(position, title, null);
             Inventory inventory = BookshelfManager.createBookshelfInventory(bookshelf, Bookshelf.bookShelfRows, title);
             bookshelf.getUnsafe().setInventory(inventory);
             chunkEntry.put(position, bookshelf);
@@ -433,7 +434,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
                         if (!checkPresence || checkIfLocationIsBookshelf(position)) {
                             JSONObject entry = (JSONObject) json.get(key);
                             String title = entry.containsKey("Title") ? entry.get("Title").toString() : null;
-                            BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
+                            BookshelfHolder bookshelf = BookshelfHolderFactory.newInstance(position, title, null);
                             Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title == null ? getBookshelfDefaultName() : title, bookshelf);
                             bookshelf.getUnsafe().setInventory(inventory);
                             chunkEntry.put(position, bookshelf);
@@ -529,9 +530,11 @@ public class BookshelfManager implements Listener, AutoCloseable {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBookshelfClose(PlayerCloseBookshelfEvent event) {
-        if (!event.getBookshelf().isForceOpen() && event.getBookshelf().getInventory().getViewers().isEmpty()) {
-            particleManager.closeBookshelf(event.getBlock());
-        }
+        Scheduler.runTaskLater(plugin, () -> {
+            if (!event.getBookshelf().isForceOpen() && event.getBookshelf().getInventory().getViewers().isEmpty()) {
+                particleManager.closeBookshelf(event.getBlock());
+            }
+        }, 1, event.getLocation());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

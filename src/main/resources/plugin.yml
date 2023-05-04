@@ -5,6 +5,7 @@ main: com.loohp.bookshelf.Bookshelf
 api-version: 1.13
 description: Actual BookShelf in Minecraft
 folia-supported: true
+depend: [ProtocolLib]
 softdepend:
   - LWC
   - WorldGuard

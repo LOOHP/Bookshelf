@@ -22,11 +22,15 @@ package com.loohp.bookshelf.objectholders;
 
 import com.loohp.bookshelf.BookshelfManager;
 import org.bukkit.block.Block;
-import org.bukkit.block.Lidded;
-import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
-public class BookshelfHolder implements BlockInventoryHolder, Lidded {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+public abstract class BookshelfHolder implements InventoryHolder {
 
     private BlockPosition position;
     private String title;
@@ -54,7 +58,7 @@ public class BookshelfHolder implements BlockInventoryHolder, Lidded {
         return position;
     }
 
-    @Override
+    @MightOverride
     public Block getBlock() {
         return position.getBlock();
     }
@@ -68,7 +72,7 @@ public class BookshelfHolder implements BlockInventoryHolder, Lidded {
         return inventory;
     }
 
-    @Override
+    @MightOverride
     public void open() {
         forceOpen = true;
         BookshelfManager manager = getManager();
@@ -77,7 +81,7 @@ public class BookshelfHolder implements BlockInventoryHolder, Lidded {
         }
     }
 
-    @Override
+    @MightOverride
     public void close() {
         forceOpen = false;
         BookshelfManager manager = getManager();
@@ -86,7 +90,7 @@ public class BookshelfHolder implements BlockInventoryHolder, Lidded {
         }
     }
 
-    @Override
+    @MightOverride
     public boolean isOpen() {
         if (forceOpen) {
             return true;
@@ -148,6 +152,11 @@ public class BookshelfHolder implements BlockInventoryHolder, Lidded {
         @Deprecated
         void setInventory(Inventory inventory);
 
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface MightOverride {
     }
 
 }

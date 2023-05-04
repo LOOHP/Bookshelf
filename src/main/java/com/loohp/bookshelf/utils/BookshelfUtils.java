@@ -86,7 +86,7 @@ public class BookshelfUtils {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            Inventory inventory = BookshelfManager.createBookshelfInventory(holder, dataInput.readInt(), title == null || title.equals("") ? null : title);
+            Inventory inventory = BookshelfManager.createBookshelfInventory(holder, dataInput.readInt() / 9, title == null || title.equals("") ? null : title);
 
             // Read the serialized inventory
             for (int i = 0; i < inventory.getSize(); i++) {

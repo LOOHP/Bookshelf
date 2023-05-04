@@ -25,6 +25,7 @@ import com.google.gson.GsonBuilder;
 import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
+import com.loohp.bookshelf.objectholders.BookshelfHolderFactory;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -78,7 +79,7 @@ public class LegacyConfigConverter {
                         bookshelves.put(position.getChunkPosition(), chunkEntry);
                     }
                     String title = entry.get("Title").toString();
-                    BookshelfHolder bookshelf = new BookshelfHolder(position, title, null);
+                    BookshelfHolder bookshelf = BookshelfHolderFactory.newInstance(position, title, null);
                     Inventory inventory = BookshelfUtils.fromBase64(entry.get("Inventory").toString(), title, bookshelf);
                     bookshelf.getUnsafe().setInventory(inventory);
                     chunkEntry.put(position, bookshelf);
