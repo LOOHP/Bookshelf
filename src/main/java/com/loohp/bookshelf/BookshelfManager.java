@@ -551,12 +551,14 @@ public class BookshelfManager implements Listener, AutoCloseable {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEnchantmentTableClose(InventoryCloseEvent event) {
         Inventory inventory = event.getInventory();
-        if (inventory.getType().equals(InventoryType.ENCHANTING) && inventory.getViewers().isEmpty()) {
-            Location location = inventory.getLocation();
-            if (location != null) {
-                particleManager.closeEnchant(location.getBlock());
+        Scheduler.runTaskLater(plugin, () -> {
+            if (inventory.getType().equals(InventoryType.ENCHANTING) && inventory.getViewers().isEmpty()) {
+                Location location = inventory.getLocation();
+                if (location != null) {
+                    particleManager.closeEnchant(location.getBlock());
+                }
             }
-        }
+        }, 1, inventory.getLocation() == null ? event.getPlayer().getLocation() : inventory.getLocation());
     }
 
 }
