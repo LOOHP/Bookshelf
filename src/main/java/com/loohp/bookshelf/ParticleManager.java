@@ -67,7 +67,7 @@ public class ParticleManager implements AutoCloseable {
 
             this.particleTask = Scheduler.runTaskTimerAsynchronously(plugin, () -> {
                 int currentTick = counter.getAndIncrement();
-                if (Bookshelf.bookshelfParticlesEnabled) {
+                if (Bookshelf.bookshelfParticlesEnabled && Bookshelf.bookshelfParticlesFrequency > 0) {
                     if (currentTick % Bookshelf.bookshelfParticlesFrequency == 0) {
                         for (Block block : openedBookshelves) {
                             if (!block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
@@ -89,7 +89,7 @@ public class ParticleManager implements AutoCloseable {
                         }
                     }
                 }
-                if (Bookshelf.enchantingParticlesCount > 0) {
+                if (Bookshelf.enchantingParticlesCount > 0 && Bookshelf.bookshelfEnchantingParticlesFrequency > 0) {
                     if (currentTick % Bookshelf.bookshelfEnchantingParticlesFrequency == 0) {
                         Set<Block> enchantEmitted = new HashSet<>();
                         for (Entry<Block, Set<Block>> entry : enchantingBoostingBlocks.entrySet()) {
