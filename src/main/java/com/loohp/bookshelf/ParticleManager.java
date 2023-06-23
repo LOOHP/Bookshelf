@@ -98,21 +98,23 @@ public class ParticleManager implements AutoCloseable {
                                 Location tablePos = entry.getKey().getLocation().add(0.5, 0.5, 0.5);
                                 tablePos.getWorld().spawnParticle(Particle.PORTAL, tablePos, Bookshelf.enchantingParticlesCount);
                                 for (Block block : blocks) {
-                                    if (block.getType().equals(Material.BOOKSHELF) && !enchantEmitted.contains(block)) {
-                                        Location loc = block.getLocation().clone();
-                                        Location loc2 = loc.clone().add(1, 1, 1);
-                                        for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
-                                            if (random.nextInt(100) >= 98) {
-                                                int ranColor = random.nextInt(2) + 1;
-                                                if (ranColor == 1) {
-                                                    loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor2);
-                                                } else {
-                                                    loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor1);
+                                    Scheduler.executeOrScheduleSync(plugin, () -> {
+                                        if (block.getType().equals(Material.BOOKSHELF) && !enchantEmitted.contains(block)) {
+                                            Location loc = block.getLocation().clone();
+                                            Location loc2 = loc.clone().add(1, 1, 1);
+                                            for (Location pos : ParticlesUtils.getHollowCube(loc.add(-0.0625, -0.0625, -0.0625), loc2.add(0.0625, 0.0625, 0.0625), 0.1666)) {
+                                                if (random.nextInt(100) >= 98) {
+                                                    int ranColor = random.nextInt(2) + 1;
+                                                    if (ranColor == 1) {
+                                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor2);
+                                                    } else {
+                                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor1);
+                                                    }
                                                 }
                                             }
+                                            enchantEmitted.add(block);
                                         }
-                                        enchantEmitted.add(block);
-                                    }
+                                    }, block.getLocation());
                                 }
                             }
                         }
