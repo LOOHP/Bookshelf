@@ -1,5 +1,5 @@
 /*
- * This file is part of LotterySix.
+ * This file is part of Bookshelf.
  *
  * Copyright (C) 2023. LoohpJames <jamesloohp@gmail.com>
  * Copyright (C) 2023. Contributors

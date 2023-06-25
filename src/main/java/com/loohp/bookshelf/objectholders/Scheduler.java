@@ -35,7 +35,7 @@ public class Scheduler {
     static {
         boolean folia;
         try {
-            Class.forName("io.papermc.paper.threadedregions.scheduler.AsyncScheduler");
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             folia = true;
         } catch (ClassNotFoundException e) {
             folia = false;
