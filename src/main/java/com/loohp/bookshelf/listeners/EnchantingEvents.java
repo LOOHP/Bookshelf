@@ -57,7 +57,7 @@ public class EnchantingEvents implements Listener {
         if (Bookshelf.version.isOlderOrEqualTo(MCVersion.V1_10)) {
             return;
         }
-        if (!Bookshelf.enchantmentTable) {
+        if (!Bookshelf.enchantmentTable || Bookshelf.eTableMulti <= 0) {
             return;
         }
 

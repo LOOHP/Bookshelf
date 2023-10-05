@@ -44,7 +44,7 @@ Options:
     Secondary: "#3333FF"
 
   #Max percentage of the enchantment table boosting feature
-  #Accepts integer from 0 to 100
+  #Accepts integer from 1 to 100
   EnchantmentTableBoostingMaxPercentage: 80
 
   #Disable bookshelves loading in these worlds

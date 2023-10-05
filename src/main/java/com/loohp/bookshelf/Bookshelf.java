@@ -187,7 +187,7 @@ public class Bookshelf extends JavaPlugin {
         } else if (eTableChance < 0) {
             eTableChance = 0;
         }
-        eTableMulti = (int) Math.pow(((double) eTableChance / 100.0), -1);
+        eTableMulti = eTableChance == 0 ? 0 : (int) Math.pow(((double) eTableChance / 100.0), -1);
         enchantingParticlesCount = getConfiguration().getInt("Options.EnchantingParticlesCount");
         bookshelfEnchantingParticlesFrequency = getConfiguration().getInt("Options.BoostingParticleColors.Frequency");
         boostingPrimaryColor = ColorUtils.hex2Rgb(getConfiguration().getString("Options.BoostingParticleColors.Primary"));
