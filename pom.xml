@@ -393,7 +393,7 @@
 			<artifactId>PlotSquared-Bukkit-7.2.1-SNAPSHOT</artifactId>
 			<scope>system</scope>
 			<version>1.0</version>
-			<systemPath>${basedir}/lib/plotSquared-Bukkit-7.2.1-SNAPSHOT.jar</systemPath>
+			<systemPath>${basedir}/lib/plotsquared-bukkit-7.2.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>PlotSquared-Bukkit-6.8.2-SNAPSHOT</groupId>
