@@ -110,8 +110,8 @@ public class PlotSquared5Events implements Listener {
 
             for (PlotFlag<?, ?> flag : plot.getFlags()) {
                 if (flag instanceof UseFlag) {
-                    for (BlockTypeWrapper blockTypeWarpper : (List<BlockTypeWrapper>) flag.getValue()) {
-                        if (blockTypeWarpper.accepts(ADAPTED_BOOKSHELF_TYPE)) {
+                    for (BlockTypeWrapper blockTypeWrapper : (List<BlockTypeWrapper>) flag.getValue()) {
+                        if (blockTypeWrapper.accepts(ADAPTED_BOOKSHELF_TYPE)) {
                             return;
                         }
                     }

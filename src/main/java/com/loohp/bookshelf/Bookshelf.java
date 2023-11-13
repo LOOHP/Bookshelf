@@ -39,6 +39,7 @@ import com.loohp.bookshelf.listeners.hooks.LandEvents;
 import com.loohp.bookshelf.listeners.hooks.PlotSquared4Events;
 import com.loohp.bookshelf.listeners.hooks.PlotSquared5Events;
 import com.loohp.bookshelf.listeners.hooks.PlotSquared6Events;
+import com.loohp.bookshelf.listeners.hooks.PlotSquared7Events;
 import com.loohp.bookshelf.listeners.hooks.RedProtectEvents;
 import com.loohp.bookshelf.listeners.hooks.ResidenceEvents;
 import com.loohp.bookshelf.listeners.hooks.SuperiorSkyblock2Events;
@@ -371,7 +372,11 @@ public class Bookshelf extends JavaPlugin {
         String PlotSquared = "PlotSquared";
         if (isPluginEnabled(PlotSquared)) {
             String plotSquaredVersion = getServer().getPluginManager().getPlugin(PlotSquared).getDescription().getVersion();
-            if (plotSquaredVersion.startsWith("6.")) {
+            if (plotSquaredVersion.startsWith("7.")) {
+                hookMessage(PlotSquared + " (v7)");
+                getServer().getPluginManager().registerEvents(new PlotSquared7Events(), this);
+                plotSquaredHook = true;
+            } else if (plotSquaredVersion.startsWith("6.")) {
                 hookMessage(PlotSquared + " (v6)");
                 getServer().getPluginManager().registerEvents(new PlotSquared6Events(), this);
                 plotSquaredHook = true;
@@ -384,7 +389,7 @@ public class Bookshelf extends JavaPlugin {
                 getServer().getPluginManager().registerEvents(new PlotSquared4Events(), this);
                 plotSquaredHook = true;
             } else {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of PlotSquared is not supported, only v4 and v5 is supported so far.");
+                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Bookshelf] This version of PlotSquared is not supported, only v4, v5, v6 and v7 are supported so far.");
             }
         }
 

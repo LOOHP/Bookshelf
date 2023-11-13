@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>3.1.6.0</version>
+	<version>3.1.6.1</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -389,11 +389,11 @@
 			<systemPath>${basedir}/lib/OpenInv.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>PlotSquared-Bukkit-4.4.495</groupId>
-			<artifactId>PlotSquared-Bukkit-4.4.495</artifactId>
+			<groupId>PlotSquared-Bukkit-7.2.1-SNAPSHOT</groupId>
+			<artifactId>PlotSquared-Bukkit-7.2.1-SNAPSHOT</artifactId>
 			<scope>system</scope>
 			<version>1.0</version>
-			<systemPath>${basedir}/lib/PlotSquared-Bukkit-4.4.495.jar</systemPath>
+			<systemPath>${basedir}/lib/PlotSquared-Bukkit-7.2.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>PlotSquared-Bukkit-6.8.2-SNAPSHOT</groupId>
@@ -401,6 +401,13 @@
 			<scope>system</scope>
 			<version>1.0</version>
 			<systemPath>${basedir}/lib/PlotSquared-Bukkit-6.8.2-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>PlotSquared-Bukkit-4.4.495</groupId>
+			<artifactId>PlotSquared-Bukkit-4.4.495</artifactId>
+			<scope>system</scope>
+			<version>1.0</version>
+			<systemPath>${basedir}/lib/PlotSquared-Bukkit-4.4.495.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>Residence4.9.0.4</groupId>

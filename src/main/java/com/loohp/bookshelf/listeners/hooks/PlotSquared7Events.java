@@ -23,8 +23,9 @@ package com.loohp.bookshelf.listeners.hooks;
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.plotsquared.core.PlotSquared;
-import com.plotsquared.core.configuration.adventure.text.minimessage.Template;
-import com.plotsquared.core.configuration.caption.Caption;
+import com.plotsquared.core.configuration.adventure.text.Component;
+import com.plotsquared.core.configuration.adventure.text.minimessage.tag.Tag;
+import com.plotsquared.core.configuration.adventure.text.minimessage.tag.resolver.TagResolver;
 import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.permissions.Permission;
@@ -42,22 +43,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
-public class PlotSquared6Events implements Listener {
+public class PlotSquared7Events implements Listener {
 
     private static final BlockType ADAPTED_BOOKSHELF_TYPE = BukkitAdapter.asBlockType(Material.BOOKSHELF);
-
-    private static Method plotPlayerSendMessageMethod;
-
-    static {
-        try {
-            plotPlayerSendMessageMethod = PlotPlayer.class.getMethod("sendMessage", Caption.class, Template[].class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
-        }
-    }
 
     @SuppressWarnings("unchecked")
     @EventHandler(priority = EventPriority.LOWEST)
@@ -118,13 +108,10 @@ public class PlotSquared6Events implements Listener {
             }
         }
 
-        try {
-            plotPlayerSendMessageMethod.invoke(player,
-                                               TranslatableCaption.of("permission.no_permission_event"),
-                                               Template.of("node", String.valueOf(Permission.PERMISSION_ADMIN_BUILD_OTHER))
-            );
-        } catch (Exception ignore) {
-        }
+        player.sendMessage(
+                TranslatableCaption.of("permission.no_permission_event"),
+                TagResolver.resolver("node", Tag.inserting(Component.text(Permission.PERMISSION_ADMIN_BUILD_OTHER.toString())))
+        );
 
         event.setCancelled(true);
     }
