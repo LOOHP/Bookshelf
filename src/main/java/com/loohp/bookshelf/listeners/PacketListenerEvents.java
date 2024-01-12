@@ -40,12 +40,14 @@ public class PacketListenerEvents {
             @SuppressWarnings("deprecation")
             @Override
             public void onPacketSending(PacketEvent event) {
-                PacketContainer packet = event.getPacket();
-                WrappedChatComponent title = packet.getChatComponents().read(0);
-                String plain = ChatColor.stripColor(BaseComponent.toLegacyText(ComponentSerializer.parse(title.getJson())));
-                if (plain.equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
-                    packet.getChatComponents().write(0, WrappedChatComponent.fromJson(BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
-                }
+                try {
+                    PacketContainer packet = event.getPacket();
+                    WrappedChatComponent title = packet.getChatComponents().read(0);
+                    String plain = ChatColor.stripColor(BaseComponent.toLegacyText(ComponentSerializer.parse(title.getJson())));
+                    if (plain.equals(BookshelfManager.DEFAULT_BOOKSHELF_NAME_TRANSLATABLE_PLACEHOLDER)) {
+                        packet.getChatComponents().write(0, WrappedChatComponent.fromJson(BookshelfManager.DEFAULT_BOOKSHELF_NAME_JSON));
+                    }
+                } catch (Throwable ignore) {}
             }
         });
     }
