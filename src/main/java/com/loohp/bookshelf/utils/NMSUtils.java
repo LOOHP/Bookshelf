@@ -27,16 +27,19 @@ import java.lang.reflect.AccessibleObject;
 public class NMSUtils {
 
     public static Class<?> getNMSClass(String path, String... paths) throws ClassNotFoundException {
-        String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-        ClassNotFoundException error = null;
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        if (!version.matches("v[0-9]+_[0-9]+_R[0-9]+")) {
+            version = "";
+        }
+        ClassNotFoundException error;
         try {
-            return Class.forName(path.replace("%s", version));
+            return Class.forName(path.replace("%s", version).replaceAll("\\.+", "."));
         } catch (ClassNotFoundException e) {
             error = e;
         }
         for (String classpath : paths) {
             try {
-                return Class.forName(classpath.replace("%s", version));
+                return Class.forName(classpath.replace("%s", version).replaceAll("\\.+", "."));
             } catch (ClassNotFoundException e) {
                 error = e;
             }
@@ -46,7 +49,7 @@ public class NMSUtils {
 
     @SafeVarargs
     public static <T extends AccessibleObject> T reflectiveLookup(Class<T> lookupType, ReflectionLookupSupplier<T> methodLookup, ReflectionLookupSupplier<T>... methodLookups) throws ReflectiveOperationException {
-        ReflectiveOperationException error = null;
+        ReflectiveOperationException error;
         try {
             return methodLookup.lookup();
         } catch (ReflectiveOperationException e) {

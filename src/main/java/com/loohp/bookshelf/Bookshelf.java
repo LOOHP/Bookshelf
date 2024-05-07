@@ -232,7 +232,7 @@ public class Bookshelf extends JavaPlugin {
         Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID);
 
         exactMinecraftVersion = Bukkit.getVersion().substring(Bukkit.getVersion().indexOf("(") + 5, Bukkit.getVersion().indexOf(")"));
-        version = MCVersion.fromPackageName(getServer().getClass().getPackage().getName());
+        version = MCVersion.resolve();
 
         ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Bookshelf World Processing Thread #%d").build();
         BookshelfManager.setAsyncExecutor(Executors.newFixedThreadPool(8, factory));

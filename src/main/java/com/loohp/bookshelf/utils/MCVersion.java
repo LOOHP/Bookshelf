@@ -20,10 +20,16 @@
 
 package com.loohp.bookshelf.utils;
 
+import org.bukkit.Bukkit;
+
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public enum MCVersion {
 
+    V1_20_6("1.20.6", "1_20_R4", 25),
+    V1_20_5("1.20.5", "1_20_R4", 24),
     V1_20_3("1.20.3", "1_20_R3", 23),
     V1_20_2("1.20.2", "1_20_R2", 22),
     V1_20("1.20", "1_20_R1", 21),
@@ -53,6 +59,28 @@ public enum MCVersion {
     public static final MCVersion MINIMUM_SUPPORTED_VERSION = V1_8;
 
     private static final MCVersion[] SUPPORTED_VALUES = Arrays.stream(values()).filter(v -> v.isSupported()).toArray(MCVersion[]::new);
+
+    public static MCVersion resolve() {
+        MCVersion version = fromVersion(Bukkit.getVersion());
+        if (version.isSupported()) {
+            return version;
+        }
+        return fromPackageName(Bukkit.getServer().getClass().getPackage().getName());
+    }
+
+    public static MCVersion fromVersion(String bukkitVersion) {
+        Pattern versionPattern = Pattern.compile("(?i)\\(MC:? ([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\)");
+        Matcher matcher = versionPattern.matcher(bukkitVersion);
+        if (matcher.find()) {
+            String minecraftVersion = matcher.group(1);
+            for (MCVersion version : SUPPORTED_VALUES) {
+                if (minecraftVersion.equals(version.getMinecraftVersion())) {
+                    return version;
+                }
+            }
+        }
+        return UNSUPPORTED;
+    }
 
     public static MCVersion fromPackageName(String packageName) {
         for (MCVersion version : SUPPORTED_VALUES) {
@@ -84,6 +112,10 @@ public enum MCVersion {
 
     @Override
     public String toString() {
+        return name;
+    }
+
+    public String getMinecraftVersion() {
         return name;
     }
 

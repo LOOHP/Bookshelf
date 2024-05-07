@@ -37,18 +37,20 @@ public class WorldUtils {
 
     static {
         try {
+            // 1.16 - 1.18.2 only
             craftWorldClass = NMSUtils.getNMSClass("org.bukkit.craftbukkit.%s.CraftWorld");
             getHandleMethod = craftWorldClass.getMethod("getHandle");
             worldServerClass = getHandleMethod.getReturnType();
             getWorldTypeKeyMethod = worldServerClass.getMethod("getTypeKey");
             getMinecraftKeyMethod = getWorldTypeKeyMethod.getReturnType().getMethod("a");
-        } catch (ReflectiveOperationException e) {
-            e.printStackTrace();
+        } catch (ReflectiveOperationException ignore) {
         }
     }
 
     public static String getNamespacedKey(World world) {
-        if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_16)) {
+        if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_18_2)) {
+            return world.getKey().toString();
+        } else if (Bookshelf.version.isNewerOrEqualTo(MCVersion.V1_16)) {
             try {
                 Object craftWorldObject = craftWorldClass.cast(world);
                 Object nmsWorldServerObject = getHandleMethod.invoke(craftWorldObject);
