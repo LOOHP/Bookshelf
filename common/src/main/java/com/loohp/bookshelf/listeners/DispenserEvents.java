@@ -25,6 +25,7 @@ import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.Scheduler;
+import com.loohp.bookshelf.objectholders.TileStateSimulateBookshelfInventory;
 import com.loohp.bookshelf.utils.BlockLockerUtils;
 import com.loohp.bookshelf.utils.DropperUtils;
 import com.loohp.bookshelf.utils.InventoryUtils;
@@ -104,7 +105,7 @@ public class DispenserEvents implements Listener {
             ItemStack additem = each.clone();
             additem.setAmount(1);
             ItemStack beforeEvent = additem.clone();
-            InventoryMoveItemEvent moveItemEvent = new InventoryMoveItemEvent(dropper, additem, inventory, true);
+            InventoryMoveItemEvent moveItemEvent = new InventoryMoveItemEvent(dropper, additem, new TileStateSimulateBookshelfInventory(bookshelf), true);
             Bukkit.getPluginManager().callEvent(moveItemEvent);
             if (moveItemEvent.isCancelled()) {
                 return;

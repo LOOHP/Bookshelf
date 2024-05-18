@@ -25,6 +25,7 @@ import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.Scheduler;
+import com.loohp.bookshelf.objectholders.TileStateSimulateBookshelfInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -87,7 +88,8 @@ public class HopperUtils {
                             }
 
                             Inventory inventory = hoppercart.getInventory();
-                            Inventory bookshelfInv = manager.getOrCreateBookshelf(new BlockPosition(bookshelfBlock), null).getInventory();
+                            BookshelfHolder holder = manager.getOrCreateBookshelf(new BlockPosition(bookshelfBlock), null);
+                            Inventory bookshelfInv = holder.getInventory();
                             for (int i = 0; i < bookshelfInv.getSize(); i++) {
                                 ItemStack item = bookshelfInv.getItem(i);
                                 if (item == null) {
@@ -112,7 +114,7 @@ public class HopperUtils {
                                     ItemStack additem = item.clone();
                                     additem.setAmount(1);
                                     ItemStack beforeEvent = additem.clone();
-                                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
+                                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, new TileStateSimulateBookshelfInventory(holder), true);
                                     Bukkit.getPluginManager().callEvent(event);
                                     if (event.isCancelled()) {
                                         break;
@@ -197,7 +199,7 @@ public class HopperUtils {
                                             }
                                             additem.setAmount(num);
                                             ItemStack beforeEvent = additem.clone();
-                                            InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, bookshelfInv, true);
+                                            InventoryMoveItemEvent event = new InventoryMoveItemEvent(inventory, additem, new TileStateSimulateBookshelfInventory(bookshelf), true);
                                             Bukkit.getPluginManager().callEvent(event);
                                             if (event.isCancelled()) {
                                                 break;
@@ -255,7 +257,7 @@ public class HopperUtils {
                                         }
                                         additem.setAmount(num);
                                         ItemStack beforeEvent = additem.clone();
-                                        InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, inventory, false);
+                                        InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, new TileStateSimulateBookshelfInventory(bookshelf), false);
                                         Bukkit.getPluginManager().callEvent(event);
                                         if (event.isCancelled()) {
                                             break;
@@ -291,7 +293,7 @@ public class HopperUtils {
                                     }
                                     additem.setAmount(num);
                                     ItemStack beforeEvent = additem.clone();
-                                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, inventory, false);
+                                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(bookshelfInv, additem, new TileStateSimulateBookshelfInventory(bookshelf), false);
                                     Bukkit.getPluginManager().callEvent(event);
                                     if (event.isCancelled()) {
                                         break;
