@@ -20,6 +20,7 @@
 
 package com.loohp.bookshelf;
 
+import com.loohp.bookshelf.nms.NMS;
 import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.EnchantmentTableUtils;
@@ -80,9 +81,9 @@ public class ParticleManager implements AutoCloseable {
                                 if (random.nextInt(100) >= 95) {
                                     int ranColor = random.nextInt(2) + 1;
                                     if (ranColor == 1) {
-                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, bookshelfColor2);
+                                        NMS.getInstance().spawnDustParticle(pos, 1, bookshelfColor2);
                                     } else {
-                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, bookshelfColor1);
+                                        NMS.getInstance().spawnDustParticle(pos, 1, bookshelfColor1);
                                     }
                                 }
                             }
@@ -106,9 +107,9 @@ public class ParticleManager implements AutoCloseable {
                                                 if (random.nextInt(100) >= 98) {
                                                     int ranColor = random.nextInt(2) + 1;
                                                     if (ranColor == 1) {
-                                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor2);
+                                                        NMS.getInstance().spawnDustParticle(pos, 1, boostColor2);
                                                     } else {
-                                                        loc.getWorld().spawnParticle(Particle.REDSTONE, pos, 1, boostColor1);
+                                                        NMS.getInstance().spawnDustParticle(pos, 1, boostColor1);
                                                     }
                                                 }
                                             }

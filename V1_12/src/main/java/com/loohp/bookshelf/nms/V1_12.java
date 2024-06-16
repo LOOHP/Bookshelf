@@ -32,9 +32,11 @@ import net.minecraft.server.v1_12_R1.LocaleI18n;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NonNullList;
 import net.minecraft.server.v1_12_R1.PacketPlayOutOpenWindow;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftContainer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -110,6 +112,16 @@ public class V1_12 extends NMSWrapper {
         entityPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(container.windowId, "minecraft:container", IChatBaseComponent.ChatSerializer.a(GsonComponentSerializer.gson().serialize(title)), inventory.getSize()));
         entityPlayer.activeContainer = container;
         entityPlayer.activeContainer.addSlotListener(entityPlayer);
+    }
+
+    @Override
+    public void spawnDustParticle(Location location, int count, Object dustOptions) {
+        //do nothing
+    }
+
+    @Override
+    public EntityType getHopperMinecartEntityType() {
+        return EntityType.MINECART_HOPPER;
     }
 
 }

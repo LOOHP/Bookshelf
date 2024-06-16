@@ -33,10 +33,10 @@ import net.minecraft.world.inventory.Containers;
 import net.minecraft.world.item.component.ItemContainerContents;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftContainer;
-import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_20_R4.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R1.util.CraftChatMessage;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
-public class V1_20_6 extends NMSWrapper {
+public class V1_21 extends NMSWrapper {
 
     @Override
     public Component getItemDisplayName(ItemStack itemStack) {
@@ -59,7 +59,7 @@ public class V1_20_6 extends NMSWrapper {
     @Override
     public BookshelfState getStoredBookshelfState(ItemStack itemStack, int slots) {
         net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
-        ItemContainerContents contents = nmsItemStack.a(DataComponents.aa);
+        ItemContainerContents contents = nmsItemStack.a(DataComponents.ab);
         Component title = getItemDisplayName(itemStack);
         if (contents == null) {
             return title == null ? null : new BookshelfState(title, null);
@@ -78,7 +78,7 @@ public class V1_20_6 extends NMSWrapper {
         if (bookshelfState.getContents() != null) {
             List<net.minecraft.world.item.ItemStack> items = Arrays.stream(bookshelfState.getContents()).map(i -> CraftItemStack.asNMSCopy(itemNonNull(i))).collect(Collectors.toList());
             ItemContainerContents contents = ItemContainerContents.a(items);
-            builder.a(DataComponents.aa, contents);
+            builder.a(DataComponents.ab, contents);
         }
         nmsItemStack.a(builder.a());
         return CraftItemStack.asCraftMirror(nmsItemStack);
@@ -90,7 +90,7 @@ public class V1_20_6 extends NMSWrapper {
         Container container = new CraftContainer(inventory, entityPlayer, entityPlayer.nextContainerCounter());
         Containers<?> windowType = CraftContainer.getNotchInventoryType(inventory);
         entityPlayer.c.b(new PacketPlayOutOpenWindow(container.j, windowType, CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(title))));
-        entityPlayer.cb = container;
+        entityPlayer.cd = container;
         entityPlayer.a(container);
     }
 

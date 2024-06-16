@@ -22,6 +22,7 @@ package com.loohp.bookshelf.utils;
 
 import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
+import com.loohp.bookshelf.nms.NMS;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.Scheduler;
@@ -35,7 +36,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Hopper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
@@ -74,7 +74,7 @@ public class HopperUtils {
                 }
                 for (Entity entity : world.getEntities()) {
                     Scheduler.executeOrScheduleSync(Bookshelf.plugin, () -> {
-                        if (entity.getType().equals(EntityType.MINECART_HOPPER)) {
+                        if (entity.getType().equals(NMS.getInstance().getHopperMinecartEntityType())) {
                             HopperMinecart hoppercart = (HopperMinecart) entity;
                             if (!hoppercart.isEnabled()) {
                                 return;

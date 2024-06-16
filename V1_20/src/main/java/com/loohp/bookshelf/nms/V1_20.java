@@ -31,11 +31,14 @@ import net.minecraft.world.ContainerUtil;
 import net.minecraft.world.inventory.Container;
 import net.minecraft.world.inventory.Containers;
 import net.minecraft.world.item.ItemBlock;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftContainer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -112,6 +115,17 @@ public class V1_20 extends NMSWrapper {
         entityPlayer.c.a(new PacketPlayOutOpenWindow(container.j, windowType, CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(title))));
         entityPlayer.bR = container;
         entityPlayer.a(container);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    @Override
+    public void spawnDustParticle(Location location, int count, Object dustOptions) {
+        location.getWorld().spawnParticle(Particle.REDSTONE, location, count, (Particle.DustOptions) dustOptions);
+    }
+
+    @Override
+    public EntityType getHopperMinecartEntityType() {
+        return EntityType.MINECART_HOPPER;
     }
 
 }
