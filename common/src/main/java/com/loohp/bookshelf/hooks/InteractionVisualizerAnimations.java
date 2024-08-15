@@ -81,7 +81,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
         if (VanishUtils.isVanished(player)) {
             return;
         }
-        if (OpenInvUtils.isSlientChest(player)) {
+        if (OpenInvUtils.isSilentChest(player)) {
             return;
         }
         if (player.getGameMode().equals(GameMode.SPECTATOR)) {
@@ -232,7 +232,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
         if (VanishUtils.isVanished(player)) {
             return;
         }
-        if (OpenInvUtils.isSlientChest(player)) {
+        if (OpenInvUtils.isSilentChest(player)) {
             return;
         }
         if (player.getGameMode().equals(GameMode.SPECTATOR)) {
@@ -316,7 +316,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
         if (VanishUtils.isVanished(player)) {
             return;
         }
-        if (OpenInvUtils.isSlientChest(player)) {
+        if (OpenInvUtils.isSilentChest(player)) {
             return;
         }
 

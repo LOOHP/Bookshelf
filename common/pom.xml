@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>3.1.10.0</version>
+	<version>3.1.10.1</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -398,13 +398,6 @@
 			<scope>system</scope>
 			<version>1.0</version>
 			<systemPath>${basedir}/lib/GriefPrevention.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>OpenInv</groupId>
-			<artifactId>OpenInv</artifactId>
-			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${basedir}/lib/OpenInv.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>PlotSquared-Bukkit-7.2.1-SNAPSHOT</groupId>
