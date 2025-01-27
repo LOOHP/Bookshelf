@@ -1,7 +1,9 @@
 [![Build Status](https://ci.loohpjames.com/job/Bookshelf/badge/icon)](https://ci.loohpjames.com/job/Bookshelf/)
 # Bookshelf
 
-https://www.spigotmc.org/resources/75804/
+https://www.spigotmc.org/resources/75804/<br>
+https://modrinth.com/plugin/bookshelf<br>
+https://hangar.papermc.io/LOOHP/Bookshelf
 
 Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!
 
