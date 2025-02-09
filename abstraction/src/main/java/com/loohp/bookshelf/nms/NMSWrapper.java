@@ -21,9 +21,11 @@
 package com.loohp.bookshelf.nms;
 
 import com.loohp.bookshelf.objectholders.BookshelfState;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -72,5 +74,7 @@ public abstract class NMSWrapper {
     public abstract void spawnDustParticle(Location location, int count, Object dustOptions);
 
     public abstract EntityType getHopperMinecartEntityType();
+
+    public abstract Key getWorldNamespacedKey(World world);
 
 }

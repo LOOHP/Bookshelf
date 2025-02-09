@@ -21,17 +21,22 @@
 package com.loohp.bookshelf.nms;
 
 import com.loohp.bookshelf.objectholders.BookshelfState;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
+import net.minecraft.resources.MinecraftKey;
 import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.ContainerUtil;
 import net.minecraft.world.inventory.Container;
 import net.minecraft.world.inventory.Containers;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftContainer;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryView;
@@ -126,6 +131,14 @@ public class V1_17 extends NMSWrapper {
     @Override
     public EntityType getHopperMinecartEntityType() {
         return EntityType.MINECART_HOPPER;
+    }
+
+    @SuppressWarnings("PatternValidation")
+    @Override
+    public Key getWorldNamespacedKey(World world) {
+        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
+        MinecraftKey key = nmsWorld.getTypeKey().a();
+        return Key.key(key.getNamespace(), key.getKey());
     }
 
 }

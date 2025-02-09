@@ -25,13 +25,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
+import com.loohp.bookshelf.nms.NMS;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
 import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.BookshelfUtils;
-import com.loohp.bookshelf.utils.WorldUtils;
 import com.loohp.bookshelf.utils.datafix.DataVersions;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -154,19 +155,11 @@ public class BookshelfManager implements Listener, AutoCloseable {
             this.bookshelfFolder = new File(world.getWorldFolder(), "DIM-1/bookshelf");
         } else if (environment.equals(Environment.THE_END)) {
             this.bookshelfFolder = new File(world.getWorldFolder(), "DIM1/bookshelf");
+        } else if (environment.equals(Environment.CUSTOM)) {
+            Key namespacedKey = NMS.getInstance().getWorldNamespacedKey(world);
+            this.bookshelfFolder = new File(world.getWorldFolder(), namespacedKey.value() + "/bookshelf");
         } else {
-            try {
-                if (environment.equals(Environment.CUSTOM)) {
-                    String namespacedKey = WorldUtils.getNamespacedKey(world);
-                    @SuppressWarnings("ConstantConditions")
-                    String key = namespacedKey.substring(namespacedKey.indexOf(":") + 1);
-                    this.bookshelfFolder = new File(world.getWorldFolder(), key + "/bookshelf");
-                } else {
-                    throw new UnsupportedOperationException("Dimension type " + environment + " of world " + world.getName() + " not supported yet!");
-                }
-            } catch (Throwable e) {
-                throw new UnsupportedOperationException("Dimension type " + environment + " of world " + world.getName() + " not supported yet!");
-            }
+            throw new UnsupportedOperationException("Dimension type " + environment + " of world " + world.getName() + " not supported yet!");
         }
         this.bookshelfFolder.mkdirs();
         this.loadedBookshelves = new ConcurrentHashMap<>();

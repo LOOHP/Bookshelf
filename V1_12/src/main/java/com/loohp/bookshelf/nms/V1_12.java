@@ -21,6 +21,7 @@
 package com.loohp.bookshelf.nms;
 
 import com.loohp.bookshelf.objectholders.BookshelfState;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -33,6 +34,7 @@ import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NonNullList;
 import net.minecraft.server.v1_12_R1.PacketPlayOutOpenWindow;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftContainer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
@@ -122,6 +124,19 @@ public class V1_12 extends NMSWrapper {
     @Override
     public EntityType getHopperMinecartEntityType() {
         return EntityType.MINECART_HOPPER;
+    }
+
+    @Override
+    public Key getWorldNamespacedKey(World world) {
+        if (world.getEnvironment().equals(World.Environment.NORMAL)) {
+            return Key.key(Key.MINECRAFT_NAMESPACE, "overworld");
+        } else if (world.getEnvironment().equals(World.Environment.NETHER)) {
+            return Key.key(Key.MINECRAFT_NAMESPACE, "the_nether");
+        } else if (world.getEnvironment().equals(World.Environment.THE_END)) {
+            return Key.key(Key.MINECRAFT_NAMESPACE, "the_end");
+        } else {
+            return Key.key(Key.MINECRAFT_NAMESPACE, "custom");
+        }
     }
 
 }

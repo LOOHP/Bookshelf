@@ -21,6 +21,7 @@
 package com.loohp.bookshelf.nms;
 
 import com.loohp.bookshelf.objectholders.BookshelfState;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.NonNullList;
@@ -32,7 +33,9 @@ import net.minecraft.world.inventory.Container;
 import net.minecraft.world.inventory.Containers;
 import net.minecraft.world.item.ItemBlock;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftContainer;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventoryView;
@@ -126,6 +129,13 @@ public class V1_19_3 extends NMSWrapper {
     @Override
     public EntityType getHopperMinecartEntityType() {
         return EntityType.MINECART_HOPPER;
+    }
+
+    @SuppressWarnings("PatternValidation")
+    @Override
+    public Key getWorldNamespacedKey(World world) {
+        NamespacedKey key = world.getKey();
+        return Key.key(key.getNamespace(), key.getKey());
     }
 
 }
