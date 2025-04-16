@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-@SuppressWarnings({"UnstableApiUsage"})
 public class TileStateSimulateBookshelfInventory implements Inventory {
 
     private final BookshelfHolder holder;
@@ -66,12 +65,6 @@ public class TileStateSimulateBookshelfInventory implements Inventory {
 
     @Override
     @Nullable
-    public InventoryHolder getHolder(boolean useSnapshot) {
-        return holder.getInventory().getHolder(useSnapshot);
-    }
-
-    @Override
-    @Nullable
     public InventoryHolder getHolder() {
         return holder.getInventory().getHolder();
     }
@@ -91,11 +84,6 @@ public class TileStateSimulateBookshelfInventory implements Inventory {
     @MightOverride
     public String getTitle() {
         return LegacyComponentSerializer.legacySection().serialize(holder.getTitle());
-    }
-
-    @Override
-    public int close() {
-        return holder.getInventory().close();
     }
 
     @Override
@@ -233,12 +221,6 @@ public class TileStateSimulateBookshelfInventory implements Inventory {
     @Nullable
     public ItemStack @NotNull [] getContents() {
         return holder.getInventory().getContents();
-    }
-
-    @Override
-    @NotNull
-    public HashMap<Integer, ItemStack> removeItemAnySlot(@NotNull ItemStack... items) throws IllegalArgumentException {
-        return holder.getInventory().removeItemAnySlot(items);
     }
 
     @Override

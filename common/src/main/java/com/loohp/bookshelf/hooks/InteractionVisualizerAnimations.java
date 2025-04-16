@@ -24,17 +24,16 @@ import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.api.BookshelfAPI;
 import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
-import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.InventoryUtils;
 import com.loohp.bookshelf.utils.OpenInvUtils;
 import com.loohp.bookshelf.utils.VanishUtils;
-import com.loohp.interactionvisualizer.InteractionVisualizer;
 import com.loohp.interactionvisualizer.api.InteractionVisualizerAPI;
 import com.loohp.interactionvisualizer.api.InteractionVisualizerAPI.Modules;
 import com.loohp.interactionvisualizer.api.VisualizerDisplay;
 import com.loohp.interactionvisualizer.entityholders.Item;
 import com.loohp.interactionvisualizer.managers.PacketManager;
 import com.loohp.interactionvisualizer.objectholders.EntryKey;
+import com.loohp.platformscheduler.Scheduler;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -198,7 +197,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
                 List<Item> list = link.get(player);
                 list.add(item);
                 boolean finalIsIn = isIn;
-                Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
+                Scheduler.runTaskLater(Bookshelf.plugin, () -> {
                     if (finalIsIn) {
                         item.teleport(location.clone());
                     } else {
@@ -208,7 +207,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
                     item.setGravity(false);
                     PacketManager.updateItem(item);
                 }, 7);
-                Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
+                Scheduler.runTaskLater(Bookshelf.plugin, () -> {
                     PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
                     list.remove(item);
                 }, 20);
@@ -289,13 +288,13 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
                     }
                     List<Item> list = link.get(player);
                     list.add(item);
-                    Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
+                    Scheduler.runTaskLater(Bookshelf.plugin, () -> {
                         item.teleport(location.clone());
                         item.setVelocity(new Vector(0.0, 0.0, 0.0));
                         item.setGravity(false);
                         PacketManager.updateItem(item);
                     }, 7);
-                    Scheduler.runTaskLater(InteractionVisualizer.plugin, () -> {
+                    Scheduler.runTaskLater(Bookshelf.plugin, () -> {
                         PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
                         list.remove(item);
                     }, 20);

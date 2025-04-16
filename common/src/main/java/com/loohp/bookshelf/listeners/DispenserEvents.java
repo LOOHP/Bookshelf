@@ -24,7 +24,6 @@ import com.loohp.bookshelf.Bookshelf;
 import com.loohp.bookshelf.BookshelfManager;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
-import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.objectholders.TileStateSimulateBookshelfInventory;
 import com.loohp.bookshelf.utils.BlockLockerUtils;
 import com.loohp.bookshelf.utils.DropperUtils;
@@ -42,8 +41,6 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;

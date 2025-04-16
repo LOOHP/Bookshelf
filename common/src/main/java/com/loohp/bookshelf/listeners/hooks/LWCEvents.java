@@ -34,7 +34,7 @@ import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
-import com.loohp.bookshelf.objectholders.Scheduler;
+import com.loohp.platformscheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

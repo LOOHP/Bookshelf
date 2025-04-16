@@ -20,9 +20,9 @@
 
 package com.loohp.bookshelf;
 
-import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.updater.Updater;
 import com.loohp.bookshelf.updater.Updater.UpdaterResponse;
+import com.loohp.platformscheduler.Scheduler;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

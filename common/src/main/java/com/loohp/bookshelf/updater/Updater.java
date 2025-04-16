@@ -21,8 +21,8 @@
 package com.loohp.bookshelf.updater;
 
 import com.loohp.bookshelf.Bookshelf;
-import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.HTTPRequestUtils;
+import com.loohp.platformscheduler.Scheduler;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

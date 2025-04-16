@@ -21,10 +21,11 @@
 package com.loohp.bookshelf;
 
 import com.loohp.bookshelf.nms.NMS;
-import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.EnchantmentTableUtils;
 import com.loohp.bookshelf.utils.ParticlesUtils;
+import com.loohp.platformscheduler.ScheduledTask;
+import com.loohp.platformscheduler.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -49,7 +50,7 @@ public class ParticleManager implements AutoCloseable {
     private final Map<Block, Set<Block>> enchantingBoostingBlocks;
     private final Random random;
 
-    private final Scheduler.ScheduledTask particleTask;
+    private final ScheduledTask particleTask;
 
     public ParticleManager(Bookshelf plugin, BookshelfManager bookshelfManager) {
         this.plugin = plugin;

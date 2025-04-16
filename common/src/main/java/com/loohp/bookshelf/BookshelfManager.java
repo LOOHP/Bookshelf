@@ -29,9 +29,10 @@ import com.loohp.bookshelf.nms.NMS;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
-import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.datafix.DataVersions;
+import com.loohp.platformscheduler.ScheduledTask;
+import com.loohp.platformscheduler.Scheduler;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -118,9 +119,6 @@ public class BookshelfManager implements Listener, AutoCloseable {
     }
 
     public synchronized static BookshelfManager loadWorld(Bookshelf plugin, World world) {
-        if (!Bukkit.isPrimaryThread()) {
-            throw new IllegalAccessError("Loading BookshelfManager in async is not allowed!");
-        }
         BookshelfManager manager = BOOKSHELF_MANAGER.get(world);
         if (manager != null) {
             return manager;
@@ -137,7 +135,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
     private final Map<ChunkPosition, Map<BlockPosition, BookshelfHolder>> loadedBookshelves;
     private final ParticleManager particleManager;
     private final Object lock;
-    private final Scheduler.ScheduledTask autoSaveTask;
+    private final ScheduledTask autoSaveTask;
     private final AtomicBoolean isClosed;
 
     @SuppressWarnings("unchecked")
@@ -447,8 +445,7 @@ public class BookshelfManager implements Listener, AutoCloseable {
     }
 
     private boolean checkIfLocationIsBookshelf(BlockPosition position) {
-        if (!Bukkit.isPrimaryThread()) {
-            new RuntimeException("Async block type check! Assuming True!").printStackTrace();
+        if (!Scheduler.isOwnedByCurrentRegion(position.getLocation())) {
             return true;
         }
         return position.getBlock().getType().equals(Material.BOOKSHELF);
@@ -503,9 +500,6 @@ public class BookshelfManager implements Listener, AutoCloseable {
     public synchronized void close() {
         if (isClosed.get()) {
             throw new IllegalAccessError("BookshelfManager already closed!");
-        }
-        if (!Bukkit.isPrimaryThread()) {
-            throw new IllegalAccessError("Closing BookshelfManager in async is not allowed!");
         }
         autoSaveTask.cancel();
         HandlerList.unregisterAll(this);

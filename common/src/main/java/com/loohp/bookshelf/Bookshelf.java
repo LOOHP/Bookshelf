@@ -49,12 +49,12 @@ import com.loohp.bookshelf.metrics.Charts;
 import com.loohp.bookshelf.metrics.Metrics;
 import com.loohp.bookshelf.objectholders.BookshelfViewType;
 import com.loohp.bookshelf.objectholders.LWCRequestOpenData;
-import com.loohp.bookshelf.objectholders.Scheduler;
 import com.loohp.bookshelf.updater.Updater;
 import com.loohp.bookshelf.utils.ColorUtils;
 import com.loohp.bookshelf.utils.HopperUtils;
 import com.loohp.bookshelf.utils.MCVersion;
 import com.loohp.bookshelf.utils.legacy.LegacyConfigConverter;
+import com.loohp.platformscheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -112,8 +112,8 @@ public class Bookshelf extends JavaPlugin {
 
     public static boolean enableHopperSupport = true;
     public static boolean enableDropperSupport = true;
-    public static Scheduler.ScheduledTask hopperTask = null;
-    public static Scheduler.ScheduledTask hopperMinecartTask = null;
+    public static ScheduledTask hopperTask = null;
+    public static ScheduledTask hopperMinecartTask = null;
     public static int hopperTicksPerTransfer = 8;
     public static int hopperAmount = 1;
 
@@ -152,7 +152,7 @@ public class Bookshelf extends JavaPlugin {
     public static Optional<Component> bookshelfDefaultName = Optional.empty();
 
     public static boolean updaterEnabled = true;
-    public static Scheduler.ScheduledTask updaterTask = null;
+    public static ScheduledTask updaterTask = null;
 
     private static void hookMessage(String name) {
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[Bookshelf] Hooked into " + name + "!");
