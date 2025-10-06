@@ -25,7 +25,7 @@
 	<groupId>com.loohp</groupId>
 	<artifactId>Bookshelf</artifactId>
 	<name>Bookshelf</name>
-	<version>3.1.16.0</version>
+	<version>3.1.17.0</version>
 
 	<description>Open bookshelves like chests and store books inside them, as well as boosting enchantment tables!</description>
 	<url>https://github.com/LOOHP/Bookshelf</url>
@@ -674,5 +674,11 @@
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.loohp</groupId>
+            <artifactId>Bookshelf-V1_21_9</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 	</dependencies>
 </project>
