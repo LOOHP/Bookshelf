@@ -30,7 +30,7 @@
         <version>3.1.18.0</version>
     </parent>
 
-    <artifactId>Bookshelf-V1_20</artifactId>
+    <artifactId>Bookshelf-V1_21_10</artifactId>
 
     <repositories>
         <repository>
@@ -83,13 +83,13 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <version>1.21.10-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <version>1.21.10-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
