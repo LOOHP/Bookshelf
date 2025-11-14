@@ -70,7 +70,7 @@
 							<relocations>
 								<relocation>
 									<pattern>com.loohp.platformscheduler</pattern>
-									<shadedPattern>com.loohp.interactivechat.libs.com.loohp.platformscheduler</shadedPattern>
+									<shadedPattern>com.loohp.bookshelf.libs.com.loohp.platformscheduler</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>net.kyori</pattern>
