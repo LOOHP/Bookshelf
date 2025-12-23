@@ -51,7 +51,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -330,9 +329,7 @@ public class InteractionVisualizerAnimations implements Listener, VisualizerDisp
             return;
         }
         List<Item> list = link.get(event.getPlayer());
-        Iterator<Item> itr = list.iterator();
-        while (itr.hasNext()) {
-            Item item = itr.next();
+        for (Item item : list) {
             PacketManager.removeItem(InteractionVisualizerAPI.getPlayers(), item);
         }
 
