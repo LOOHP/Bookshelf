@@ -25,15 +25,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.loohp.bookshelf.api.events.PlayerCloseBookshelfEvent;
 import com.loohp.bookshelf.api.events.PlayerOpenBookshelfEvent;
-import com.loohp.bookshelf.nms.NMS;
 import com.loohp.bookshelf.objectholders.BlockPosition;
 import com.loohp.bookshelf.objectholders.BookshelfHolder;
 import com.loohp.bookshelf.objectholders.ChunkPosition;
+import com.loohp.bookshelf.utils.BookshelfStorageLocationUtils;
 import com.loohp.bookshelf.utils.BookshelfUtils;
 import com.loohp.bookshelf.utils.datafix.DataVersions;
 import com.loohp.platformscheduler.ScheduledTask;
 import com.loohp.platformscheduler.Scheduler;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -42,7 +41,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.World.Environment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -146,19 +144,9 @@ public class BookshelfManager implements Listener, AutoCloseable {
         this.plugin = plugin;
         this.world = world;
 
-        Environment environment = world.getEnvironment();
-        if (environment.equals(Environment.NORMAL)) {
-            this.bookshelfFolder = new File(world.getWorldFolder(), "bookshelf");
-        } else if (environment.equals(Environment.NETHER)) {
-            this.bookshelfFolder = new File(world.getWorldFolder(), "DIM-1/bookshelf");
-        } else if (environment.equals(Environment.THE_END)) {
-            this.bookshelfFolder = new File(world.getWorldFolder(), "DIM1/bookshelf");
-        } else if (environment.equals(Environment.CUSTOM)) {
-            Key namespacedKey = NMS.getInstance().getWorldNamespacedKey(world);
-            this.bookshelfFolder = new File(world.getWorldFolder(), namespacedKey.value() + "/bookshelf");
-        } else {
-            throw new UnsupportedOperationException("Dimension type " + environment + " of world " + world.getName() + " not supported yet!");
-        }
+        BookshelfStorageLocationUtils.checkAndNotifyWorldMigration(world);
+
+        this.bookshelfFolder = BookshelfStorageLocationUtils.locateBookshelfStorageLocation(world);
         this.bookshelfFolder.mkdirs();
         this.loadedBookshelves = new ConcurrentHashMap<>();
 
